@@ -39,8 +39,8 @@ export default function CardPage() {
 
       <Button className="w-full">Show my QR to stamp</Button>
       <p className="text-center text-xs text-text-muted">
-        Wallet passes arrive in Phase 1 — this card always works right here in
-        your browser.
+        Your card always works right here in your browser — nothing to
+        download.
       </p>
     </main>
   );

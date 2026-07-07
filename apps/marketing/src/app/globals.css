@@ -3,3 +3,233 @@
 
 /* Scan shared UI sources for class names */
 @source "../../../../packages/ui/src";
+
+/*
+ * Marketing theme — editorial-journal direction from brand/DESIGN-Monad.md,
+ * recolored with the Kembali Pandan palette (brand/BRAND.md):
+ *   parchment canvas   → sand            (--bg #F6F1E3)
+ *   off-black ink      → text            (#16261E)
+ *   lake-blue action   → pandan          (--primary, the ONLY saturated fill)
+ *   ash hairlines      → border          (#DCD5BF)
+ *   pastel washes      → coral/leaf      (decorative only, per BRAND rules)
+ * Type: serif (Fraunces 400) announces, mono (JetBrains Mono) instructs.
+ *
+ * Marketing is deliberately LIGHT-ONLY — the warm canvas is the signature
+ * (DESIGN-Monad.md). Re-asserting the light values here (after the shared
+ * import) pins them regardless of the system color scheme.
+ */
+:root {
+  color-scheme: light;
+  --bg: #f6f1e3;
+  --surface: #ffffff;
+  --surface-alt: #ede6d2;
+  --text: #16261e;
+  --text-secondary: #5c6b60;
+  --text-muted: #8b9689;
+  --border: #dcd5bf;
+  --primary: #0f3d32;
+  --primary-hover: #0a2c24;
+  --on-primary: #ffffff;
+  --accent: #e0684b;
+  --accent-deep: #a93e24;
+  --leaf: #7fb069;
+}
+
+@theme inline {
+  --font-serif: var(--font-fraunces), Georgia, "Times New Roman", serif;
+  --font-mono:
+    var(--font-jetbrains), ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Strong curves per the emil-design-eng skill — built-ins are too weak */
+  --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out-strong: cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+body {
+  font-family: var(--font-mono);
+}
+
+/* ---------- interaction primitives ---------------------------------- */
+
+/* Pressable feedback (skill: buttons must feel responsive) */
+.press {
+  transition: transform 160ms var(--ease-out-strong);
+}
+.press:active {
+  transform: scale(0.97);
+}
+
+/* Scroll reveal: transform+opacity only; entering → ease-out */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 550ms var(--ease-out-strong),
+    transform 550ms var(--ease-out-strong);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+[data-reveal][data-inview="true"] {
+  opacity: 1;
+  transform: none;
+}
+
+/* Qualifier step entrance (marketing context, still snappy) */
+@keyframes step-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.step-in {
+  animation: step-in 220ms var(--ease-out-strong) both;
+}
+
+/* ---------- roadmap illustrations (decorative loops) ------------------ */
+/* Loops pause until their section is in view (animation-play-state). */
+
+[data-inview="false"] :is(.rm-stamp, .rm-bubble, .rm-bar, .rm-node, .rm-wallet) {
+  animation-play-state: paused;
+}
+
+/* Phase 1 — stamps landing on a card, one by one (never from scale(0)) */
+@keyframes rm-stamp {
+  0% {
+    opacity: 0.2;
+    transform: scale(0.7);
+  }
+  7% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+  11% {
+    transform: scale(1);
+  }
+  82% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  92%,
+  100% {
+    opacity: 0.2;
+    transform: scale(0.7);
+  }
+}
+.rm-stamp {
+  animation: rm-stamp 6s var(--ease-out-strong) infinite;
+  animation-delay: calc(var(--i) * 550ms);
+}
+
+/* Phase 2 — WhatsApp-style bubbles arriving */
+@keyframes rm-bubble {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  8% {
+    opacity: 1;
+    transform: none;
+  }
+  80% {
+    opacity: 1;
+  }
+  92%,
+  100% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+.rm-bubble {
+  animation: rm-bubble 6.5s var(--ease-out-strong) infinite;
+  animation-delay: calc(var(--i) * 900ms);
+}
+
+/* Phase 3 — chart bars growing (origin bottom, transform only) */
+@keyframes rm-bar {
+  0% {
+    transform: scaleY(0.15);
+  }
+  12% {
+    transform: scaleY(1);
+  }
+  80% {
+    transform: scaleY(1);
+  }
+  94%,
+  100% {
+    transform: scaleY(0.15);
+  }
+}
+.rm-bar {
+  transform-origin: bottom;
+  animation: rm-bar 5.5s var(--ease-in-out-strong) infinite;
+  animation-delay: calc(var(--i) * 250ms);
+}
+
+/* Phase 4 — platform nodes pulsing along the pipeline */
+@keyframes rm-node {
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: scale(0.96);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.rm-node {
+  animation: rm-node 3s var(--ease-in-out-strong) infinite;
+  animation-delay: calc(var(--i) * 500ms);
+}
+
+/* Backlog — wallet pass sliding into its slot, patiently */
+@keyframes rm-wallet {
+  0% {
+    opacity: 0;
+    transform: translateY(26px);
+  }
+  18% {
+    opacity: 1;
+    transform: none;
+  }
+  78% {
+    opacity: 1;
+    transform: none;
+  }
+  92%,
+  100% {
+    opacity: 0;
+    transform: translateY(26px);
+  }
+}
+.rm-wallet {
+  animation: rm-wallet 7s var(--ease-out-strong) infinite;
+}
+
+/* ---------- accessibility -------------------------------------------- */
+/* Reduced motion ≠ no feedback: keep opacity, drop movement/loops. */
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    transform: none;
+    transition: opacity 200ms ease;
+  }
+  .step-in {
+    animation-duration: 1ms;
+  }
+  .press:active {
+    transform: none;
+  }
+  .rm-stamp,
+  .rm-bubble,
+  .rm-bar,
+  .rm-node,
+  .rm-wallet {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}

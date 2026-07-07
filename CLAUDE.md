@@ -7,15 +7,17 @@ Multi-tenant SaaS digital stamp-card loyalty platform (Malaysia/SEA first). Cust
 2. `brand/BRAND.md` — name, logo, Pandan palette, CSS design tokens (use these, don't invent colors)
 
 ## Current status
-**Pre-code. Next milestone: Phase 0 (foundations) → Phase 1 MVP** (see ROADMAP §7).
+**Phase 0 done (2026-07-07). Current: Phase 0.5 (marketing landing + /roadmap), then Phase 1 MVP — core loyalty, wallet passes BACKLOGGED** (see ROADMAP §7).
 
 Phase 0 checklist:
-- [ ] Scaffold Turborepo + pnpm monorepo per ROADMAP §3 layout (`apps/marketing`, `apps/app`, `apps/admin`; `packages/db|passes|core|ui|config`)
-- [ ] Next.js (App Router) + TypeScript strict in all apps
-- [ ] `packages/db`: Drizzle + Postgres schema v1 (ROADMAP §4) + RLS policies + seed script
-- [ ] `packages/ui`: Tailwind theme from BRAND.md tokens (light + dark)
-- [ ] Env validation (zod), Sentry, GitHub Actions CI (typecheck, lint, test, build)
-- [ ] Reminder to founder: create Apple Developer + Google Wallet Console accounts (long lead time)
+- [x] Scaffold Turborepo + pnpm monorepo per ROADMAP §3 layout (`apps/marketing`, `apps/app`, `apps/admin`; `packages/db|passes|core|ui|config`)
+- [x] Next.js (App Router) + TypeScript strict in all apps
+- [x] `packages/db`: Drizzle + Postgres schema v1 (ROADMAP §4) + RLS policies + seed script
+- [x] `packages/ui`: Tailwind theme from BRAND.md tokens (light + dark)
+- [x] Env validation (zod), Sentry, GitHub Actions CI (typecheck, lint, test, build)
+- [x] ~~Apple Developer + Google Wallet Console accounts~~ — wallet passes moved to Backlog; start the applications when that item is pulled
+
+Routing: one domain — marketing at `/`, customer PWA at `/app` (basePath), admin at `/admin` (basePath). Marketing style: `brand/DESIGN-Monad.md` (serif+mono editorial) on Pandan colors, light-only.
 
 ## Conventions
 - TypeScript strict everywhere; no `any` without a comment justifying it

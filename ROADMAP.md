@@ -34,6 +34,8 @@
 
 **Our differentiation = Stampede's CX + merchant tooling AND wallet-native passes (which Stampede lacks), localized for MY/SEA (WhatsApp-first, BM/EN/CN, PDPA).**
 
+> **2026-07-07:** wallet-native passes remain the long-term differentiator but are **backlogged** (see §7 Backlog) — we validate core loyalty CX first. The web PWA card is the MVP surface.
+
 ### Feature/module inventory observed across the market
 
 - **Customer:** web stamp card, wallet passes, QR identity, milestone rewards, welcome/birthday/referral rewards, coupon wallet with expiry reminders, OTP login, opt-in notification preferences, multi-language.
@@ -79,6 +81,10 @@ mobileLoyalty/
 │   └── config/           # eslint, tsconfig, env validation (zod)
 └── ROADMAP.md
 ```
+
+### Routing (decided 2026-07-07): one domain, path-based
+
+Everything lives on the base domain via Next.js multi-zones: `apps/marketing` serves `/` (landing + `/roadmap`), `apps/app` serves under **`/app`** (basePath), `apps/admin` under **`/admin`** (basePath). The marketing app rewrites `/app/:path*` and `/admin/:path*` to the other deployments (env-driven URLs; localhost ports in dev). Merchant custom domains (Phase 3) still map to the customer app.
 
 ---
 
@@ -133,7 +139,9 @@ audit_log                       actor, action, entity, tenant_id
 
 ---
 
-## 6. Wallet Integration Design
+## 6. Wallet Integration Design — **BACKLOG**
+
+> **Status (2026-07-07):** deferred out of the MVP to the Backlog (§7). The design below is retained verbatim for when it's scheduled; nothing in Phases 1–3 may depend on it. The Apple/Google account applications (long lead time) should be started when wallet work is pulled off the backlog.
 
 ### Apple Wallet (storeCard pass)
 1. Apple Developer account → **Pass Type ID** + certificate; download WWDR intermediate cert.
@@ -155,20 +163,24 @@ audit_log                       actor, action, entity, tenant_id
 
 ## 7. Phases
 
-### Phase 0 — Foundations (Week 1–2)
+### Phase 0 — Foundations (Week 1–2) ✅ *done 2026-07-07*
 - Monorepo scaffold (Turborepo, Next.js apps, Drizzle, CI with GitHub Actions).
 - DB schema v1 + RLS; env validation; Sentry; seed scripts.
-- Apple Developer + Google Wallet Console accounts (start early — approval takes time).
-- **Exit criteria:** deploy pipeline green; schema migrated; hello-world on all 3 apps.
+- ~~Apple Developer + Google Wallet Console accounts~~ → moved to Backlog trigger (create when wallet work is scheduled).
+- **Exit criteria:** deploy pipeline green; schema migrated; hello-world on all 3 apps. ✅
 
-### Phase 1 — MVP: Core loyalty + Wallet (Week 3–8) ← *current target*
-- **Customer PWA:** OTP login, branded stamp card, live stamp animation, reward list, Add to Apple/Google Wallet.
+### Phase 0.5 — Public face (interleaved) ← *current*
+- Marketing landing page at the base domain: what the system is, how it works, and an interactive reach-out section (3 multiple-choice questions narrowing business type + needs → tailored pitch + contact CTA).
+- `/roadmap` page: high-level public roadmap with per-phase animations.
+- Path-based routing wired: `/` marketing, `/app` customer PWA, `/admin` merchant admin.
+
+### Phase 1 — MVP: Core loyalty (Week 3–8)
+- **Customer PWA:** OTP login, branded stamp card, live stamp animation, reward list.
 - **Cashier flow:** staff login → camera QR scan → stamp/redeem in ≤3s, offline-tolerant retry.
 - **Merchant admin:** onboarding wizard (branding, program setup: X stamps → reward), outlet + staff management, customer list, basic dashboard (stamps/signups/redemptions today).
-- **Wallet:** Apple pass issue + APNs update; Google loyaltyObject issue + PATCH update.
 - **Security:** rotating QR tokens, velocity rules v1, RLS, audit log.
 - **Billing:** Stripe subscription, 14-day trial, plan gate (1 outlet).
-- **Exit criteria:** 1 pilot merchant live; stamp→wallet-update round trip <5s; zero cross-tenant leakage (tested).
+- **Exit criteria:** 1 pilot merchant live; stamp→card-update round trip <5s in the web PWA; zero cross-tenant leakage (tested).
 
 ### Phase 2 — Retention engine (Week 9–14)
 - Welcome / birthday / milestone rewards; coupon expiry reminders.
@@ -190,8 +202,13 @@ audit_log                       actor, action, entity, tenant_id
 - Public **API + webhooks** (POS integrations later: Square/StoreHub/Feedme are SEA-relevant).
 - Points/tiers mode (beyond stamps) — competitive gap vs Loopy Loyalty.
 - AI weekly plain-English reports; campaign send-time optimization.
-- Meta ads integration, Google Wallet smart-tap/NFC exploration, lock-screen geo notifications.
+- Meta ads integration.
 - Reseller/agency (white-label) tier; SG/PH/ID expansion; local billing (FPX, TNG).
+
+### Backlog (no committed week — pull when core loyalty is validated)
+- **Apple Wallet + Google Wallet passes** — full design in §6 (pass issue, APNs/PATCH updates, PassKit web service). Was the MVP differentiator; backlogged 2026-07-07 to ship core loyalty CX first. Pulling this item requires starting the Apple Developer + Google Wallet Console applications immediately (long approval lead time), and revisits §11's wallet KPIs and §12's pass-infra risk.
+- Google Wallet smart-tap/NFC exploration; lock-screen geo relevance (`locations[]`) — both depend on the item above.
+- `/demo` page issuing a real demo pass to the visitor's wallet (§10) — wallet-dependent; until then the landing page carries an interactive web demo card instead.
 
 ---
 
@@ -218,8 +235,8 @@ Super-admin (internal): /tenants, /usage, /billing-health, /feature-flags
 ```
 /                             # merchant-branded landing → "Join & get your card"
 /join                         # phone → OTP → (name, birthday optional) → card issued
-/card                         # THE screen: stamp grid, animated progress, personal QR,
-                              #   Add-to-Apple-Wallet / Add-to-Google-Wallet buttons
+/card                         # THE screen: stamp grid, animated progress, personal QR
+                              #   (wallet add-buttons return when §7 Backlog wallet item ships)
 /rewards                      # earned coupons, expiry countdown, redemption state
 /refer                        # personal referral link/QR, reward explainer
 /profile                      # language, notification opt-ins (WhatsApp/email), delete account
@@ -230,18 +247,19 @@ Super-admin (internal): /tenants, /usage, /billing-health, /feature-flags
 
 ## 10. Marketing site structure
 
+**Style (decided 2026-07-07):** editorial-journal direction per `DESIGN-Monad.md` reference — serif headlines at weight 400, monospace body/UI text, hairline borders, pill buttons, 40px card radius, no shadows — recolored with the Kembali Pandan palette (sand canvas, pandan = the single primary action fill, coral/leaf decorative only). Marketing is deliberately light-only (the warm canvas is the signature).
+
 ```
-/                 # Hero: "Loyalty cards your customers never lose." Live demo card in
-                  #   Apple/Google Wallet mock; scan-to-join demo QR; primary CTA: Start free
-/how-it-works     # 3 steps for customers (scan → stamp → reward) + 3 for staff — CX-first
-/features         # sections mirroring modules: customer card, wallet passes, cashier scan,
-                  #   dashboard, campaigns, referrals, multi-outlet, fraud, white-label
-/integrations     # Apple Wallet, Google Wallet, WhatsApp Business, Stripe, (POS: roadmap)
-/pricing          # per-outlet/month, trial, FAQ (no app? no hardware? PDPA?)
-/roadmap          # public high-level roadmap (builds trust; mirrors Phases above)
-/blog             # SEO: "digital stamp card for <vertical> in <city>" (Stampede's playbook)
-/case-studies     # pilot merchant results (member count, redemption rate)
-/signup, /demo    # self-serve trial + demo card anyone can add to their own wallet
+/                 # Hero: "Loyalty cards your customers never lose." Interactive web demo
+                  #   card; how-it-works + features sections; INTERACTIVE reach-out section:
+                  #   3 multiple-choice questions (business type → outlets → main goal)
+                  #   narrowing to a tailored pitch + contact CTA (v1: WhatsApp/email)
+/roadmap          # public high-level roadmap, one animated illustration per phase
+/pricing          # per-outlet/month, trial, FAQ (no app? no hardware? PDPA?)   [later]
+/blog             # SEO: "digital stamp card for <vertical> in <city>"          [later]
+/case-studies     # pilot merchant results (member count, redemption rate)      [later]
+/signup           # self-serve trial                                            [Phase 1]
+/demo             # demo pass into the visitor's own wallet                     [Backlog — wallet]
 /privacy, /terms
 ```
 **Positioning line:** *"Kembali — the stamp card that lives in Apple Wallet & Google Wallet. No app for your customers, no hardware for your staff, set up in 10 minutes."* (Name doubles as tagline: *"Make them kembali."*)
@@ -255,12 +273,12 @@ Super-admin (internal): /tenants, /usage, /billing-health, /feature-flags
 ## 11. KPIs
 
 - **Merchant-side:** trial→paid conversion, churn, outlets per tenant.
-- **Product:** join-flow completion rate (>80%), wallet-add rate, stamp→wallet-update latency (<5s), scan success rate.
+- **Product:** join-flow completion rate (>80%), stamp→card-update latency (<5s), scan success rate. *(Wallet-add rate + wallet-update latency return with the §7 Backlog wallet item.)*
 - **End-customer (the numbers merchants buy for):** repeat-visit rate, member share of transactions (target >33%), coupon redemption rate (Stampede benchmark: 59%).
 
 ## 12. Risks
 
-- **Apple pass update infra is the hardest MVP piece** (certs, APNs, web service protocol) — prototype in Phase 0, not Phase 1's end.
+- ~~Apple pass update infra is the hardest MVP piece~~ → **de-risked by backlogging wallet passes (2026-07-07)**; the certs/APNs/web-service complexity now sits behind an explicit backlog pull. New risk: shipping without the wallet differentiator means MVP must win on CX + price alone.
 - **WhatsApp API costs/approval** — template approval lead time; meter credits from day one.
 - **QR fraud** — mitigated by rotating signed tokens + velocity rules (see §5).
 - **Incumbent moat (Stampede)** — compete on wallet-native passes + pricing + niche verticals first.
@@ -276,6 +294,9 @@ Super-admin (internal): /tenants, /usage, /billing-health, /feature-flags
 | 2026-07-07 | Wallet passes in MVP | Core differentiator vs Stampede |
 | 2026-07-07 | Brand name **Kembali** | "Come back" in Malay = the product promise; clear of Chop*/Stamp* crowd (trademark search pending) |
 | 2026-07-07 | Logo = return-loop mark + wordmark; **Pandan palette** | Founder choice; specs in `brand/BRAND.md` |
+| 2026-07-07 | **Wallet passes moved MVP → Backlog** | Founder call: validate core loyalty CX first; defers Apple cert/APNs complexity and account lead times (supersedes "Wallet passes in MVP" above) |
+| 2026-07-07 | One domain, path-based routing: `/` marketing, `/app` PWA, `/admin` | Simpler mental model + single cert/domain; Next.js multi-zones with basePath |
+| 2026-07-07 | Marketing style = editorial serif+mono (DESIGN-Monad.md ref) on Kembali palette | Founder-supplied reference; brand colors stay Pandan |
 
 ## 14. References
 

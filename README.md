@@ -9,11 +9,15 @@ cards live in a web PWA and Apple Wallet / Google Wallet — no app download.
 
 ## Layout
 
+One domain, path-based (Next.js multi-zones): marketing serves `/`, and
+rewrites `/app/*` and `/admin/*` to the other two apps (their `basePath`).
+In dev, everything is reachable through `http://localhost:3000`.
+
 | Path | What |
 |---|---|
-| `apps/marketing` | Public site — port 3000 |
-| `apps/app` | Customer PWA + cashier scanner — port 3001 |
-| `apps/admin` | Merchant dashboard (+ super-admin) — port 3002 |
+| `apps/marketing` | Landing + `/roadmap` at the base domain — port 3000 |
+| `apps/app` | Customer PWA + cashier scanner at **`/app`** — port 3001 |
+| `apps/admin` | Merchant dashboard (+ super-admin) at **`/admin`** — port 3002 |
 | `packages/db` | Drizzle schema, migrations, RLS policies, seed |
 | `packages/passes` | Apple/Google wallet passes (Phase 1) |
 | `packages/core` | Domain logic (stamping, rewards, fraud rules) |

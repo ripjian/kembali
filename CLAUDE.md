@@ -8,7 +8,7 @@ Multi-tenant SaaS digital stamp-card loyalty platform (Malaysia/SEA first). Cust
 1. `ROADMAP.md` — requirements, architecture, phases, data model. **Source of truth.** Check the Decision Log (§13) before proposing anything — it may already be decided.
 2. `SECURITY.md` — hard rules, standards (OWASP ASVS 5.0 L2, ISO 27001 alignment, PDPA), pre-merge checklist. Read before touching auth, data, or tenant-facing code.
 3. `brand/BRAND.md` — Pandan palette tokens, logo rules, **voice & language rules (§5)**.
-4. `brand/DESIGN-Monad.md` — marketing-site style reference (serif+mono editorial).
+4. `brand/DESIGN-dub.md` — marketing-site style reference (frosted SaaS: white canvas, ash hairlines, Inter, restrained glass). `DESIGN-Monad.md` is superseded.
 
 ## Current status
 Phase 0 (foundations) + Phase 0.5 (marketing landing, animated /roadmap, one-server routing, copy rules, security baseline) done as of 2026-07-08. **Current: Phase 1 MVP** — OTP auth, scan-to-stamp, merchant onboarding, **basic reports** (simple numbers only — deep analytics is Phase 5), Stripe billing. Phase order after that (founder, 2026-07-08): **2 wallet passes → 3 WhatsApp → 4 referrals → 5 API/POS + advanced analytics** (ROADMAP §7). Never build a later phase early. Founder to-do during Phase 1: Apple Developer + Google Wallet Console applications (weeks of lead time).
@@ -40,7 +40,7 @@ packages/config                 → shared tsconfig/eslint presets + zod env hel
 - DB access **only** via `packages/db` → `withTenant()` + `kembali_app` role. Every tenant table: `tenant_id` + RLS policy + cross-tenant test. `stamp_events`/`audit_log` are append-only; `cards.stamps_count` is a projection.
 - Domain logic goes in `packages/core` (pure functions, unit-tested), never in route handlers or components.
 - Colors/typography come from BRAND.md tokens via `packages/ui`. **Pandan = actions, coral = earned rewards, leaf = progress — never swap.** Never invent hex values; derive with `color-mix` from tokens if a variant is missing, and flag the gap.
-- Marketing surface: serif (Fraunces 400, never bold) headings, mono body, pill buttons, hairline borders, 40px card radius, no shadows, light-only via `data-theme="marketing"`. App/admin: Plus Jakarta Sans, light+dark.
+- Marketing surface (`brand/DESIGN-dub.md`): white canvas, 1px `--border` hairlines over shadows, Inter (500 tight-tracked display, 16px body, mono only for technical micro-labels), radii 9999/16/12/8px, glass (`.glass`) only on floating elements, light-only via `data-theme="marketing"`. Pandan is the single filled action per surface. App/admin: Plus Jakarta Sans, light+dark.
 - Animations: follow `.claude/skills/emil-design-eng/SKILL.md` — transform/opacity only, strong ease-out for entries, UI under 300ms, stagger 30–80ms, never from scale(0), respect `prefers-reduced-motion`, pause decorative loops off-screen. In-page animations are CSS (the `rm-*` system in `apps/web/src/app/globals.css`); **video assets** (demo clips, social promos, MP4s) use the `remotion-best-practices` skill — never pull Remotion runtime deps into the web app for UI loops.
 - Comments explain constraints the code can't show — not what the next line does.
 

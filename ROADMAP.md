@@ -256,7 +256,7 @@ Super-admin (internal): /tenants, /usage, /billing-health, /feature-flags
 
 ## 10. Marketing site structure
 
-**Style (decided 2026-07-07):** editorial-journal direction per `DESIGN-Monad.md` reference — serif headlines at weight 400, monospace body/UI text, hairline borders, pill buttons, 40px card radius, no shadows — recolored with the Kembali Pandan palette (sand canvas, pandan = the single primary action fill, coral/leaf decorative only). Marketing is deliberately light-only (the warm canvas is the signature).
+**Style (re-set 2026-07-08, supersedes the Monad direction):** frosted-SaaS per `brand/DESIGN-dub.md` — near-white canvas, 1px ash hairline borders instead of elevation, Inter type (weight-500 tight-tracked display, 16px body), compact density, radius vocabulary 9999/16/12/8px, restrained glassmorphism on floating elements only (sticky nav, hero activity cards, scene toast). Kembali chroma unchanged: pandan = the single committed action color, coral = earned, leaf = progress. Scroll-pull architecture: hero ends in a fold-clipped dashboard mockup with glass activity cards; sticky-phone showcase continues the momentum. Marketing stays light-only.
 
 ```
 /                 # Hero: "Loyalty cards your customers never lose." Interactive web demo
@@ -271,7 +271,7 @@ Super-admin (internal): /tenants, /usage, /billing-health, /feature-flags
 /demo             # demo pass into the visitor's own wallet                     [Backlog — wallet]
 /privacy, /terms
 ```
-**Positioning line:** *"Kembali — the stamp card that lives on your customers' phones. No app for your customers, no hardware for your staff, set up in 10 minutes."* Tagline: *"Make them come back."* (wallet-first positioning returns with the §7 Backlog wallet item)
+**Positioning line:** *"Kembali — the stamp card that lives on your customers' phones. No app for your customers, no hardware for your staff, set up in 10 minutes."* Tagline: *"Loyalty your customers will love."* (replaced "Make them come back" 2026-07-08 — founder found it too direct/commanding; wallet-first positioning returns with Phase 2)
 
 **Copy hard rules (2026-07-07, non-negotiable):**
 1. All product and marketing copy is **English only**. "Kembali" appears **only as the brand name** — never as a verb, pun, or tagline word, and no other Malay words in UI copy ("kopi", "Selamat datang", etc.). Feature *support* for BM/CN templates (Phase 2) is unaffected — that's localization, not brand voice.
@@ -314,6 +314,7 @@ Super-admin (internal): /tenants, /usage, /billing-health, /feature-flags
 | 2026-07-07 | **English-only copy; "Kembali" only as brand name** | Founder call: don't force Malay/English mixing; ux-writing skill governs style (see §10 copy hard rules, BRAND.md §5) |
 | 2026-07-07 | **Security baseline codified in SECURITY.md** — ASVS 5.0 L2 as code standard, ISO 27001:2022 alignment, PDPA 2024 amendments; headers + CI audit + Dependabot added | Founder wants certification-ready posture; lower-grade models need explicit rules |
 | 2026-07-08 | **Phase order re-set:** loyalty + basic reports → wallet passes → WhatsApp → referrals → API/POS; complex analytics deferred to Phase 5 | Founder call: wallet differentiator right after MVP; small businesses need simple reports first, deep analytics later (supersedes 2026-07-07 wallet-backlog row) |
+| 2026-07-08 | **Marketing restyled to DESIGN-dub.md** (frosted SaaS, Inter, hairlines, restrained glass); **tagline → "Loyalty your customers will love"**; copy re-toned warm/inviting | Founder disliked the Monad look and the commanding tagline; scroll-pull hero added per founder's exploration goal (supersedes Monad style row) |
 
 ## 14. References
 

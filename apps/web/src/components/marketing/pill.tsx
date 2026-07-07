@@ -1,31 +1,31 @@
 import Link from "next/link";
 import type { CSSProperties, ReactNode } from "react";
 
-/* Pill containers are the language of this system (DESIGN-Monad.md):
- * 100px radius, mono uppercase 14px labels. Pandan is the ONLY saturated
- * fill and marks the single primary action per screen. */
+/* Button vocabulary (brand/DESIGN-dub.md): one filled committed action per
+ * surface (pandan plays the Deep Sapphire role), outlined 1px-ash buttons
+ * as the workhorse, ghost for nav. Buttons are 8px radius; tags are pills. */
 
-type PillVariant = "primary" | "dark" | "ghost";
+type ButtonVariant = "primary" | "outline" | "ghost";
 
 const base =
-  "press inline-flex h-12 items-center justify-center gap-2 rounded-full " +
-  "px-8 font-mono text-sm uppercase tracking-tight whitespace-nowrap " +
-  "transition-colors";
+  "press inline-flex h-11 items-center justify-center gap-2 rounded-lg px-5 " +
+  "text-sm font-medium transition-colors";
 
-const variants: Record<PillVariant, string> = {
-  primary: "bg-primary text-on-primary hover:bg-primary-hover",
-  dark: "bg-text text-bg hover:opacity-90",
-  ghost: "border border-text text-text hover:bg-surface-alt",
+const variants: Record<ButtonVariant, string> = {
+  primary:
+    "bg-primary text-on-primary shadow-[0_1px_2px_rgb(0_0_0/0.05)] hover:bg-primary-hover",
+  outline: "border border-border bg-surface text-text hover:bg-surface-alt",
+  ghost: "text-text hover:bg-surface-alt",
 };
 
-export function PillLink({
+export function ActionLink({
   href,
   variant = "primary",
   className,
   children,
 }: {
   href: string;
-  variant?: PillVariant;
+  variant?: ButtonVariant;
   className?: string;
   children: ReactNode;
 }) {
@@ -45,28 +45,35 @@ export function PillLink({
   );
 }
 
-/** Hairline pill tag — the node/badge language (14px mono uppercase).
+/** Feature pill — the system's signature floating element: a small colored
+ * dot (exactly one accent per pill) + quiet label, 9999px radius.
  * `style` is exposed for animation custom properties (e.g. `--i` delays). */
 export function Tag({
   children,
+  dot,
   className,
   style,
 }: {
   children: ReactNode;
+  /** accent dot color: coral = earned, leaf = progress, pandan = action */
+  dot?: "coral" | "leaf" | "pandan";
   className?: string;
   style?: CSSProperties;
 }) {
+  const dotColor =
+    dot === "coral" ? "bg-accent" : dot === "leaf" ? "bg-leaf" : dot === "pandan" ? "bg-primary" : null;
   return (
     <span
       style={style}
       className={[
         "inline-flex items-center gap-2 rounded-full border border-border",
-        "bg-bg px-5 py-2.5 font-mono text-sm uppercase tracking-tight text-text",
+        "bg-surface px-4 py-1.5 text-sm font-medium text-text",
         className,
       ]
         .filter(Boolean)
         .join(" ")}
     >
+      {dotColor && <span className={`size-2 rounded-full ${dotColor}`} />}
       {children}
     </span>
   );

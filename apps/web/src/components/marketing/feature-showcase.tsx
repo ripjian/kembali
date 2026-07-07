@@ -56,7 +56,7 @@ export function FeatureShowcase() {
   }, []);
 
   return (
-    <div className="mt-12 grid gap-10 lg:grid-cols-2">
+    <div className="mt-10 grid gap-10 lg:grid-cols-2">
       <div>
         {CHAPTERS.map((chapter, i) => (
           <div
@@ -65,17 +65,17 @@ export function FeatureShowcase() {
             ref={(el) => {
               chapterRefs.current[i] = el;
             }}
-            className={`flex flex-col justify-center gap-4 py-14 transition-opacity duration-300 lg:min-h-[75vh] lg:py-0 ${
+            className={`flex flex-col justify-center gap-3 py-12 transition-opacity duration-300 lg:min-h-[70vh] lg:py-0 ${
               active === i ? "opacity-100" : "lg:opacity-40"
             }`}
           >
-            <span className="w-fit rounded-full border border-border px-3 py-1 font-mono text-xs uppercase tracking-tight text-text-muted">
+            <span className="w-fit rounded-full border border-border bg-surface px-3 py-0.5 text-xs font-medium text-text-muted">
               {chapter.tag}
             </span>
-            <h3 className="font-serif text-3xl font-normal leading-tight tracking-tight text-text sm:text-[40px]">
+            <h3 className="text-2xl font-medium leading-tight tracking-[-0.02em] text-text sm:text-3xl">
               {chapter.title}
             </h3>
-            <p className="max-w-md font-mono text-base leading-relaxed text-text-secondary">
+            <p className="max-w-md text-sm leading-relaxed text-text-secondary sm:text-base">
               {chapter.body}
             </p>
 
@@ -101,7 +101,7 @@ function PhoneMock({ scene }: { scene: number }) {
   return (
     <div
       aria-hidden
-      className="relative h-[560px] w-[272px] overflow-hidden rounded-[44px] border-[6px] border-text bg-bg"
+      className="panel-ring relative h-[560px] w-[272px] overflow-hidden rounded-[44px] border-[6px] border-text bg-bg"
     >
       {/* dynamic island */}
       <div className="absolute left-1/2 top-3 z-10 h-5 w-20 -translate-x-1/2 rounded-full bg-text" />
@@ -138,10 +138,8 @@ function MiniHeader({ label }: { label: string }) {
         <span className="size-2.5 rounded-full bg-accent" />
       </span>
       <div>
-        <p className="font-mono text-xs font-medium text-text">Corner Coffee</p>
-        <p className="font-mono text-[10px] uppercase tracking-tight text-text-muted">
-          {label}
-        </p>
+        <p className="text-xs font-semibold text-text">Corner Coffee</p>
+        <p className="text-[10px] text-text-muted">{label}</p>
       </div>
     </div>
   );
@@ -179,12 +177,12 @@ function WebCardScene({ active }: { active: boolean }) {
   return (
     <SceneShell active={active}>
       <MiniHeader label="Coffee Card" />
-      <div className="rounded-3xl border border-border bg-bg p-4">
+      <div className="rounded-xl border border-border bg-bg p-4">
         <Dots filled={4} total={10} />
         <div className="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-surface-alt">
           <div className="rm-fill h-full w-full rounded-full bg-leaf" />
         </div>
-        <p className="mt-2.5 font-mono text-[10px] text-text-secondary">
+        <p className="mt-2.5 text-[10px] text-text-secondary">
           6 more stamps to a free coffee
         </p>
       </div>
@@ -197,7 +195,7 @@ function WebCardScene({ active }: { active: boolean }) {
           <span key={`e${n}`} className="rounded-[3px] border border-border" />
         ))}
       </div>
-      <span className="mx-auto rounded-full bg-primary px-5 py-2 font-mono text-[10px] uppercase tracking-tight text-on-primary">
+      <span className="mx-auto rounded-lg bg-primary px-4 py-2 text-[10px] font-medium text-on-primary">
         Show my QR code
       </span>
     </SceneShell>
@@ -208,19 +206,15 @@ function WebCardScene({ active }: { active: boolean }) {
 function WalletScene({ active }: { active: boolean }) {
   return (
     <SceneShell active={active}>
-      <p className="text-center font-mono text-[10px] uppercase tracking-tight text-text-muted">
-        Wallet
-      </p>
+      <p className="text-center text-[10px] font-medium text-text-muted">Wallet</p>
       {/* other passes peeking behind */}
       <div className="flex flex-col gap-2">
-        <div className="h-9 rounded-t-2xl border border-border bg-surface-alt" />
-        <div className="-mt-4 h-9 rounded-t-2xl border border-border bg-bg" />
+        <div className="h-9 rounded-t-xl border border-border bg-surface-alt" />
+        <div className="-mt-4 h-9 rounded-t-xl border border-border bg-bg" />
         {/* the Kembali-powered pass sliding in */}
-        <div className="rm-wallet -mt-3 rounded-2xl bg-primary p-4">
+        <div className="rm-wallet -mt-3 rounded-xl bg-primary p-4">
           <div className="flex items-center justify-between">
-            <span className="font-mono text-[10px] uppercase tracking-tight text-on-primary">
-              Corner Coffee
-            </span>
+            <span className="text-[10px] font-medium text-on-primary">Corner Coffee</span>
             <span className="size-2.5 rounded-full bg-accent" />
           </div>
           <div className="mt-3 flex gap-1.5">
@@ -235,12 +229,12 @@ function WalletScene({ active }: { active: boolean }) {
               />
             ))}
           </div>
-          <p className="mt-3 font-mono text-[9px] uppercase tracking-tight text-on-primary/70">
+          <p className="mt-3 text-[9px] text-on-primary/70">
             Updates the moment a stamp lands
           </p>
         </div>
       </div>
-      <span className="mx-auto rounded-full bg-text px-5 py-2 font-mono text-[10px] uppercase tracking-tight text-bg">
+      <span className="mx-auto rounded-lg bg-text px-4 py-2 text-[10px] font-medium text-bg">
         Add to wallet
       </span>
     </SceneShell>
@@ -252,17 +246,16 @@ function StampingScene({ active }: { active: boolean }) {
   return (
     <SceneShell active={active}>
       <MiniHeader label="Stamping" />
-      <div className="rounded-3xl border border-border bg-bg p-4">
+      <div className="rounded-xl border border-border bg-bg p-4">
         <Dots filled={7} total={10} pop />
-        <p className="mt-3 font-mono text-[10px] text-text-secondary">
+        <p className="mt-3 text-[10px] text-text-secondary">
           Scanned — stamp added in 3 seconds
         </p>
       </div>
-      <div className="rm-toast mx-auto flex items-center gap-2 rounded-full border border-border bg-bg px-4 py-2">
+      {/* frosted confirmation toast */}
+      <div className="rm-toast glass backdrop-blur-md mx-auto flex items-center gap-2 rounded-full px-4 py-2">
         <span className="size-2 rounded-full bg-leaf" />
-        <span className="font-mono text-[10px] uppercase tracking-tight text-text">
-          +1 stamp collected
-        </span>
+        <span className="text-[10px] font-medium text-text">+1 stamp collected</span>
       </div>
     </SceneShell>
   );

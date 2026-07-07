@@ -1,16 +1,17 @@
 import type { Metadata } from "next";
-import { Fraunces, JetBrains_Mono } from "next/font/google";
+import { Inter, JetBrains_Mono } from "next/font/google";
 
 import { SiteFooter } from "@/components/marketing/site-footer";
 import { SiteNav } from "@/components/marketing/site-nav";
 
-// Editorial pairing (brand/DESIGN-Monad.md): the serif announces, the mono
-// instructs. Fraunces is the brand display serif (BRAND.md §4); JetBrains
-// Mono stands in for ABC Diatype Mono. Scoped to the marketing surface —
+// Frosted-SaaS type system (brand/DESIGN-dub.md): Inter is the workhorse —
+// weight 500 with tight tracking plays the display role (Satoshi
+// substitute per the reference), 400 body at 16px. JetBrains Mono only for
+// technical micro-labels (the Geist Mono role). Scoped to marketing —
 // /app and /admin keep Plus Jakarta Sans.
-const fraunces = Fraunces({
+const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-fraunces",
+  variable: "--font-inter",
 });
 
 const jetbrains = JetBrains_Mono({
@@ -22,7 +23,7 @@ const jetbrains = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "Kembali — loyalty cards your customers never lose",
   description:
-    "Digital stamp cards for cafés, F&B, salons and gyms in Malaysia & SEA. Customers join from a QR in under 30 seconds — no app, no hardware. Make them come back.",
+    "Digital stamp cards for cafés, F&B, salons and gyms in Malaysia & SEA. Customers join from a QR in under 30 seconds — no app, no hardware. Loyalty your customers will love.",
 };
 
 export default function MarketingLayout({
@@ -30,11 +31,11 @@ export default function MarketingLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <div
-      // data-theme pins the light Pandan tokens for this subtree only
+      // data-theme pins the light Dub-style tokens for this subtree only
       // (globals.css) — marketing is light-locked, the app/admin surfaces
       // keep dark-mode support.
       data-theme="marketing"
-      className={`${fraunces.variable} ${jetbrains.variable} min-h-dvh bg-bg font-mono text-text`}
+      className={`${inter.variable} ${jetbrains.variable} min-h-dvh bg-bg font-body text-text`}
     >
       <SiteNav />
       {children}

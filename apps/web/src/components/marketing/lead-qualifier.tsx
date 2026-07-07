@@ -26,7 +26,7 @@ interface Question {
 const QUESTIONS: Question[] = [
   {
     id: "business",
-    eyebrow: "01 / 03 — Your business",
+    eyebrow: "1 of 3 — your business",
     prompt: "What kind of business do you run?",
     options: [
       { id: "cafe", label: "Café or coffee shop" },
@@ -37,7 +37,7 @@ const QUESTIONS: Question[] = [
   },
   {
     id: "outlets",
-    eyebrow: "02 / 03 — Your outlets",
+    eyebrow: "2 of 3 — your outlets",
     prompt: "How many outlets do you have?",
     options: [
       { id: "one", label: "Just one" },
@@ -48,36 +48,36 @@ const QUESTIONS: Question[] = [
   },
   {
     id: "goal",
-    eyebrow: "03 / 03 — Your goal",
+    eyebrow: "3 of 3 — your goal",
     prompt: "What matters most to you right now?",
     options: [
       { id: "paper", label: "Replace paper stamp cards" },
-      { id: "retention", label: "Bring customers back more often" },
-      { id: "growth", label: "Grow with referrals & campaigns" },
-      { id: "insight", label: "See loyalty numbers across outlets" },
+      { id: "retention", label: "See more familiar faces" },
+      { id: "growth", label: "Grow through word of mouth" },
+      { id: "insight", label: "Understand my regulars better" },
     ],
   },
 ];
 
 const BUSINESS_PITCH: Record<string, string> = {
-  cafe: "Kembali replaces your paper stamp card. Regulars get a digital card from a QR at your counter. Your barista stamps it with any phone camera in under 3 seconds.",
-  fnb: "Speed at the counter matters most in F&B. Customers join from a table or counter QR in under 30 seconds. Staff stamp with any phone — no hardware, no extra queue.",
-  beauty: "Salon visits are weeks apart — exactly how paper cards get lost. A digital card stays on your client's phone, and win-back messages bring quiet clients back.",
+  cafe: "Your regulars would get a digital card from a QR at the counter, and your barista stamps it with any phone camera in under 3 seconds. No queue, no fuss.",
+  fnb: "Customers join from a table or counter QR in under 30 seconds, and staff stamp with any phone. Your counter stays fast, your regulars feel remembered.",
+  beauty: "Salon visits are weeks apart — exactly how paper cards get lost. A digital card stays on your client's phone, and a friendly reminder brings quiet clients back.",
   other: "Kembali works anywhere customers visit repeatedly — gyms, studios, workshops. Members keep their card on their phone and redeem rewards in person.",
 };
 
 const OUTLET_NOTE: Record<string, string> = {
-  one: "Pricing is per outlet per month, with a free trial. One outlet keeps it simple and affordable.",
+  one: "Pricing is per outlet per month, and the trial is free. One outlet keeps it simple and affordable.",
   few: "Each branch gets its own QR kit and staff accounts. Stamps and rewards work across all of them.",
-  many: "Cross-outlet stamping, per-branch reporting and staff permissions are planned for larger chains like yours.",
-  planning: "Opening day is the best time to start — launch with digital loyalty and skip paper entirely. The free trial means you pay nothing while you set up.",
+  many: "Cross-outlet stamping, per-branch reporting and staff permissions are planned with chains like yours in mind.",
+  planning: "Opening day is a lovely time to start — launch with digital loyalty and skip paper entirely. The trial is free while you set up.",
 };
 
 const GOAL_NOTE: Record<string, string> = {
   paper: "You could be live in an afternoon: set your stamp count and reward, print the QR kit, done. No app for customers, no hardware for staff.",
-  retention: "Milestone rewards, birthday treats and win-back messages on WhatsApp are next on our roadmap. Every message is opt-in.",
-  growth: "Referral links that reward both the sender and the friend are coming soon — pilot merchants help shape them.",
-  insight: "Repeat-visit rate, member share of sales and per-branch numbers are planned — pilot merchants get them first.",
+  retention: "Milestone rewards, birthday treats and warm win-back messages on WhatsApp are next on our roadmap. Every message is opt-in.",
+  growth: "Referral rewards for both the sender and the friend are coming — and pilot merchants help shape how they work.",
+  insight: "Simple reports show who keeps coming back and what they redeem — with deeper insights planned. Pilot merchants see them first.",
 };
 
 function answerLabel(answers: Answers, q: QuestionId): string {
@@ -119,16 +119,15 @@ export function LeadQualifier() {
     setStep(0);
   }
 
-  /* Progress dots — filled = answered */
   const dots = (
-    <div className="flex items-center gap-2" aria-hidden>
+    <div className="flex items-center gap-1.5" aria-hidden>
       {QUESTIONS.map((q, i) => (
         <span
           key={q.id}
           className={
             i < step
-              ? "size-2 rounded-full bg-primary"
-              : "size-2 rounded-full border border-text-muted"
+              ? "size-1.5 rounded-full bg-primary"
+              : "size-1.5 rounded-full border border-text-muted"
           }
         />
       ))}
@@ -139,26 +138,24 @@ export function LeadQualifier() {
     return (
       <div
         key={step}
-        className="step-in mx-auto w-full max-w-2xl rounded-[40px] border border-border bg-surface p-8 sm:p-10"
+        className="step-in panel-ring mx-auto w-full max-w-xl rounded-2xl border border-border bg-surface p-6 sm:p-8"
       >
         <div className="flex items-center justify-between gap-4">
-          <p className="font-mono text-xs uppercase tracking-tight text-text-muted">
-            {question.eyebrow}
-          </p>
+          <p className="text-xs font-medium text-text-muted">{question.eyebrow}</p>
           {dots}
         </div>
 
-        <h3 className="mt-4 font-serif text-2xl font-normal tracking-tight text-text sm:text-[32px] sm:leading-tight">
+        <h3 className="mt-3 text-xl font-medium tracking-[-0.01em] text-text sm:text-2xl">
           {question.prompt}
         </h3>
 
-        <div className="mt-8 flex flex-col gap-3">
+        <div className="mt-6 flex flex-col gap-2">
           {question.options.map((option) => (
             <button
               key={option.id}
               type="button"
               onClick={() => choose(option)}
-              className="press flex w-full items-center justify-between gap-4 rounded-full border border-border bg-bg px-6 py-4 text-left font-mono text-sm text-text transition-colors hover:border-primary hover:bg-surface-alt"
+              className="press flex w-full items-center justify-between gap-4 rounded-xl border border-border bg-surface px-4 py-3.5 text-left text-sm font-medium text-text transition-colors hover:border-smoke hover:bg-surface-alt"
             >
               <span>{option.label}</span>
               <span aria-hidden className="text-text-muted">
@@ -172,7 +169,7 @@ export function LeadQualifier() {
           <button
             type="button"
             onClick={() => setStep((s) => s - 1)}
-            className="mt-6 font-mono text-xs uppercase tracking-tight text-text-muted hover:text-text"
+            className="mt-5 text-xs font-medium text-text-muted hover:text-text"
           >
             ← Back
           </button>
@@ -182,45 +179,45 @@ export function LeadQualifier() {
   }
 
   return (
-    <div className="step-in mx-auto w-full max-w-2xl rounded-[40px] border border-border bg-surface-alt p-8 sm:p-10">
-      <div className="flex flex-wrap gap-2">
+    <div className="step-in panel-ring mx-auto w-full max-w-xl rounded-2xl border border-border bg-surface p-6 sm:p-8">
+      <div className="flex flex-wrap gap-1.5">
         {QUESTIONS.map((q) => (
           <span
             key={q.id}
-            className="rounded-full border border-border bg-bg px-4 py-1.5 font-mono text-xs uppercase tracking-tight text-text-secondary"
+            className="rounded-full border border-border bg-surface-alt px-3 py-1 text-xs font-medium text-text-secondary"
           >
             {answerLabel(answers, q.id)}
           </span>
         ))}
       </div>
 
-      <h3 className="mt-6 font-serif text-2xl font-normal tracking-tight text-text sm:text-[32px] sm:leading-tight">
-        Here&apos;s how Kembali fits your business.
+      <h3 className="mt-5 text-xl font-medium tracking-[-0.01em] text-text sm:text-2xl">
+        Kembali would fit right in.
       </h3>
 
-      <div className="mt-4 flex flex-col gap-3 font-mono text-sm leading-relaxed text-text-secondary sm:text-base">
+      <div className="mt-3 flex flex-col gap-3 text-sm leading-relaxed text-text-secondary sm:text-base">
         <p>{BUSINESS_PITCH[answers.business?.id ?? "other"]}</p>
         <p>{OUTLET_NOTE[answers.outlets?.id ?? "one"]}</p>
         <p>{GOAL_NOTE[answers.goal?.id ?? "paper"]}</p>
       </div>
 
-      <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+      <div className="mt-6 flex flex-col gap-2 sm:flex-row">
         <a
           href={buildMailto(answers)}
-          className="press inline-flex h-12 items-center justify-center rounded-full bg-primary px-8 font-mono text-sm uppercase tracking-tight text-on-primary hover:bg-primary-hover"
+          className="press inline-flex h-11 items-center justify-center rounded-lg bg-primary px-5 text-sm font-medium text-on-primary shadow-[0_1px_2px_rgb(0_0_0/0.05)] hover:bg-primary-hover"
         >
-          Email us your answers ▸
+          Email us your answers
         </a>
         <button
           type="button"
           onClick={restart}
-          className="press inline-flex h-12 items-center justify-center rounded-full border border-text px-8 font-mono text-sm uppercase tracking-tight text-text hover:bg-bg"
+          className="press inline-flex h-11 items-center justify-center rounded-lg border border-border bg-surface px-5 text-sm font-medium text-text hover:bg-surface-alt"
         >
-          Start over ↺
+          Start over
         </button>
       </div>
 
-      <p className="mt-4 font-mono text-xs text-text-muted">
+      <p className="mt-4 text-xs text-text-muted">
         Your answers are prefilled into the email. Nothing is sent or stored
         until you send it.
       </p>

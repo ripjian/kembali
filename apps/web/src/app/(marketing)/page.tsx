@@ -3,7 +3,7 @@ import type { CSSProperties } from "react";
 import { DemoCard } from "@/components/marketing/demo-card";
 import { FeatureShowcase } from "@/components/marketing/feature-showcase";
 import { LeadQualifier } from "@/components/marketing/lead-qualifier";
-import { PillLink, Tag } from "@/components/marketing/pill";
+import { ActionLink, Tag } from "@/components/marketing/pill";
 import { Reveal } from "@/components/marketing/reveal";
 
 /** Animation-order variable for the sequential flow-pill loop (rm-flow). */
@@ -16,21 +16,21 @@ const STAFF_FLOW = ["Open camera", "Scan their QR", "Stamp — done"];
 
 const FEATURES = [
   {
-    glyph: "▤",
+    dot: "leaf" as const,
     title: "Simple reports, not homework",
     body: "Today's stamps, signups and redemptions, plus who keeps coming back. The numbers you check over morning coffee — deeper analytics comes later.",
     tag: "At launch",
   },
   {
-    glyph: "✆",
+    dot: "pandan" as const,
     title: "WhatsApp campaigns",
-    body: "Send birthday rewards, expiry reminders and win-back offers on WhatsApp. Every message is opt-in, as PDPA requires.",
+    body: "Birthday rewards, expiry reminders and friendly win-back offers on WhatsApp. Every message is opt-in, as PDPA requires.",
     tag: "Planned",
   },
   {
-    glyph: "⇄",
+    dot: "coral" as const,
     title: "Referral rewards",
-    body: "Customers share a personal link. When a friend joins, both of them get a reward.",
+    body: "Customers share a personal link. When a friend joins, both of them get a treat.",
     tag: "Planned",
   },
 ];
@@ -38,176 +38,229 @@ const FEATURES = [
 export default function Home() {
   return (
     <main>
-      {/* Hero — pure typographic, per the reference */}
-      <section className="relative overflow-hidden">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute left-1/2 top-8 h-72 w-[36rem] -translate-x-1/2 rounded-full opacity-25 blur-3xl"
-          style={{
-            background:
-              "linear-gradient(100deg, var(--accent), var(--leaf), var(--surface-alt))",
-          }}
-        />
-        <div className="relative mx-auto flex w-full max-w-[1432px] flex-col items-center gap-8 px-6 pb-20 pt-16 text-center sm:pt-24">
-          <Tag>Digital stamp cards · Malaysia &amp; SEA</Tag>
-          <h1 className="max-w-4xl font-serif text-5xl font-normal leading-[1.15] tracking-[-0.02em] text-text sm:text-6xl lg:text-[80px] lg:leading-[1.1]">
+      {/* Hero — thesis up top, product peeking past the fold below */}
+      <section className="relative overflow-hidden border-b border-border">
+        <div aria-hidden className="dot-grid absolute inset-0" />
+        <div className="relative mx-auto flex w-full max-w-[1200px] flex-col items-center px-6 pt-16 text-center sm:pt-20">
+          {/* floating feature pills — one accent each */}
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            <Tag dot="coral">Stamp cards</Tag>
+            <Tag dot="pandan">Wallet passes</Tag>
+            <Tag dot="leaf">Simple reports</Tag>
+          </div>
+
+          <h1 className="mt-8 max-w-3xl text-4xl font-medium leading-[1.05] tracking-[-0.02em] text-text sm:text-5xl lg:text-6xl">
             Loyalty cards your customers never lose.
           </h1>
-          <p className="max-w-2xl font-mono text-base leading-relaxed text-text-secondary sm:text-xl">
-            Kembali puts your stamp card on your customer&apos;s phone. They
-            join from a QR in under 30 seconds — no app to download, no
-            hardware for your staff. Make them come back.
+          <p className="mt-6 max-w-xl text-base leading-relaxed text-text-secondary sm:text-lg">
+            Kembali puts your stamp card on your customers&apos; phones. They
+            join in 30 seconds from a QR at your counter — and every visit
+            brings them closer to their next reward.
           </p>
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <PillLink href="/#reach-out">Tell us about your business ▸</PillLink>
-            <PillLink href="/roadmap" variant="ghost">
-              See the roadmap →
-            </PillLink>
+
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <ActionLink href="/#reach-out">See how it fits your shop</ActionLink>
+            <ActionLink href="/#showcase" variant="outline">
+              Take a look inside
+            </ActionLink>
+          </div>
+
+          <p className="scroll-cue mt-10 text-sm text-text-muted" aria-hidden>
+            ↓
+          </p>
+
+          {/* Dashboard mockup, deliberately clipped by the fold — the rest
+              is one scroll away */}
+          <div className="relative mt-8 h-56 w-full max-w-4xl overflow-hidden sm:h-72">
+            <div className="panel-ring absolute inset-x-0 top-0 flex h-[420px] overflow-hidden rounded-t-2xl border border-border bg-surface text-left">
+              {/* sidebar */}
+              <div aria-hidden className="hidden w-44 shrink-0 flex-col gap-1 border-r border-border bg-surface-alt p-4 sm:flex">
+                <p className="mb-2 text-xs font-semibold text-text">Corner Coffee</p>
+                {["Overview", "Customers", "Programs", "Outlets", "Campaigns"].map((item, i) => (
+                  <span
+                    key={item}
+                    className={`rounded-lg px-2.5 py-1.5 text-xs ${
+                      i === 0 ? "bg-surface font-medium text-text" : "text-text-secondary"
+                    }`}
+                  >
+                    {item}
+                  </span>
+                ))}
+              </div>
+              {/* content */}
+              <div aria-hidden className="flex-1 p-4 sm:p-5">
+                <p className="text-xs font-medium text-text-muted">Today at your counter</p>
+                <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                  {[
+                    ["Stamps", "128"],
+                    ["Signups", "24"],
+                    ["Redemptions", "9"],
+                    ["Repeat visits", "41%"],
+                  ].map(([label, value]) => (
+                    <div key={label} className="rounded-xl border border-border bg-surface p-3">
+                      <p className="font-mono text-lg text-text" data-stat>
+                        {value}
+                      </p>
+                      <p className="mt-0.5 text-[11px] text-text-muted">{label}</p>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-3 flex flex-col">
+                  {["Aisyah — stamp 7 of 10", "Ming Wei — reward redeemed", "Priya — joined your program"].map(
+                    (row, i) => (
+                      <div
+                        key={row}
+                        className="flex items-center gap-2 border-b border-border py-2.5 text-xs text-text-secondary"
+                      >
+                        <span
+                          className={`size-1.5 rounded-full ${i === 1 ? "bg-accent" : "bg-leaf"}`}
+                        />
+                        {row}
+                      </div>
+                    ),
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* glass activity cards floating over the panel */}
+            <div aria-hidden className="glass backdrop-blur-md absolute left-3 top-24 z-10 rounded-xl px-3.5 py-2.5 sm:left-10">
+              <p className="text-xs font-medium text-text">+1 stamp collected</p>
+              <p className="mt-0.5 text-[11px] text-text-muted">Aisyah is 3 away from a free coffee</p>
+            </div>
+            <div aria-hidden className="glass backdrop-blur-md absolute right-3 top-40 z-10 rounded-xl px-3.5 py-2.5 sm:right-10">
+              <p className="font-mono text-sm text-text">↗ 41%</p>
+              <p className="mt-0.5 text-[11px] text-text-muted">repeat visits this month</p>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Proof strip — pill nodes, the system's diagram language */}
-      <section className="border-y border-border">
-        <div className="mx-auto flex w-full max-w-[1432px] flex-wrap items-center justify-center gap-3 px-6 py-8">
-          {["Join in under 30s", "Stamp in 3s", "No app needed", "No extra hardware", "Built for PDPA"].map(
-            (stat) => (
-              <Tag key={stat}>{stat}</Tag>
-            ),
-          )}
+      {/* Scroll showcase: sticky phone, scenes change per chapter */}
+      <section id="showcase" className="scroll-mt-20 border-b border-border">
+        <div className="mx-auto w-full max-w-[1200px] px-6 py-16">
+          <Reveal>
+            <p className="text-sm font-medium text-text-muted">The product</p>
+            <h2 className="mt-2 max-w-2xl text-3xl font-medium leading-tight tracking-[-0.02em] text-text sm:text-4xl">
+              What your customers see, from first scan to free coffee.
+            </h2>
+          </Reveal>
+          <FeatureShowcase />
         </div>
       </section>
 
       {/* How it works */}
-      <section id="how-it-works" className="mx-auto w-full max-w-[1432px] scroll-mt-24 px-6 py-20">
-        <Reveal>
-          <p className="font-mono text-sm uppercase tracking-tight text-text-muted">
-            How it works
-          </p>
-          <h2 className="mt-3 max-w-2xl font-serif text-3xl font-normal leading-tight tracking-tight text-text sm:text-5xl">
-            The stamp card your customers already know — now on their phone.
-          </h2>
-        </Reveal>
+      <section id="how-it-works" className="scroll-mt-20 border-b border-border bg-surface-alt">
+        <div className="mx-auto w-full max-w-[1200px] px-6 py-16">
+          <Reveal>
+            <p className="text-sm font-medium text-text-muted">How it works</p>
+            <h2 className="mt-2 max-w-2xl text-3xl font-medium leading-tight tracking-[-0.02em] text-text sm:text-4xl">
+              Easy for customers. Even easier for your staff.
+            </h2>
+          </Reveal>
 
-        <div className="mt-12 grid items-start gap-8 lg:grid-cols-2">
-          <div className="flex flex-col gap-8">
-            <Reveal delay={80}>
-              <div className="rounded-[40px] border border-border p-8 sm:p-10">
-                <p className="font-mono text-xs uppercase tracking-tight text-text-muted">
-                  For your customers
-                </p>
-                <div className="mt-5 flex flex-wrap items-center gap-2">
-                  {CUSTOMER_FLOW.map((step, i) => (
-                    <span key={step} className="flex items-center gap-2">
-                      <Tag className="rm-flow" style={flowDelay(i)}>
-                        {step}
-                      </Tag>
-                      {i < CUSTOMER_FLOW.length - 1 && (
-                        <span aria-hidden className="font-mono text-text-muted">
-                          →
-                        </span>
-                      )}
-                    </span>
-                  ))}
+          <div className="mt-10 grid items-start gap-6 lg:grid-cols-2">
+            <div className="flex flex-col gap-6">
+              <Reveal delay={80}>
+                <div className="rounded-2xl border border-border bg-surface p-6 sm:p-8">
+                  <p className="text-sm font-medium text-text-muted">For your customers</p>
+                  <div className="mt-4 flex flex-wrap items-center gap-2">
+                    {CUSTOMER_FLOW.map((step, i) => (
+                      <span key={step} className="flex items-center gap-2">
+                        <Tag className="rm-flow" style={flowDelay(i)}>
+                          {step}
+                        </Tag>
+                        {i < CUSTOMER_FLOW.length - 1 && (
+                          <span aria-hidden className="text-text-muted">
+                            →
+                          </span>
+                        )}
+                      </span>
+                    ))}
+                  </div>
+                  <p className="mt-4 text-sm leading-relaxed text-text-secondary">
+                    Customers scan a QR at your counter and enter their phone
+                    number. That&apos;s it — the card is theirs, ready for
+                    every visit.
+                  </p>
                 </div>
-                <p className="mt-5 font-mono text-sm leading-relaxed text-text-secondary">
-                  Customers scan a QR at your counter and enter their phone
-                  number. That&apos;s it — the card is theirs, on every visit.
-                </p>
-              </div>
-            </Reveal>
+              </Reveal>
 
-            <Reveal delay={160}>
-              <div className="rounded-[40px] border border-border p-8 sm:p-10">
-                <p className="font-mono text-xs uppercase tracking-tight text-text-muted">
-                  For your staff
-                </p>
-                <div className="mt-5 flex flex-wrap items-center gap-2">
-                  {STAFF_FLOW.map((step, i) => (
-                    <span key={step} className="flex items-center gap-2">
-                      <Tag className="rm-flow" style={flowDelay(i)}>
-                        {step}
-                      </Tag>
-                      {i < STAFF_FLOW.length - 1 && (
-                        <span aria-hidden className="font-mono text-text-muted">
-                          →
-                        </span>
-                      )}
-                    </span>
-                  ))}
+              <Reveal delay={160}>
+                <div className="rounded-2xl border border-border bg-surface p-6 sm:p-8">
+                  <p className="text-sm font-medium text-text-muted">For your staff</p>
+                  <div className="mt-4 flex flex-wrap items-center gap-2">
+                    {STAFF_FLOW.map((step, i) => (
+                      <span key={step} className="flex items-center gap-2">
+                        <Tag className="rm-flow" style={flowDelay(i)}>
+                          {step}
+                        </Tag>
+                        {i < STAFF_FLOW.length - 1 && (
+                          <span aria-hidden className="text-text-muted">
+                            →
+                          </span>
+                        )}
+                      </span>
+                    ))}
+                  </div>
+                  <p className="mt-4 text-sm leading-relaxed text-text-secondary">
+                    Staff stamp cards with any phone camera. No POS
+                    integration, no terminal, no training needed.
+                  </p>
                 </div>
-                <p className="mt-5 font-mono text-sm leading-relaxed text-text-secondary">
-                  Staff stamp cards with any phone camera. No POS integration,
-                  no terminal, no training needed.
-                </p>
-              </div>
+              </Reveal>
+            </div>
+
+            <Reveal delay={240} className="flex justify-center lg:sticky lg:top-24">
+              <DemoCard />
             </Reveal>
           </div>
-
-          <Reveal delay={240} className="flex justify-center lg:sticky lg:top-8">
-            <DemoCard />
-          </Reveal>
         </div>
       </section>
 
       {/* Features */}
-      <section id="features" className="border-t border-border">
-        <div className="mx-auto w-full max-w-[1432px] scroll-mt-24 px-6 py-20">
+      <section id="features" className="scroll-mt-20 border-b border-border">
+        <div className="mx-auto w-full max-w-[1200px] px-6 py-16">
           <Reveal>
-            <p className="font-mono text-sm uppercase tracking-tight text-text-muted">
-              Features
-            </p>
-            <h2 className="mt-3 max-w-2xl font-serif text-3xl font-normal leading-tight tracking-tight text-text sm:text-5xl">
+            <p className="text-sm font-medium text-text-muted">And there&apos;s more coming</p>
+            <h2 className="mt-2 max-w-2xl text-3xl font-medium leading-tight tracking-[-0.02em] text-text sm:text-4xl">
               Everything a loyalty program needs, nothing that slows your
               counter down.
             </h2>
           </Reveal>
 
-          {/* Scroll showcase: sticky phone, scenes change per chapter */}
-          <FeatureShowcase />
-
-          <div className="mt-16 grid gap-6 sm:grid-cols-2">
+          <div className="mt-10 grid gap-4 sm:grid-cols-2">
             {FEATURES.map((feature, i) => (
-              <Reveal key={feature.title} delay={(i % 3) * 70}>
-                <div className="flex h-full flex-col gap-4 rounded-[40px] border border-border p-10">
-                  <div className="flex items-start justify-between">
-                    <span aria-hidden className="font-mono text-xl text-text">
-                      {feature.glyph}
-                    </span>
-                    <span className="rounded-full border border-border px-3 py-1 font-mono text-xs uppercase tracking-tight text-text-muted">
+              <Reveal key={feature.title} delay={(i % 2) * 70}>
+                <div className="flex h-full flex-col gap-3 rounded-2xl border border-border bg-surface p-6 sm:p-8">
+                  <div className="flex items-center justify-between">
+                    <span className={`size-2.5 rounded-full ${
+                      feature.dot === "coral" ? "bg-accent" : feature.dot === "leaf" ? "bg-leaf" : "bg-primary"
+                    }`} />
+                    <span className="rounded-full border border-border px-3 py-0.5 text-xs font-medium text-text-muted">
                       {feature.tag}
                     </span>
                   </div>
-                  <h3 className="font-serif text-2xl font-normal tracking-tight text-text">
+                  <h3 className="text-xl font-medium tracking-[-0.01em] text-text">
                     {feature.title}
                   </h3>
-                  <p className="font-mono text-base leading-relaxed text-text-secondary">
+                  <p className="text-sm leading-relaxed text-text-secondary sm:text-base">
                     {feature.body}
                   </p>
                 </div>
               </Reveal>
             ))}
 
-            {/* The one colored card that draws the eye */}
+            {/* the one tinted card */}
             <Reveal delay={140}>
-              <div className="relative flex h-full flex-col gap-4 overflow-hidden rounded-[40px] bg-surface-alt p-10">
-                <div
-                  aria-hidden
-                  className="pointer-events-none absolute -right-10 -top-10 h-44 w-44 rounded-full opacity-40 blur-2xl"
-                  style={{
-                    background:
-                      "linear-gradient(120deg, var(--accent), var(--leaf))",
-                  }}
-                />
-                <span aria-hidden className="font-mono text-xl text-text">
-                  ✦
-                </span>
-                <h3 className="font-serif text-2xl font-normal tracking-tight text-text">
+              <div className="flex h-full flex-col gap-3 rounded-2xl bg-primary p-6 sm:p-8">
+                <span className="size-2.5 rounded-full bg-accent" />
+                <h3 className="text-xl font-medium tracking-[-0.01em] text-on-primary">
                   Your brand, not ours
                 </h3>
-                <p className="font-mono text-base leading-relaxed text-text-secondary">
+                <p className="text-sm leading-relaxed text-on-primary/80 sm:text-base">
                   Your logo, your colors, your domain. Customers see your
-                  brand — Kembali stays out of sight.
+                  brand — Kembali stays quietly behind the scenes.
                 </p>
               </div>
             </Reveal>
@@ -216,18 +269,16 @@ export default function Home() {
       </section>
 
       {/* Interactive reach-out */}
-      <section id="reach-out" className="border-t border-border">
-        <div className="mx-auto w-full max-w-[1432px] scroll-mt-24 px-6 py-20">
+      <section id="reach-out" className="scroll-mt-20 bg-surface-alt">
+        <div className="mx-auto w-full max-w-[1200px] px-6 py-16">
           <Reveal className="mx-auto max-w-2xl text-center">
-            <p className="font-mono text-sm uppercase tracking-tight text-text-muted">
-              Reach out
-            </p>
-            <h2 className="mt-3 font-serif text-3xl font-normal leading-tight tracking-tight text-text sm:text-5xl">
-              Three questions, then we&apos;ll talk.
+            <p className="text-sm font-medium text-text-muted">Let&apos;s talk</p>
+            <h2 className="mt-2 text-3xl font-medium leading-tight tracking-[-0.02em] text-text sm:text-4xl">
+              Curious how it would look in your shop?
             </h2>
-            <p className="mt-4 font-mono text-base leading-relaxed text-text-secondary">
-              Answer three quick questions and we&apos;ll show you how Kembali
-              fits your business.
+            <p className="mt-4 text-base leading-relaxed text-text-secondary">
+              Answer three quick questions and we&apos;ll sketch it out for
+              you — no signup, no pressure.
             </p>
           </Reveal>
 

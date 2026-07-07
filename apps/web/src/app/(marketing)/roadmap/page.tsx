@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
-import { PillLink } from "@/components/marketing/pill";
+import { ActionLink } from "@/components/marketing/pill";
 import { Reveal } from "@/components/marketing/reveal";
 import {
   FoundationsIllustration,
@@ -23,7 +23,7 @@ type Status = "shipped" | "now" | "next" | "later";
 const STATUS_STYLE: Record<Status, string> = {
   shipped: "bg-primary text-on-primary",
   now: "bg-primary text-on-primary",
-  next: "border border-text text-text",
+  next: "border border-smoke text-text",
   later: "border border-border text-text-secondary",
 };
 
@@ -77,7 +77,7 @@ const PHASES: Phase[] = [
   {
     status: "later",
     title: "Bring them back on WhatsApp",
-    body: "Messages that keep customers returning, sent on the channel they actually read. Every message is opt-in, as PDPA requires.",
+    body: "Warm messages that invite customers back, sent on the channel they actually read. Every message is opt-in, as PDPA requires.",
     points: [
       "Welcome, birthday & milestone rewards",
       "Reward-expiry reminders & win-back offers",
@@ -88,7 +88,7 @@ const PHASES: Phase[] = [
   {
     status: "later",
     title: "Referral rewards",
-    body: "Your regulars bring their friends. Everyone shares a personal link — when a friend joins and visits, both sides get a reward.",
+    body: "Your regulars bring their friends. Everyone shares a personal link — when a friend joins and visits, both sides get a treat.",
     points: [
       "Personal referral links & QR codes",
       "Rewards for the sender and the friend",
@@ -111,56 +111,52 @@ const PHASES: Phase[] = [
 
 export default function RoadmapPage() {
   return (
-    <main className="mx-auto w-full max-w-[1432px] px-6 pb-24">
-      <section className="flex flex-col items-center gap-6 py-16 text-center sm:py-24">
+    <main className="mx-auto w-full max-w-[1200px] px-6 pb-20">
+      <section className="flex flex-col items-center gap-5 py-14 text-center sm:py-20">
         <Reveal>
-          <p className="font-mono text-sm uppercase tracking-tight text-text-muted">
-            Public roadmap
-          </p>
+          <p className="text-sm font-medium text-text-muted">Public roadmap</p>
         </Reveal>
         <Reveal delay={80}>
-          <h1 className="max-w-3xl font-serif text-4xl font-normal leading-[1.15] tracking-[-0.02em] text-text sm:text-6xl">
+          <h1 className="max-w-3xl text-4xl font-medium leading-[1.05] tracking-[-0.02em] text-text sm:text-5xl">
             Where Kembali is going.
           </h1>
         </Reveal>
         <Reveal delay={160}>
-          <p className="max-w-2xl font-mono text-base leading-relaxed text-text-secondary sm:text-lg">
+          <p className="max-w-xl text-base leading-relaxed text-text-secondary sm:text-lg">
             What&apos;s done, what we&apos;re building now, and what comes
             next. Pilot merchants shape the order.
           </p>
         </Reveal>
       </section>
 
-      <div className="flex flex-col gap-8">
+      <div className="flex flex-col gap-6">
         {PHASES.map((phase, i) => (
           <Reveal key={phase.title} delay={60}>
-            <article className="grid gap-8 rounded-[40px] border border-border p-8 sm:p-10 lg:grid-cols-2 lg:items-center">
+            <article className="grid gap-8 rounded-2xl border border-border bg-surface p-6 sm:p-8 lg:grid-cols-2 lg:items-center">
               <div className={i % 2 === 1 ? "lg:order-2" : undefined}>
                 <div className="flex items-center gap-3">
                   <span
-                    className={`rounded-full px-4 py-1.5 font-mono text-xs uppercase tracking-tight ${STATUS_STYLE[phase.status]}`}
+                    className={`rounded-full px-3 py-1 text-xs font-medium ${STATUS_STYLE[phase.status]}`}
                   >
                     {STATUS_LABEL[phase.status]}
                   </span>
-                  <span className="font-mono text-xs uppercase tracking-tight text-text-muted tabular-nums">
+                  <span className="font-mono text-xs text-text-muted tabular-nums">
                     {String(i).padStart(2, "0")}
                   </span>
                 </div>
-                <h2 className="mt-4 font-serif text-3xl font-normal leading-tight tracking-tight text-text sm:text-[40px]">
+                <h2 className="mt-3 text-2xl font-medium leading-tight tracking-[-0.02em] text-text sm:text-3xl">
                   {phase.title}
                 </h2>
-                <p className="mt-4 font-mono text-base leading-relaxed text-text-secondary">
+                <p className="mt-3 text-sm leading-relaxed text-text-secondary sm:text-base">
                   {phase.body}
                 </p>
-                <ul className="mt-5 flex flex-col gap-2">
+                <ul className="mt-4 flex flex-col gap-1.5">
                   {phase.points.map((point) => (
                     <li
                       key={point}
-                      className="flex items-baseline gap-3 font-mono text-sm text-text-secondary"
+                      className="flex items-baseline gap-2.5 text-sm text-text-secondary"
                     >
-                      <span aria-hidden className="text-leaf">
-                        ●
-                      </span>
+                      <span aria-hidden className="size-1.5 shrink-0 translate-y-[-2px] rounded-full bg-leaf" />
                       {point}
                     </li>
                   ))}
@@ -176,20 +172,20 @@ export default function RoadmapPage() {
         ))}
       </div>
 
-      <section className="mt-20 flex flex-col items-center gap-6 rounded-[40px] bg-surface-alt px-8 py-16 text-center">
+      <section className="mt-16 flex flex-col items-center gap-5 rounded-2xl border border-border bg-surface-alt px-8 py-14 text-center">
         <Reveal>
-          <h2 className="max-w-2xl font-serif text-3xl font-normal leading-tight tracking-tight text-text sm:text-5xl">
-            Want to shape what ships first?
+          <h2 className="max-w-2xl text-2xl font-medium leading-tight tracking-[-0.02em] text-text sm:text-4xl">
+            Want a say in what ships first?
           </h2>
         </Reveal>
         <Reveal delay={100}>
-          <p className="max-w-xl font-mono text-base leading-relaxed text-text-secondary">
+          <p className="max-w-xl text-base leading-relaxed text-text-secondary">
             Pilot merchants use Kembali free while we build — and their
-            feedback decides what ships next.
+            feedback decides what comes next.
           </p>
         </Reveal>
         <Reveal delay={180}>
-          <PillLink href="/#reach-out">Become a pilot merchant ▸</PillLink>
+          <ActionLink href="/#reach-out">Become a pilot merchant</ActionLink>
         </Reveal>
       </section>
     </main>

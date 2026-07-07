@@ -3,14 +3,15 @@ import type { CSSProperties } from "react";
 /* Decorative, looping illustrations for the public roadmap — pure CSS
  * animations (globals.css `rm-*`), transform/opacity only, paused until
  * their section scrolls into view and disabled under reduced motion.
- * Coral = earned, leaf = progress, pandan = actions (BRAND.md). */
+ * Coral = earned, leaf = progress, pandan = actions (BRAND.md).
+ * Mono micro-labels are the technical voice (DESIGN-dub.md Geist role). */
 
 function iVar(i: number): CSSProperties {
   return { "--i": i } as CSSProperties;
 }
 
 const frame =
-  "relative flex h-64 items-center justify-center overflow-hidden rounded-[40px] border border-border bg-surface";
+  "relative flex h-64 items-center justify-center overflow-hidden rounded-2xl border border-border bg-surface-alt";
 
 /** Shipped — the platform layers, stacking from the bottom up. */
 export function FoundationsIllustration() {
@@ -26,13 +27,13 @@ export function FoundationsIllustration() {
           <div
             key={layer.label}
             style={iVar(layer.i)}
-            className={`rm-slab ${layer.width} rounded-full border border-border bg-bg px-4 py-2.5 text-center font-mono text-xs uppercase tracking-tight text-text-secondary`}
+            className={`rm-slab ${layer.width} rounded-full border border-border bg-surface px-4 py-2 text-center text-xs font-medium text-text-secondary`}
           >
             {layer.label}
           </div>
         ))}
-        <p className="mt-3 font-mono text-xs uppercase tracking-tight text-text-muted">
-          Built bottom-up, security first
+        <p className="mt-3 font-mono text-xs text-text-muted">
+          built bottom-up · security first
         </p>
       </div>
     </div>
@@ -43,13 +44,13 @@ export function FoundationsIllustration() {
 export function StampsIllustration() {
   return (
     <div className={frame} aria-hidden>
-      <div className="rounded-3xl border border-border bg-bg p-6">
+      <div className="panel-ring rounded-xl border border-border bg-surface p-6">
         <div className="grid grid-cols-5 gap-3">
           {Array.from({ length: 10 }, (_, i) => (
             <span key={i} style={iVar(i)} className="rm-stamp size-9 rounded-full bg-accent" />
           ))}
         </div>
-        <p className="mt-4 font-mono text-xs uppercase tracking-tight text-text-muted">
+        <p className="mt-4 font-mono text-xs text-text-muted">
           10 stamps → free coffee
         </p>
       </div>
@@ -57,120 +58,14 @@ export function StampsIllustration() {
   );
 }
 
-/** Phase 2 — WhatsApp-first nudges arriving. */
-export function MessagesIllustration() {
-  return (
-    <div className={frame} aria-hidden>
-      <div className="flex w-64 flex-col gap-3 font-mono text-xs leading-snug">
-        <div style={iVar(0)} className="rm-bubble max-w-52 self-start rounded-2xl rounded-bl-md border border-border bg-bg px-4 py-2.5 text-text-secondary">
-          Welcome! Your card is ready ☕
-        </div>
-        <div style={iVar(1)} className="rm-bubble max-w-52 self-start rounded-2xl rounded-bl-md border border-border bg-bg px-4 py-2.5 text-text-secondary">
-          2 stamps to your free coffee 👀
-        </div>
-        <div style={iVar(2)} className="rm-bubble max-w-52 self-end rounded-2xl rounded-br-md bg-primary px-4 py-2.5 text-on-primary">
-          Happy birthday — treat&apos;s on us 🎂
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/** Phase 3 — repeat visits climbing across branches. */
-export function AnalyticsIllustration() {
-  const heights = ["h-12", "h-20", "h-16", "h-28", "h-24", "h-36"];
-  return (
-    <div className={frame} aria-hidden>
-      <div>
-        <div className="flex items-end gap-3 border-b border-border pb-0.5">
-          {heights.map((h, i) => (
-            <span key={i} style={iVar(i)} className={`rm-bar w-8 rounded-t-lg bg-leaf ${h}`} />
-          ))}
-        </div>
-        <p className="mt-4 font-mono text-xs uppercase tracking-tight text-text-muted">
-          Repeat visits ↗ member share ↗
-        </p>
-      </div>
-    </div>
-  );
-}
-
-/** Phase 4 — the platform opens up: API, webhooks, POS. */
-export function PlatformIllustration() {
-  const nodes = ["POS", "Kembali API", "Webhooks"];
-  return (
-    <div className={frame} aria-hidden>
-      <div>
-        <div className="flex items-center gap-2">
-          {nodes.map((label, i) => (
-            <span key={label} className="flex items-center gap-2">
-              <span
-                style={iVar(i)}
-                className="rm-node rounded-full border border-border bg-bg px-4 py-2 font-mono text-xs uppercase tracking-tight text-text"
-              >
-                {label}
-              </span>
-              {i < nodes.length - 1 && <span className="h-px w-6 bg-border" />}
-            </span>
-          ))}
-        </div>
-        <p className="mt-4 text-center font-mono text-xs uppercase tracking-tight text-text-muted">
-          Points · tiers · integrations
-        </p>
-      </div>
-    </div>
-  );
-}
-
-/** Referrals — a link travels from one customer to a friend; both win. */
-export function ReferralIllustration() {
-  return (
-    <div className={frame} aria-hidden>
-      <div>
-        <div className="flex items-center gap-3">
-          {/* sender */}
-          <div className="relative">
-            <span className="flex size-14 items-center justify-center rounded-full bg-primary font-mono text-xs text-on-primary">
-              A
-            </span>
-            <span
-              style={iVar(6)}
-              className="rm-stamp absolute -right-1 -top-1 size-5 rounded-full bg-accent"
-            />
-          </div>
-          {/* the shared link travelling across */}
-          <div className="relative h-px w-24 bg-border">
-            <span className="rm-travel absolute -top-1.5 left-0 size-3 rounded-full bg-leaf" />
-          </div>
-          {/* friend */}
-          <div className="relative">
-            <span className="flex size-14 items-center justify-center rounded-full border border-border bg-bg font-mono text-xs text-text">
-              B
-            </span>
-            <span
-              style={iVar(8)}
-              className="rm-stamp absolute -right-1 -top-1 size-5 rounded-full bg-accent"
-            />
-          </div>
-        </div>
-        <p className="mt-5 text-center font-mono text-xs uppercase tracking-tight text-text-muted">
-          Share a link, both get rewarded
-        </p>
-      </div>
-    </div>
-  );
-}
-
-/** Wallet passes — the card sliding into the phone's own wallet. */
+/** Phase 2 — the card sliding into the phone's own wallet. */
 export function WalletIllustration() {
   return (
     <div className={frame} aria-hidden>
-      <div className="rounded-3xl border border-border p-4">
-        <div className="rm-wallet w-56 rounded-2xl bg-primary p-5">
+      <div className="panel-ring rounded-xl border border-border bg-surface p-4">
+        <div className="rm-wallet w-56 rounded-xl bg-primary p-5">
           <div className="flex items-center justify-between">
-            <span className="font-mono text-xs uppercase tracking-tight text-on-primary">
-              Coffee Card
-            </span>
+            <span className="text-xs font-medium text-on-primary">Coffee Card</span>
             <span className="size-3 rounded-full bg-accent" />
           </div>
           <div className="mt-4 flex gap-2">
@@ -183,10 +78,92 @@ export function WalletIllustration() {
               />
             ))}
           </div>
-          <p className="mt-4 font-mono text-[10px] uppercase tracking-tight text-on-primary/70">
+          <p className="mt-4 text-[10px] text-on-primary/70">
             Add to Apple &amp; Google Wallet
           </p>
         </div>
+      </div>
+    </div>
+  );
+}
+
+/** Phase 3 — WhatsApp-first nudges arriving. */
+export function MessagesIllustration() {
+  return (
+    <div className={frame} aria-hidden>
+      <div className="flex w-64 flex-col gap-3 text-xs leading-snug">
+        <div style={iVar(0)} className="rm-bubble max-w-52 self-start rounded-2xl rounded-bl-md border border-border bg-surface px-4 py-2.5 text-text-secondary">
+          Welcome! Your card is ready ☕
+        </div>
+        <div style={iVar(1)} className="rm-bubble max-w-52 self-start rounded-2xl rounded-bl-md border border-border bg-surface px-4 py-2.5 text-text-secondary">
+          2 stamps to your free coffee 👀
+        </div>
+        <div style={iVar(2)} className="rm-bubble max-w-52 self-end rounded-2xl rounded-br-md bg-primary px-4 py-2.5 text-on-primary">
+          Happy birthday — treat&apos;s on us 🎂
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** Phase 4 — a link travels from one customer to a friend; both win. */
+export function ReferralIllustration() {
+  return (
+    <div className={frame} aria-hidden>
+      <div>
+        <div className="flex items-center gap-3">
+          <div className="relative">
+            <span className="flex size-14 items-center justify-center rounded-full bg-primary text-xs font-medium text-on-primary">
+              A
+            </span>
+            <span
+              style={iVar(6)}
+              className="rm-stamp absolute -right-1 -top-1 size-5 rounded-full bg-accent"
+            />
+          </div>
+          <div className="relative h-px w-24 bg-border">
+            <span className="rm-travel absolute -top-1.5 left-0 size-3 rounded-full bg-leaf" />
+          </div>
+          <div className="relative">
+            <span className="flex size-14 items-center justify-center rounded-full border border-border bg-surface text-xs font-medium text-text">
+              B
+            </span>
+            <span
+              style={iVar(8)}
+              className="rm-stamp absolute -right-1 -top-1 size-5 rounded-full bg-accent"
+            />
+          </div>
+        </div>
+        <p className="mt-5 text-center font-mono text-xs text-text-muted">
+          share a link · both get rewarded
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/** Phase 5 — the platform opens up: API, webhooks, POS. */
+export function PlatformIllustration() {
+  const nodes = ["POS", "Kembali API", "Webhooks"];
+  return (
+    <div className={frame} aria-hidden>
+      <div>
+        <div className="flex items-center gap-2">
+          {nodes.map((label, i) => (
+            <span key={label} className="flex items-center gap-2">
+              <span
+                style={iVar(i)}
+                className="rm-node rounded-full border border-border bg-surface px-4 py-2 font-mono text-xs text-text"
+              >
+                {label}
+              </span>
+              {i < nodes.length - 1 && <span className="h-px w-6 bg-border" />}
+            </span>
+          ))}
+        </div>
+        <p className="mt-4 text-center font-mono text-xs text-text-muted">
+          points · tiers · integrations
+        </p>
       </div>
     </div>
   );

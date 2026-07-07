@@ -86,7 +86,8 @@ Coral stamps stay coral in both modes — the reward color is the brand constant
 
 ## 5. Voice & language (added 2026-07-07, hard rules)
 
-- **English only** in all UI and marketing copy. **"Kembali" is a name, not a word**: it appears only as the brand/product name (logo, wordmark, "Kembali API"), never as a verb or pun ("make them kembali" ❌ → "make them come back" ✅). No other Malay words in copy ("kopi" ❌ → "coffee" ✅). This is about brand voice — product *localization* (BM/CN message templates, Phase 2) is separate and unaffected.
+- **English only** in all UI and marketing copy. **"Kembali" is a name, not a word**: it appears only as the brand/product name (logo, wordmark, "Kembali API"), never as a verb or pun. No other Malay words in copy ("kopi" ❌ → "coffee" ✅). This is about brand voice — product *localization* (BM/CN message templates, Phase 3) is separate and unaffected.
+- **Warm and inviting, never commanding (2026-07-08).** Sell the feeling of regulars returning; don't order anyone around. "Make them come back" ❌ (direct, reads rude) → "Loyalty your customers will love" ✅. Prefer invitations ("See how it fits your shop") over demands ("Tell us about your business"). Technical terms stay technical — warmth is tone, not vagueness.
 - Style follows the `ux-writing` skill (`.claude/skills/ux-writing/SKILL.md`): purposeful, concise, conversational, clear. Sentence case everywhere (uppercase is a CSS treatment, not a writing style). Buttons are verb-first, 2–4 words. Front-load the benefit. 8–14 words per sentence where possible.
 - No idioms, no cultural references, no internal jargon in public copy: "MVP" → "At launch", "backlog" → "Planned", "Phase 0" → "Preview". Merchants are not startup people.
 - Demo/sample data uses English business names ("Corner Coffee", "Coffee Card"). Customer names in seed data reflect the real market (Aisyah, Ming Wei, Priya) — people's names are not copy.

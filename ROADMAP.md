@@ -264,7 +264,11 @@ Super-admin (internal): /tenants, /usage, /billing-health, /feature-flags
 /demo             # demo pass into the visitor's own wallet                     [Backlog — wallet]
 /privacy, /terms
 ```
-**Positioning line:** *"Kembali — the stamp card that lives in Apple Wallet & Google Wallet. No app for your customers, no hardware for your staff, set up in 10 minutes."* (Name doubles as tagline: *"Make them kembali."*)
+**Positioning line:** *"Kembali — the stamp card that lives on your customers' phones. No app for your customers, no hardware for your staff, set up in 10 minutes."* Tagline: *"Make them come back."* (wallet-first positioning returns with the §7 Backlog wallet item)
+
+**Copy hard rules (2026-07-07, non-negotiable):**
+1. All product and marketing copy is **English only**. "Kembali" appears **only as the brand name** — never as a verb, pun, or tagline word, and no other Malay words in UI copy ("kopi", "Selamat datang", etc.). Feature *support* for BM/CN templates (Phase 2) is unaffected — that's localization, not brand voice.
+2. Copy follows the `ux-writing` skill (`.claude/skills/ux-writing/`): purposeful, concise, conversational, clear; sentence case; verb-first buttons (2–4 words); no idioms; no internal jargon in public copy (no "MVP", "backlog", "Phase 0" — say "At launch", "Planned", "Preview").
 
 **Marketing visual language:** Pandan palette on sand canvas; the archived stamp-grid mark (`brand/logo-c-last-stamp.svg` — 8 stamps + return arrow) is the hero illustration motif; serif display (Fraunces/Lora) for headlines, Plus Jakarta Sans for UI.
 
@@ -300,6 +304,7 @@ Super-admin (internal): /tenants, /usage, /billing-health, /feature-flags
 | 2026-07-07 | One domain, path-based routing: `/` marketing, `/app` PWA, `/admin` | Simpler mental model + single cert/domain; Next.js multi-zones with basePath |
 | 2026-07-07 | **One server**: 3 apps merged into `apps/web` (route groups) | Solo founder: one process/build/deploy beats zone plumbing; per-surface layouts keep separation (supersedes multi-zone row above) |
 | 2026-07-07 | Marketing style = editorial serif+mono (DESIGN-Monad.md ref) on Kembali palette | Founder-supplied reference; brand colors stay Pandan |
+| 2026-07-07 | **English-only copy; "Kembali" only as brand name** | Founder call: don't force Malay/English mixing; ux-writing skill governs style (see §10 copy hard rules, BRAND.md §5) |
 
 ## 14. References
 

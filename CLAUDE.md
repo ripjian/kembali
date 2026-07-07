@@ -85,4 +85,4 @@ Typecheck + lint + tests + build green · RLS respected with a cross-tenant test
 ## Environment quirks (this machine)
 - No Docker, no local Postgres, no corepack. pnpm was installed via `npm i -g pnpm`. DB verification = PGlite tests; `pnpm db:migrate`/`db:seed` need a real `DATABASE_URL` (Neon/Supabase, or `docker compose up -d db` once Docker exists).
 - Dev server: `pnpm dev` → everything on http://localhost:3000 (`/`, `/roadmap`, `/app`, `/admin`). Use the preview tools, not raw background processes, when a browser check is needed.
-- CI (GitHub Actions) runs typecheck/lint/test/audit/build on push — there is no remote configured yet, so run the same gates locally and say so.
+- Remote: `origin` = https://github.com/ripjian/kembali.git. CI (GitHub Actions) runs typecheck/lint/test/audit/build on every push to main and on PRs. Still run the gates locally before committing — don't use CI as the first check.

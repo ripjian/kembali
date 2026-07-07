@@ -37,5 +37,9 @@ jobs:
         # DB tests run against in-process PGlite — no Postgres service needed.
         run: pnpm turbo run test
 
+      - name: Audit dependencies
+        # SECURITY.md hard rule #12 — fail on high/critical advisories.
+        run: pnpm audit --prod --audit-level high
+
       - name: Build
         run: pnpm turbo run build

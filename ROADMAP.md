@@ -114,6 +114,8 @@ audit_log                       actor, action, entity, tenant_id
 
 ## 5. Security Implementation
 
+> **`SECURITY.md` is the enforceable version of this section** — hard rules, the standards we follow (OWASP ASVS 5.0 L2, ISO/IEC 27001:2022 alignment, Malaysia PDPA incl. the 2024 Amendment, SOC 2 later), a control map, and the pre-merge checklist. Read it before touching auth, data, or anything tenant-facing.
+
 ### Identity & auth
 - **Customers:** OTP (WhatsApp/SMS/email) → httpOnly session cookie. No passwords. Rate-limit OTP per phone/IP (Redis).
 - **Merchant staff:** email+password + optional TOTP 2FA; role-based access (owner/manager/cashier); cashiers scoped to assigned outlets.
@@ -305,6 +307,7 @@ Super-admin (internal): /tenants, /usage, /billing-health, /feature-flags
 | 2026-07-07 | **One server**: 3 apps merged into `apps/web` (route groups) | Solo founder: one process/build/deploy beats zone plumbing; per-surface layouts keep separation (supersedes multi-zone row above) |
 | 2026-07-07 | Marketing style = editorial serif+mono (DESIGN-Monad.md ref) on Kembali palette | Founder-supplied reference; brand colors stay Pandan |
 | 2026-07-07 | **English-only copy; "Kembali" only as brand name** | Founder call: don't force Malay/English mixing; ux-writing skill governs style (see §10 copy hard rules, BRAND.md §5) |
+| 2026-07-07 | **Security baseline codified in SECURITY.md** — ASVS 5.0 L2 as code standard, ISO 27001:2022 alignment, PDPA 2024 amendments; headers + CI audit + Dependabot added | Founder wants certification-ready posture; lower-grade models need explicit rules |
 
 ## 14. References
 

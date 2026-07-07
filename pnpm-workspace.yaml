@@ -1,0 +1,28 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+allowBuilds:
+  '@sentry/cli': true
+  '@tailwindcss/oxide': true
+  esbuild: true
+  sharp: true
+  unrs-resolver: true
+minimumReleaseAgeExclude:
+  - '@turbo/darwin-64@2.10.4'
+  - '@turbo/darwin-arm64@2.10.4'
+  - '@turbo/linux-64@2.10.4'
+  - '@turbo/linux-arm64@2.10.4'
+  - '@turbo/windows-64@2.10.4'
+  - '@turbo/windows-arm64@2.10.4'
+  - '@typescript-eslint/eslint-plugin@8.63.0'
+  - '@typescript-eslint/parser@8.63.0'
+  - '@typescript-eslint/project-service@8.63.0'
+  - '@typescript-eslint/scope-manager@8.63.0'
+  - '@typescript-eslint/tsconfig-utils@8.63.0'
+  - '@typescript-eslint/type-utils@8.63.0'
+  - '@typescript-eslint/types@8.63.0'
+  - '@typescript-eslint/typescript-estree@8.63.0'
+  - '@typescript-eslint/utils@8.63.0'
+  - '@typescript-eslint/visitor-keys@8.63.0'
+  - turbo@2.10.4
+  - typescript-eslint@8.63.0

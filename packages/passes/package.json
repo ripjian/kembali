@@ -1,0 +1,18 @@
+{
+  "name": "@kembali/passes",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@kembali/config": "workspace:*",
+    "eslint": "^10.6.0",
+    "typescript": "^5.9.3"
+  }
+}

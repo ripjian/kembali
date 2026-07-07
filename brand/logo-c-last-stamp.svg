@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" role="img" aria-label="Kembali stamp grid mark, eight stamps collected and a return arrow as the ninth">
+  <circle cx="18" cy="18" r="6.5" fill="#E8A33D"/><circle cx="40" cy="18" r="6.5" fill="#E8A33D"/><circle cx="62" cy="18" r="6.5" fill="#E8A33D"/>
+  <circle cx="18" cy="40" r="6.5" fill="#E8A33D"/><circle cx="40" cy="40" r="6.5" fill="#E8A33D"/><circle cx="62" cy="40" r="6.5" fill="#E8A33D"/>
+  <circle cx="18" cy="62" r="6.5" fill="#E8A33D"/><circle cx="40" cy="62" r="6.5" fill="#E8A33D"/>
+  <path d="M70 62 A8 8 0 1 1 67.7 56.3" fill="none" stroke="#3A2A21" stroke-width="3" stroke-linecap="round"/>
+  <polygon points="70.5,59.1 69.5,54.5 65.9,58.1" fill="#3A2A21"/>
+</svg>

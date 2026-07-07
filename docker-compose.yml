@@ -1,0 +1,16 @@
+# Local Postgres for development (matches .env.example DATABASE_URL).
+# Prod uses Neon/Supabase (ROADMAP §3).
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: kembali
+      POSTGRES_PASSWORD: kembali
+      POSTGRES_DB: kembali
+    ports:
+      - "5432:5432"
+    volumes:
+      - kembali-pgdata:/var/lib/postgresql/data
+
+volumes:
+  kembali-pgdata:

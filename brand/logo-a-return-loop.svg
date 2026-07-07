@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" role="img" aria-label="Kembali return loop mark">
+  <path d="M64 40 A24 24 0 1 1 57 23" fill="none" stroke="#0F3D32" stroke-width="6" stroke-linecap="round"/>
+  <polygon points="62.7,28.7 60.5,19.5 53.5,26.5" fill="#0F3D32"/>
+  <circle cx="40" cy="40" r="8" fill="#E0684B"/>
+</svg>

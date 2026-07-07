@@ -1,0 +1,109 @@
+/*
+ * Kembali design tokens — single source: brand/BRAND.md (Pandan palette).
+ * Do not invent colors here; change BRAND.md first, then mirror it.
+ *
+ * Usage rules (BRAND.md §2):
+ *  - Pandan (primary) = things you DO: buttons, links, scan CTA.
+ *  - Coral (accent)  = things you EARN: stamps, coupons, rewards. Never swap.
+ *  - Coral is decorative/status only — use accent-deep for coral-tinted text.
+ *  - Leaf = progress fills and success tints only, never primary actions.
+ *
+ * Merchant white-label (Phase 3) overrides --primary / --accent per tenant.
+ */
+
+/* Brand core — constant in both modes */
+:root {
+  --kembali-pandan: #0f3d32;
+  --kembali-coral: #e0684b;
+  --kembali-leaf: #7fb069;
+  --kembali-sand: #f6f1e3;
+}
+
+/* System / UI tokens — light (BRAND.md §2) */
+:root {
+  --bg: #f6f1e3;
+  --surface: #ffffff;
+  --surface-alt: #ede6d2;
+  --text: #16261e;
+  --text-secondary: #5c6b60;
+  --text-muted: #8b9689;
+  --border: #dcd5bf;
+  --primary: #0f3d32;
+  --primary-hover: #0a2c24;
+  --on-primary: #ffffff;
+  --accent: #e0684b;
+  --accent-deep: #a93e24;
+  --leaf: #7fb069;
+  --success: #3b7d46;
+  --warning: #b45309;
+  --error: #c0392b;
+  --info: #2d6cb5;
+}
+
+/* Dark mode (BRAND.md §2) — coral stamps stay coral; unlisted tokens keep
+   their light values per the brand spec. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #10201a;
+    --surface: #182b23;
+    --surface-alt: #20362c;
+    --text: #edeee2;
+    --text-secondary: #afbca9;
+    --text-muted: #7e8c80;
+    --border: #2f443a;
+    --primary: #3e8a72;
+    /* BRAND.md defines no dark primary-hover token — derived from the dark
+       primary rather than inventing a hex. TODO: add token to BRAND.md. */
+    --primary-hover: color-mix(in srgb, #3e8a72 85%, black);
+    --on-primary: #0b1712;
+    --accent: #ec7f63;
+    --accent-deep: #f4a98f;
+  }
+}
+
+/* Map tokens into Tailwind v4 theme → utilities like bg-bg, text-text,
+   bg-primary, text-on-primary, bg-accent, bg-leaf, border-border. */
+@theme inline {
+  --color-*: initial;
+  --color-pandan: var(--kembali-pandan);
+  --color-coral: var(--kembali-coral);
+  --color-sand: var(--kembali-sand);
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-alt: var(--surface-alt);
+  --color-text: var(--text);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-on-primary: var(--on-primary);
+  --color-accent: var(--accent);
+  --color-accent-deep: var(--accent-deep);
+  --color-leaf: var(--leaf);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-error: var(--error);
+  --color-info: var(--info);
+  --color-white: #ffffff;
+  --color-transparent: transparent;
+  --color-current: currentColor;
+
+  /* Typography (BRAND.md §4) — apps load Plus Jakarta Sans via next/font
+     and expose it as --font-jakarta; falls back to the system stack. */
+  --font-sans:
+    var(--font-jakarta, "Plus Jakarta Sans"), ui-sans-serif, system-ui,
+    -apple-system, "Segoe UI", sans-serif;
+  --font-display: var(--font-fraunces, Fraunces), Georgia, serif;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+}
+
+/* Stamp counts and dashboards use tabular figures (BRAND.md §4) */
+.tabular-nums,
+[data-stat] {
+  font-variant-numeric: tabular-nums;
+}

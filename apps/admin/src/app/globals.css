@@ -1,0 +1,5 @@
+@import "tailwindcss";
+@import "@kembali/ui/styles.css";
+
+/* Scan shared UI sources for class names */
+@source "../../../../packages/ui/src";

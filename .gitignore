@@ -1,0 +1,28 @@
+# dependencies
+node_modules/
+
+# builds
+.next/
+dist/
+out/
+.turbo/
+
+# env — secrets never in the repo (ROADMAP §5)
+.env
+.env.*
+!.env.example
+
+# wallet credentials must never be committed (ROADMAP §5)
+*.p12
+*.pem
+*.cer
+*.pkpass
+service-account*.json
+
+# logs & OS
+*.log
+.DS_Store
+
+# test artifacts
+coverage/
+*.tsbuildinfo

@@ -89,36 +89,90 @@
 /* ---------- roadmap illustrations (decorative loops) ------------------ */
 /* Loops pause until their section is in view (animation-play-state). */
 
-[data-inview="false"] :is(.rm-stamp, .rm-bubble, .rm-bar, .rm-node, .rm-wallet) {
+[data-inview="false"]
+  :is(.rm-stamp, .rm-bubble, .rm-bar, .rm-node, .rm-wallet, .rm-flow, .rm-slab) {
   animation-play-state: paused;
 }
 
-/* Phase 1 — stamps landing on a card, one by one (never from scale(0)) */
+/* Phase 1 — stamps landing on a card, one by one (never from scale(0)).
+   10 stamps (5 × 2 rows) → longer loop so the full card fills. */
 @keyframes rm-stamp {
   0% {
     opacity: 0.2;
     transform: scale(0.7);
   }
-  7% {
+  5% {
     opacity: 1;
     transform: scale(1.08);
   }
-  11% {
+  8% {
     transform: scale(1);
   }
-  82% {
+  85% {
     opacity: 1;
     transform: scale(1);
   }
-  92%,
+  94%,
   100% {
     opacity: 0.2;
     transform: scale(0.7);
   }
 }
 .rm-stamp {
-  animation: rm-stamp 6s var(--ease-out-strong) infinite;
-  animation-delay: calc(var(--i) * 550ms);
+  animation: rm-stamp 9s var(--ease-out-strong) infinite;
+  animation-delay: calc(var(--i) * 600ms);
+}
+
+/* How-it-works flow pills — each step lights up in order, holds, resets.
+   Explains the sequence without a single word of extra copy. */
+@keyframes rm-flow {
+  0% {
+    opacity: 0.45;
+    transform: scale(1);
+  }
+  6% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  11% {
+    transform: scale(1);
+  }
+  84% {
+    opacity: 1;
+  }
+  94%,
+  100% {
+    opacity: 0.45;
+  }
+}
+.rm-flow {
+  animation: rm-flow 7s var(--ease-out-strong) infinite;
+  animation-delay: calc(var(--i) * 800ms);
+}
+
+/* Foundations — platform layers stacking from the bottom up. */
+@keyframes rm-slab {
+  0% {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  9% {
+    opacity: 1;
+    transform: none;
+  }
+  84% {
+    opacity: 1;
+    transform: none;
+  }
+  94%,
+  100% {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+.rm-slab {
+  animation: rm-slab 7s var(--ease-out-strong) infinite;
+  animation-delay: calc(var(--i) * 700ms);
 }
 
 /* Phase 2 — WhatsApp-style bubbles arriving */
@@ -225,7 +279,9 @@
   .rm-bubble,
   .rm-bar,
   .rm-node,
-  .rm-wallet {
+  .rm-wallet,
+  .rm-flow,
+  .rm-slab {
     animation: none;
     opacity: 1;
     transform: none;

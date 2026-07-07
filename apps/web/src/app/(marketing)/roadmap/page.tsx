@@ -5,6 +5,7 @@ import { PillLink } from "@/components/marketing/pill";
 import { Reveal } from "@/components/marketing/reveal";
 import {
   AnalyticsIllustration,
+  FoundationsIllustration,
   MessagesIllustration,
   PlatformIllustration,
   StampsIllustration,
@@ -49,6 +50,7 @@ const PHASES: Phase[] = [
     title: "Foundations",
     body: "The groundwork is done: a secure multi-tenant platform, each merchant's data isolated at the database layer, and a stamp history that can't be edited.",
     points: ["Isolated data per merchant", "Tamper-proof stamp history", "Brand & theming engine"],
+    illustration: <FoundationsIllustration />,
   },
   {
     status: "now",

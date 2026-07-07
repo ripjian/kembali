@@ -12,18 +12,45 @@ function iVar(i: number): CSSProperties {
 const frame =
   "relative flex h-64 items-center justify-center overflow-hidden rounded-[40px] border border-border bg-surface";
 
-/** Phase 1 — stamps landing on a card, one by one. */
+/** Shipped — the platform layers, stacking from the bottom up. */
+export function FoundationsIllustration() {
+  const layers = [
+    { label: "Your brand & card", width: "w-36", i: 2 },
+    { label: "Tamper-proof stamp ledger", width: "w-48", i: 1 },
+    { label: "Isolated data per merchant", width: "w-60", i: 0 },
+  ];
+  return (
+    <div className={frame} aria-hidden>
+      <div className="flex flex-col items-center gap-2">
+        {layers.map((layer) => (
+          <div
+            key={layer.label}
+            style={iVar(layer.i)}
+            className={`rm-slab ${layer.width} rounded-full border border-border bg-bg px-4 py-2.5 text-center font-mono text-xs uppercase tracking-tight text-text-secondary`}
+          >
+            {layer.label}
+          </div>
+        ))}
+        <p className="mt-3 font-mono text-xs uppercase tracking-tight text-text-muted">
+          Built bottom-up, security first
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/** Phase 1 — stamps landing on a card, one by one (5 × 2 rows). */
 export function StampsIllustration() {
   return (
     <div className={frame} aria-hidden>
       <div className="rounded-3xl border border-border bg-bg p-6">
-        <div className="flex gap-3">
-          {Array.from({ length: 5 }, (_, i) => (
+        <div className="grid grid-cols-5 gap-3">
+          {Array.from({ length: 10 }, (_, i) => (
             <span key={i} style={iVar(i)} className="rm-stamp size-9 rounded-full bg-accent" />
           ))}
         </div>
         <p className="mt-4 font-mono text-xs uppercase tracking-tight text-text-muted">
-          9 stamps → free coffee
+          10 stamps → free coffee
         </p>
       </div>
     </div>

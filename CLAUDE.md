@@ -41,7 +41,7 @@ packages/config                 → shared tsconfig/eslint presets + zod env hel
 - Domain logic goes in `packages/core` (pure functions, unit-tested), never in route handlers or components.
 - Colors/typography come from BRAND.md tokens via `packages/ui`. **Pandan = actions, coral = earned rewards, leaf = progress — never swap.** Never invent hex values; derive with `color-mix` from tokens if a variant is missing, and flag the gap.
 - Marketing surface: serif (Fraunces 400, never bold) headings, mono body, pill buttons, hairline borders, 40px card radius, no shadows, light-only via `data-theme="marketing"`. App/admin: Plus Jakarta Sans, light+dark.
-- Animations: follow `.claude/skills/emil-design-eng/SKILL.md` — transform/opacity only, strong ease-out for entries, UI under 300ms, stagger 30–80ms, never from scale(0), respect `prefers-reduced-motion`, pause decorative loops off-screen.
+- Animations: follow `.claude/skills/emil-design-eng/SKILL.md` — transform/opacity only, strong ease-out for entries, UI under 300ms, stagger 30–80ms, never from scale(0), respect `prefers-reduced-motion`, pause decorative loops off-screen. In-page animations are CSS (the `rm-*` system in `apps/web/src/app/globals.css`); **video assets** (demo clips, social promos, MP4s) use the `remotion-best-practices` skill — never pull Remotion runtime deps into the web app for UI loops.
 - Comments explain constraints the code can't show — not what the next line does.
 
 ## SOP 3 — Copy rules (hard)

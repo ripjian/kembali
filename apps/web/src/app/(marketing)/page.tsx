@@ -1,7 +1,14 @@
+import type { CSSProperties } from "react";
+
 import { DemoCard } from "@/components/marketing/demo-card";
 import { LeadQualifier } from "@/components/marketing/lead-qualifier";
 import { PillLink, Tag } from "@/components/marketing/pill";
 import { Reveal } from "@/components/marketing/reveal";
+
+/** Animation-order variable for the sequential flow-pill loop (rm-flow). */
+function flowDelay(i: number): CSSProperties {
+  return { "--i": i } as CSSProperties;
+}
 
 const CUSTOMER_FLOW = ["Scan the QR", "Card on phone", "Collect stamps", "Earn reward", "Come back ↺"];
 const STAFF_FLOW = ["Open camera", "Scan their QR", "Stamp — done"];
@@ -103,7 +110,9 @@ export default function Home() {
                 <div className="mt-5 flex flex-wrap items-center gap-2">
                   {CUSTOMER_FLOW.map((step, i) => (
                     <span key={step} className="flex items-center gap-2">
-                      <Tag>{step}</Tag>
+                      <Tag className="rm-flow" style={flowDelay(i)}>
+                        {step}
+                      </Tag>
                       {i < CUSTOMER_FLOW.length - 1 && (
                         <span aria-hidden className="font-mono text-text-muted">
                           →
@@ -127,7 +136,9 @@ export default function Home() {
                 <div className="mt-5 flex flex-wrap items-center gap-2">
                   {STAFF_FLOW.map((step, i) => (
                     <span key={step} className="flex items-center gap-2">
-                      <Tag>{step}</Tag>
+                      <Tag className="rm-flow" style={flowDelay(i)}>
+                        {step}
+                      </Tag>
                       {i < STAFF_FLOW.length - 1 && (
                         <span aria-hidden className="font-mono text-text-muted">
                           →

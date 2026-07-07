@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 /* Pill containers are the language of this system (DESIGN-Monad.md):
  * 100px radius, mono uppercase 14px labels. Pandan is the ONLY saturated
@@ -45,16 +45,20 @@ export function PillLink({
   );
 }
 
-/** Hairline pill tag — the node/badge language (14px mono uppercase). */
+/** Hairline pill tag — the node/badge language (14px mono uppercase).
+ * `style` is exposed for animation custom properties (e.g. `--i` delays). */
 export function Tag({
   children,
   className,
+  style,
 }: {
   children: ReactNode;
   className?: string;
+  style?: CSSProperties;
 }) {
   return (
     <span
+      style={style}
       className={[
         "inline-flex items-center gap-2 rounded-full border border-border",
         "bg-bg px-5 py-2.5 font-mono text-sm uppercase tracking-tight text-text",

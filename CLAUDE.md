@@ -17,7 +17,7 @@ Phase 0 checklist:
 - [x] Env validation (zod), Sentry, GitHub Actions CI (typecheck, lint, test, build)
 - [x] ~~Apple Developer + Google Wallet Console accounts~~ — wallet passes moved to Backlog; start the applications when that item is pulled
 
-Routing: one domain — marketing at `/`, customer PWA at `/app` (basePath), admin at `/admin` (basePath). Marketing style: `brand/DESIGN-Monad.md` (serif+mono editorial) on Pandan colors, light-only.
+Routing: **one Next.js server** (`apps/web`) — marketing at `/` (route group `(marketing)`), customer PWA at `/app`, admin at `/admin`; each surface has its own nested layout. Marketing style: `brand/DESIGN-Monad.md` (serif+mono editorial) on Pandan colors, light-only (scoped via `data-theme="marketing"`); app/admin keep dark mode.
 
 ## Conventions
 - TypeScript strict everywhere; no `any` without a comment justifying it

@@ -70,9 +70,11 @@
 ```
 mobileLoyalty/
 ├── apps/
-│   ├── marketing/        # public site (stampcard.example)
-│   ├── app/              # customer PWA + cashier scanner (card.<merchant-domain>)
-│   └── admin/            # merchant CMS/dashboard (+ super-admin)
+│   └── web/              # ONE Next.js server, three surfaces by route:
+│       └── src/app/
+│           ├── (marketing)/   #   /  and  /roadmap  (public site)
+│           ├── app/           #   /app — customer PWA + cashier scanner
+│           └── admin/         #   /admin — merchant CMS (+ super-admin)
 ├── packages/
 │   ├── db/               # Drizzle schema, migrations, RLS policies
 │   ├── passes/           # Apple/Google pass generation + update service
@@ -82,9 +84,9 @@ mobileLoyalty/
 └── ROADMAP.md
 ```
 
-### Routing (decided 2026-07-07): one domain, path-based
+### Routing (decided 2026-07-07, simplified same day): one server, path-based
 
-Everything lives on the base domain via Next.js multi-zones: `apps/marketing` serves `/` (landing + `/roadmap`), `apps/app` serves under **`/app`** (basePath), `apps/admin` under **`/admin`** (basePath). The marketing app rewrites `/app/:path*` and `/admin/:path*` to the other deployments (env-driven URLs; localhost ports in dev). Merchant custom domains (Phase 3) still map to the customer app.
+A single Next.js app (`apps/web`) serves everything on the base domain: the `(marketing)` route group owns `/` and `/roadmap`, the customer PWA lives under **`/app`**, admin under **`/admin`**. Each surface has its own nested layout (fonts, theme, chrome) — marketing is light-locked via scoped tokens, app/admin keep dark mode. One process, one deploy, no zones/rewrites. Merchant custom domains (Phase 3) will map onto the `/app` surface; revisit splitting into separate deployments only if scale demands it.
 
 ---
 
@@ -296,6 +298,7 @@ Super-admin (internal): /tenants, /usage, /billing-health, /feature-flags
 | 2026-07-07 | Logo = return-loop mark + wordmark; **Pandan palette** | Founder choice; specs in `brand/BRAND.md` |
 | 2026-07-07 | **Wallet passes moved MVP → Backlog** | Founder call: validate core loyalty CX first; defers Apple cert/APNs complexity and account lead times (supersedes "Wallet passes in MVP" above) |
 | 2026-07-07 | One domain, path-based routing: `/` marketing, `/app` PWA, `/admin` | Simpler mental model + single cert/domain; Next.js multi-zones with basePath |
+| 2026-07-07 | **One server**: 3 apps merged into `apps/web` (route groups) | Solo founder: one process/build/deploy beats zone plumbing; per-surface layouts keep separation (supersedes multi-zone row above) |
 | 2026-07-07 | Marketing style = editorial serif+mono (DESIGN-Monad.md ref) on Kembali palette | Founder-supplied reference; brand colors stay Pandan |
 
 ## 14. References

@@ -1,15 +1,15 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
-import { PillLink } from "../../components/pill";
-import { Reveal } from "../../components/reveal";
+import { PillLink } from "@/components/marketing/pill";
+import { Reveal } from "@/components/marketing/reveal";
 import {
   AnalyticsIllustration,
   MessagesIllustration,
   PlatformIllustration,
   StampsIllustration,
   WalletIllustration,
-} from "../../components/roadmap-illustrations";
+} from "@/components/marketing/roadmap-illustrations";
 
 export const metadata: Metadata = {
   title: "Roadmap — Kembali",

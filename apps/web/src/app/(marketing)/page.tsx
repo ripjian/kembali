@@ -1,7 +1,7 @@
-import { DemoCard } from "../components/demo-card";
-import { LeadQualifier } from "../components/lead-qualifier";
-import { PillLink, Tag } from "../components/pill";
-import { Reveal } from "../components/reveal";
+import { DemoCard } from "@/components/marketing/demo-card";
+import { LeadQualifier } from "@/components/marketing/lead-qualifier";
+import { PillLink, Tag } from "@/components/marketing/pill";
+import { Reveal } from "@/components/marketing/reveal";
 
 const CUSTOMER_FLOW = ["Scan the QR", "Card on phone", "Collect stamps", "Earn reward", "Come back ↺"];
 const STAFF_FLOW = ["Open camera", "Scan their QR", "Stamp — done"];

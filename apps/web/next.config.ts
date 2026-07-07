@@ -1,9 +1,8 @@
 import type { NextConfig } from "next";
 
+// One server, one route tree (ROADMAP §3): marketing at /, customer PWA
+// under /app, merchant admin under /admin — no zones, no rewrites.
 const nextConfig: NextConfig = {
-  // Multi-zone: this app is served under the base domain at /app
-  // (marketing rewrites /app/* here). See ROADMAP §3 routing decision.
-  basePath: "/app",
   transpilePackages: ["@kembali/ui", "@kembali/config", "@kembali/core"],
 };
 

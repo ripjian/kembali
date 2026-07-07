@@ -15,10 +15,12 @@
  * Type: serif (Fraunces 400) announces, mono (JetBrains Mono) instructs.
  *
  * Marketing is deliberately LIGHT-ONLY — the warm canvas is the signature
- * (DESIGN-Monad.md). Re-asserting the light values here (after the shared
- * import) pins them regardless of the system color scheme.
+ * (DESIGN-Monad.md). Scoped to the (marketing) layout's wrapper so /app
+ * and /admin keep their system light/dark behavior: element-scoped custom
+ * properties beat the :root dark overrides from the shared sheet for this
+ * subtree only.
  */
-:root {
+[data-theme="marketing"] {
   color-scheme: light;
   --bg: #f6f1e3;
   --surface: #ffffff;
@@ -43,10 +45,6 @@
   /* Strong curves per the emil-design-eng skill — built-ins are too weak */
   --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out-strong: cubic-bezier(0.77, 0, 0.175, 1);
-}
-
-body {
-  font-family: var(--font-mono);
 }
 
 /* ---------- interaction primitives ---------------------------------- */

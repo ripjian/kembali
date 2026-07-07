@@ -23,7 +23,7 @@ export function StampsIllustration() {
           ))}
         </div>
         <p className="mt-4 font-mono text-xs uppercase tracking-tight text-text-muted">
-          9 stamps → free kopi
+          9 stamps → free coffee
         </p>
       </div>
     </div>
@@ -36,10 +36,10 @@ export function MessagesIllustration() {
     <div className={frame} aria-hidden>
       <div className="flex w-64 flex-col gap-3 font-mono text-xs leading-snug">
         <div style={iVar(0)} className="rm-bubble max-w-52 self-start rounded-2xl rounded-bl-md border border-border bg-bg px-4 py-2.5 text-text-secondary">
-          Selamat datang! Your card is ready ☕
+          Welcome! Your card is ready ☕
         </div>
         <div style={iVar(1)} className="rm-bubble max-w-52 self-start rounded-2xl rounded-bl-md border border-border bg-bg px-4 py-2.5 text-text-secondary">
-          2 stamps to your free kopi 👀
+          2 stamps to your free coffee 👀
         </div>
         <div style={iVar(2)} className="rm-bubble max-w-52 self-end rounded-2xl rounded-br-md bg-primary px-4 py-2.5 text-on-primary">
           Happy birthday — treat&apos;s on us 🎂
@@ -103,7 +103,7 @@ export function WalletIllustration() {
         <div className="rm-wallet w-56 rounded-2xl bg-primary p-5">
           <div className="flex items-center justify-between">
             <span className="font-mono text-xs uppercase tracking-tight text-on-primary">
-              Kopi Card
+              Coffee Card
             </span>
             <span className="size-3 rounded-full bg-accent" />
           </div>
@@ -118,7 +118,7 @@ export function WalletIllustration() {
             ))}
           </div>
           <p className="mt-4 font-mono text-[10px] uppercase tracking-tight text-on-primary/70">
-            Add to Wallet — waiting in the backlog
+            Add to Apple &amp; Google Wallet — planned
           </p>
         </div>
       </div>

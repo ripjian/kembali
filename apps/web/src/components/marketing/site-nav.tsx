@@ -15,13 +15,13 @@ export function SiteNav() {
       {/* Announcement bar — deepest surface, per the reference */}
       <div className="flex items-center justify-center gap-4 bg-primary px-4 py-2.5">
         <p className="font-mono text-xs uppercase tracking-tight text-on-primary sm:text-sm">
-          Now looking for pilot cafés &amp; shops in Malaysia
+          Now onboarding pilot cafés &amp; shops in Malaysia
         </p>
         <Link
           href="/#reach-out"
           className="press hidden rounded-full border border-on-primary px-4 py-1 font-mono text-xs uppercase tracking-tight text-on-primary sm:inline-flex"
         >
-          Say hi
+          Apply now
         </Link>
       </div>
 

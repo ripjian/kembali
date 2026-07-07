@@ -28,11 +28,11 @@ const STATUS_STYLE: Record<Status, string> = {
 };
 
 const STATUS_LABEL: Record<Status, string> = {
-  shipped: "Shipped",
+  shipped: "Done",
   now: "Building now",
   next: "Up next",
   later: "Later",
-  backlog: "Backlog",
+  backlog: "Planned",
 };
 
 interface Phase {
@@ -47,56 +47,56 @@ const PHASES: Phase[] = [
   {
     status: "shipped",
     title: "Foundations",
-    body: "The unglamorous part is done: secure multi-tenant platform, tenant data isolated at the database layer, tamper-proof stamp history.",
-    points: ["Multi-tenant core with row-level isolation", "Append-only stamp ledger", "Brand & theming engine"],
+    body: "The groundwork is done: a secure multi-tenant platform, each merchant's data isolated at the database layer, and a stamp history that can't be edited.",
+    points: ["Isolated data per merchant", "Tamper-proof stamp history", "Brand & theming engine"],
   },
   {
     status: "now",
     title: "The stamp card, done right",
-    body: "The MVP: a card your customers get from a QR in under 30 seconds, a scanner your staff run on any phone, and a dashboard that shows it working.",
+    body: "The first release: customers get a card from a QR in under 30 seconds, staff stamp it with any phone, and your dashboard shows it working.",
     points: [
       "Customer card with live stamp animation",
-      "3-second cashier scan with anti-fraud QR",
+      "3-second stamping with fraud-proof QR codes",
       "Merchant onboarding, programs & dashboard",
-      "Per-outlet subscription, free trial",
+      "Per-outlet subscription with a free trial",
     ],
     illustration: <StampsIllustration />,
   },
   {
     status: "next",
-    title: "The retention engine",
-    body: "Loyalty that talks back — on WhatsApp, the channel Malaysia actually reads. Every message opt-in, per channel, PDPA-first.",
+    title: "Bring them back automatically",
+    body: "Messages that keep customers returning, sent on WhatsApp — the channel your customers actually read. Every message is opt-in, as PDPA requires.",
     points: [
       "Welcome, birthday & milestone rewards",
-      "Coupon-expiry reminders & win-back nudges",
-      "Referrals that reward both sides",
-      "Bahasa Melayu + English (+中文 templates)",
+      "Reward-expiry reminders & win-back offers",
+      "Referral rewards for both sides",
+      "Templates in English, Bahasa Melayu and Chinese",
     ],
     illustration: <MessagesIllustration />,
   },
   {
     status: "later",
     title: "Multi-outlet & analytics",
-    body: "For the moment one shop becomes three: cross-outlet stamping, per-branch reporting, and the numbers merchants actually buy loyalty for.",
+    body: "For when one shop becomes three: stamps that work across branches, per-branch reporting, and the numbers that prove loyalty pays.",
     points: [
-      "Cross-outlet stamping & per-branch stats",
+      "Cross-outlet stamping & per-branch reports",
       "Repeat-visit rate, member share, redemptions",
-      "Fraud dashboard & custom domains",
+      "Fraud alerts & custom domains",
     ],
     illustration: <AnalyticsIllustration />,
   },
   {
     status: "later",
     title: "Growth & platform",
-    body: "Kembali opens up: an API for POS integrations, points and tiers beyond stamps, and AI reports in plain English.",
-    points: ["Public API + webhooks", "Points & tiers mode", "AI weekly reports"],
+    body: "Kembali opens up: an API for POS integrations, points and tiers beyond stamps, and weekly reports in plain English.",
+    points: ["Public API & webhooks", "Points & tiers", "Weekly summary reports"],
     illustration: <PlatformIllustration />,
   },
   {
     status: "backlog",
     title: "Apple & Google Wallet passes",
-    body: "Cards that live in the phone's own wallet, updating the second a stamp lands. Designed and waiting — we're proving the core loyalty loop first, then pulling this forward.",
-    points: ["Apple Wallet pass + live updates", "Google Wallet loyalty cards", "Lock-screen relevance near your outlet"],
+    body: "Cards that live in the phone's own wallet and update the moment a stamp lands. The design is ready — we're shipping the core card first.",
+    points: ["Apple Wallet pass with live updates", "Google Wallet loyalty cards", "Appears on the lock screen near your outlet"],
     illustration: <WalletIllustration />,
   },
 ];
@@ -117,9 +117,8 @@ export default function RoadmapPage() {
         </Reveal>
         <Reveal delay={160}>
           <p className="max-w-2xl font-mono text-base leading-relaxed text-text-secondary sm:text-lg">
-            High level and honest — what&apos;s shipped, what we&apos;re
-            building now, and what&apos;s earning its place. Pilot merchants
-            shape the order.
+            What&apos;s done, what we&apos;re building now, and what comes
+            next. Pilot merchants shape the order.
           </p>
         </Reveal>
       </section>
@@ -183,8 +182,8 @@ export default function RoadmapPage() {
         </Reveal>
         <Reveal delay={100}>
           <p className="max-w-xl font-mono text-base leading-relaxed text-text-secondary">
-            Pilot merchants get Kembali free while we build — and their
-            counter is where the roadmap gets decided.
+            Pilot merchants use Kembali free while we build — and their
+            feedback decides what ships next.
           </p>
         </Reveal>
         <Reveal delay={180}>

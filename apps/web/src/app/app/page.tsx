@@ -1,7 +1,7 @@
 import { computeCardProgress } from "@kembali/core";
 import { Button, LogoMark, StampGrid } from "@kembali/ui";
 
-// Placeholder card matching the demo seed (Kopi Card: 4/9 stamps).
+// Placeholder card matching the demo seed (Coffee Card: 4/9 stamps).
 // Phase 1 replaces this with the real OTP-authenticated /card screen.
 const DEMO = { stampsCount: 4, stampsRequired: 9 };
 
@@ -14,8 +14,8 @@ export default function CardPage() {
         <LogoMark size={36} className="dark:hidden" />
         <LogoMark size={36} mono="sand" className="hidden dark:block" />
         <div>
-          <h1 className="text-lg font-semibold text-text">Kopi Kembali</h1>
-          <p className="text-sm text-text-secondary">Kopi Card</p>
+          <h1 className="text-lg font-semibold text-text">Corner Coffee</h1>
+          <p className="text-sm text-text-secondary">Coffee Card</p>
         </div>
       </header>
 
@@ -33,11 +33,11 @@ export default function CardPage() {
           <span className="font-semibold tabular-nums text-text" data-stat>
             {progress.stampsRemaining}
           </span>{" "}
-          more stamps to your free kopi
+          more stamps to your free coffee
         </p>
       </section>
 
-      <Button className="w-full">Show my QR to stamp</Button>
+      <Button className="w-full">Show my QR code</Button>
       <p className="text-center text-xs text-text-muted">
         Your card always works right here in your browser — nothing to
         download.

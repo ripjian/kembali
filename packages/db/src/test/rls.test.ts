@@ -43,12 +43,12 @@ let client: Awaited<ReturnType<typeof createTestDb>>["client"];
 beforeAll(async () => {
   ({ db, client } = await createTestDb());
 
-  // Tenant A: full demo seed. Tenant B: minimal rival café.
+  // Tenant A: full demo seed. Tenant B: a minimal second tenant.
   await seed(db);
   await db.insert(schema.tenants).values({
     id: TENANT_B,
-    name: "Teh Balik",
-    slug: "teh-balik",
+    name: "Rival Coffee",
+    slug: "rival-coffee",
   });
   await db.insert(schema.customers).values({
     id: B_CUSTOMER,
@@ -59,7 +59,7 @@ beforeAll(async () => {
   await db.insert(schema.programs).values({
     id: B_PROGRAM,
     tenantId: TENANT_B,
-    name: "Teh Card",
+    name: "Rival Card",
     stampsRequired: 10,
   });
   await db.insert(schema.cards).values({

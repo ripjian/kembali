@@ -60,24 +60,24 @@ const QUESTIONS: Question[] = [
 ];
 
 const BUSINESS_PITCH: Record<string, string> = {
-  cafe: "Cafés are where stamp cards were born. Kembali turns yours digital — every regular gets a card on their phone from a QR at the counter, and your barista stamps it with any phone camera in under 3 seconds.",
-  fnb: "For F&B, speed at the counter is everything. Your customers join from a table or counter QR in under 30 seconds, and staff stamp with any phone — no hardware, no queue built up.",
-  beauty: "For salons and wellness, visits are weeks apart — exactly when paper cards get lost. A card on their phone survives every handbag change, and win-back nudges bring quiet clients back.",
-  other: "Kembali works anywhere visits repeat — gyms, studios, workshops. If your customers come back, they deserve a card that can't be lost and rewards that redeem themselves.",
+  cafe: "Kembali replaces your paper stamp card. Regulars get a digital card from a QR at your counter. Your barista stamps it with any phone camera in under 3 seconds.",
+  fnb: "Speed at the counter matters most in F&B. Customers join from a table or counter QR in under 30 seconds. Staff stamp with any phone — no hardware, no extra queue.",
+  beauty: "Salon visits are weeks apart — exactly how paper cards get lost. A digital card stays on your client's phone, and win-back messages bring quiet clients back.",
+  other: "Kembali works anywhere customers visit repeatedly — gyms, studios, workshops. Members keep their card on their phone and redeem rewards in person.",
 };
 
 const OUTLET_NOTE: Record<string, string> = {
-  one: "Pricing is per outlet per month with a free trial — one outlet keeps it simple and cheap.",
-  few: "Each branch gets its own QR kit and staff accounts; stamps and rewards work across all of them.",
-  many: "Multi-outlet reporting, per-branch staff permissions and cross-outlet stamping are exactly what our analytics phase is built for.",
-  planning: "Starting fresh is the best time — launch day one with digital loyalty and skip paper entirely. The free trial means you pay nothing until doors open.",
+  one: "Pricing is per outlet per month, with a free trial. One outlet keeps it simple and affordable.",
+  few: "Each branch gets its own QR kit and staff accounts. Stamps and rewards work across all of them.",
+  many: "Cross-outlet stamping, per-branch reporting and staff permissions are planned for larger chains like yours.",
+  planning: "Opening day is the best time to start — launch with digital loyalty and skip paper entirely. The free trial means you pay nothing while you set up.",
 };
 
 const GOAL_NOTE: Record<string, string> = {
-  paper: "You'd be live in an afternoon: set your stamp count and reward, print the QR kit, done — no app for customers, no hardware for staff.",
-  retention: "Milestone rewards, birthday treats and \"we miss you\" nudges (WhatsApp-first, opt-in) are the retention engine we're building right after the core card.",
-  growth: "Referral links that reward both sides plus campaign tools are on the roadmap right behind the MVP — you'd shape them as a pilot merchant.",
-  insight: "Repeat-visit rate, member share of sales and per-branch numbers land in our analytics phase — pilots get them first.",
+  paper: "You could be live in an afternoon: set your stamp count and reward, print the QR kit, done. No app for customers, no hardware for staff.",
+  retention: "Milestone rewards, birthday treats and win-back messages on WhatsApp are next on our roadmap. Every message is opt-in.",
+  growth: "Referral links that reward both the sender and the friend are coming soon — pilot merchants help shape them.",
+  insight: "Repeat-visit rate, member share of sales and per-branch numbers are planned — pilot merchants get them first.",
 };
 
 function answerLabel(answers: Answers, q: QuestionId): string {
@@ -195,7 +195,7 @@ export function LeadQualifier() {
       </div>
 
       <h3 className="mt-6 font-serif text-2xl font-normal tracking-tight text-text sm:text-[32px] sm:leading-tight">
-        Here&apos;s how Kembali fits you.
+        Here&apos;s how Kembali fits your business.
       </h3>
 
       <div className="mt-4 flex flex-col gap-3 font-mono text-sm leading-relaxed text-text-secondary sm:text-base">
@@ -209,7 +209,7 @@ export function LeadQualifier() {
           href={buildMailto(answers)}
           className="press inline-flex h-12 items-center justify-center rounded-full bg-primary px-8 font-mono text-sm uppercase tracking-tight text-on-primary hover:bg-primary-hover"
         >
-          Email us — we reply fast ▸
+          Email us your answers ▸
         </a>
         <button
           type="button"
@@ -221,8 +221,8 @@ export function LeadQualifier() {
       </div>
 
       <p className="mt-4 font-mono text-xs text-text-muted">
-        Your answers are prefilled into the email — nothing is sent or stored
-        until you hit send.
+        Your answers are prefilled into the email. Nothing is sent or stored
+        until you send it.
       </p>
     </div>
   );

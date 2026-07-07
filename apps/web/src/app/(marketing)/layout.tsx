@@ -22,7 +22,7 @@ const jetbrains = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "Kembali — loyalty cards your customers never lose",
   description:
-    "Digital stamp cards for cafés, F&B, salons and gyms in Malaysia & SEA. Customers join from a QR in under 30 seconds — no app, no hardware. Make them kembali.",
+    "Digital stamp cards for cafés, F&B, salons and gyms in Malaysia & SEA. Customers join from a QR in under 30 seconds — no app, no hardware. Make them come back.",
 };
 
 export default function MarketingLayout({

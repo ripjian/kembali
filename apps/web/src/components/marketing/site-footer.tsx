@@ -10,7 +10,7 @@ export function SiteFooter() {
           <p className="font-mono text-sm text-text-secondary">
             The stamp card that lives on your customers&apos; phones.
             <br />
-            Make them <span className="text-accent-deep">kembali</span>.
+            Make them come back.
           </p>
         </div>
 
@@ -46,7 +46,7 @@ export function SiteFooter() {
           © 2026 Kembali — Malaysia &amp; SEA
         </p>
         <p className="font-mono text-xs uppercase tracking-tight text-text-muted">
-          PDPA-first: opt-in marketing, export &amp; delete on request
+          PDPA: marketing is opt-in; export or delete your data anytime
         </p>
       </div>
     </footer>

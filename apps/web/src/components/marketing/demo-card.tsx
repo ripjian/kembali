@@ -15,7 +15,7 @@ export function DemoCard() {
     <div className="w-full max-w-sm rounded-[40px] border border-border bg-surface p-8">
       <div className="flex items-center justify-between">
         <p className="font-mono text-xs uppercase tracking-tight text-text-muted">
-          Demo — Kopi Card
+          Demo — Coffee Card
         </p>
         <p className="font-mono text-xs uppercase tracking-tight text-text-muted tabular-nums">
           {stamps}/{TOTAL}
@@ -38,10 +38,11 @@ export function DemoCard() {
       <p className="mt-6 min-h-10 font-mono text-sm text-text-secondary" aria-live="polite">
         {done ? (
           <span className="text-accent-deep">
-            Reward earned — free kopi. That&apos;s the moment they come back for.
+            Reward earned — a free coffee. This is the moment that brings
+            customers back.
           </span>
         ) : (
-          <>Tap stamp — this is what your customer sees, live, after each visit.</>
+          <>Tap &quot;Stamp it&quot; to see what your customer sees after each visit.</>
         )}
       </p>
 

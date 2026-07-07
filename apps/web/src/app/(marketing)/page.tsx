@@ -10,32 +10,32 @@ const FEATURES = [
   {
     glyph: "◍",
     title: "A card they can't lose",
-    body: "Lives on their phone as a web card — no app store, no download, no forgotten paper card in the other wallet.",
-    tag: "MVP",
+    body: "The card lives on their phone as a web page — no app store, no download, nothing left at home.",
+    tag: "At launch",
   },
   {
     glyph: "⌁",
-    title: "3-second cashier scan",
-    body: "Staff stamp with any phone camera. Rotating signed QR codes stop screenshots and buddy-stamping cold.",
-    tag: "MVP",
+    title: "3-second stamping",
+    body: "Staff stamp with any phone camera. QR codes rotate and expire, so screenshots and shared codes don't work.",
+    tag: "At launch",
   },
   {
     glyph: "▤",
-    title: "Dashboard & CRM",
-    body: "Today's stamps, signups and redemptions in real time, with every customer's visit history behind them.",
-    tag: "MVP",
+    title: "Dashboard & customer list",
+    body: "See today's stamps, signups and redemptions as they happen, plus each customer's visit history.",
+    tag: "At launch",
   },
   {
     glyph: "✆",
-    title: "WhatsApp-first campaigns",
-    body: "Birthday treats, coupon-expiry reminders and win-back nudges on the channel SEA actually reads. Opt-in, PDPA-first.",
-    tag: "Next",
+    title: "WhatsApp campaigns",
+    body: "Send birthday rewards, expiry reminders and win-back offers on WhatsApp. Every message is opt-in, as PDPA requires.",
+    tag: "Coming soon",
   },
   {
     glyph: "⇄",
-    title: "Referrals both sides love",
-    body: "Personal referral links that reward the sender and the friend — your regulars become your growth channel.",
-    tag: "Next",
+    title: "Referral rewards",
+    body: "Customers share a personal link. When a friend joins, both of them get a reward.",
+    tag: "Coming soon",
   },
 ];
 
@@ -60,12 +60,12 @@ export default function Home() {
           <p className="max-w-2xl font-mono text-base leading-relaxed text-text-secondary sm:text-xl">
             Kembali puts your stamp card on your customer&apos;s phone. They
             join from a QR in under 30 seconds — no app to download, no
-            hardware for your staff. Make them kembali.
+            hardware for your staff. Make them come back.
           </p>
           <div className="flex flex-col gap-3 sm:flex-row">
             <PillLink href="/#reach-out">Tell us about your business ▸</PillLink>
             <PillLink href="/roadmap" variant="ghost">
-              See what&apos;s coming →
+              See the roadmap →
             </PillLink>
           </div>
         </div>
@@ -74,7 +74,7 @@ export default function Home() {
       {/* Proof strip — pill nodes, the system's diagram language */}
       <section className="border-y border-border">
         <div className="mx-auto flex w-full max-w-[1432px] flex-wrap items-center justify-center gap-3 px-6 py-8">
-          {["Join in < 30s", "Stamp in ≤ 3s", "0 app downloads", "0 extra hardware", "PDPA-ready"].map(
+          {["Join in under 30s", "Stamp in 3s", "No app needed", "No extra hardware", "Built for PDPA"].map(
             (stat) => (
               <Tag key={stat}>{stat}</Tag>
             ),
@@ -89,7 +89,7 @@ export default function Home() {
             How it works
           </p>
           <h2 className="mt-3 max-w-2xl font-serif text-3xl font-normal leading-tight tracking-tight text-text sm:text-5xl">
-            Paper stamp cards, minus the paper. And the losing.
+            The stamp card your customers already know — now on their phone.
           </h2>
         </Reveal>
 
@@ -113,9 +113,8 @@ export default function Home() {
                   ))}
                 </div>
                 <p className="mt-5 font-mono text-sm leading-relaxed text-text-secondary">
-                  One scan at your counter and the card is theirs — phone
-                  number, done. Every visit after that is a tap and a thank
-                  you.
+                  Customers scan a QR at your counter and enter their phone
+                  number. That&apos;s it — the card is theirs, on every visit.
                 </p>
               </div>
             </Reveal>
@@ -138,9 +137,8 @@ export default function Home() {
                   ))}
                 </div>
                 <p className="mt-5 font-mono text-sm leading-relaxed text-text-secondary">
-                  Any phone with a camera is the stamping machine. No POS
-                  integration, no terminal, no training beyond &quot;point it
-                  there&quot;.
+                  Staff stamp cards with any phone camera. No POS integration,
+                  no terminal, no training needed.
                 </p>
               </div>
             </Reveal>
@@ -160,7 +158,8 @@ export default function Home() {
               Features
             </p>
             <h2 className="mt-3 max-w-2xl font-serif text-3xl font-normal leading-tight tracking-tight text-text sm:text-5xl">
-              Everything a loyalty program needs. Nothing your staff will hate.
+              Everything a loyalty program needs, nothing that slows your
+              counter down.
             </h2>
           </Reveal>
 
@@ -204,8 +203,8 @@ export default function Home() {
                   Your brand, not ours
                 </h3>
                 <p className="font-mono text-base leading-relaxed text-text-secondary">
-                  Your logo, your colors, your domain. Kembali is the engine
-                  under the hood — your customers only ever see your café.
+                  Your logo, your colors, your domain. Customers see your
+                  brand — Kembali stays out of sight.
                 </p>
               </div>
             </Reveal>
@@ -224,8 +223,8 @@ export default function Home() {
               Three questions, then we&apos;ll talk.
             </h2>
             <p className="mt-4 font-mono text-base leading-relaxed text-text-secondary">
-              Tell us what you run and what you&apos;re after — we&apos;ll show
-              you exactly how Kembali would work in your shop.
+              Answer three quick questions and we&apos;ll show you how Kembali
+              fits your business.
             </p>
           </Reveal>
 

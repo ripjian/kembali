@@ -14,14 +14,14 @@ export default function DashboardPage() {
         <LogoWordmark size={26} className="dark:hidden" />
         <LogoWordmark size={26} mono="sand" className="hidden dark:block" />
         <span className="rounded-full bg-surface-alt px-3 py-1 text-xs font-medium text-text-secondary">
-          Phase 0 preview
+          Preview
         </span>
       </header>
 
       <div>
         <h1 className="text-2xl font-semibold text-text">Dashboard</h1>
         <p className="mt-1 text-sm text-text-secondary">
-          Real-time numbers land in Phase 1 — this is the Phase 0 hello-world.
+          Live numbers arrive with the first release. This is a preview.
         </p>
       </div>
 

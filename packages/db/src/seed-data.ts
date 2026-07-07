@@ -1,5 +1,5 @@
 /**
- * Demo seed: one tenant (Kopi Kembali), one outlet, one 9-stamp program,
+ * Demo seed: one tenant (Corner Coffee), one outlet, one 9-stamp program,
  * three customers with cards in different states. Idempotent — fixed UUIDs
  * + ON CONFLICT DO NOTHING, safe to re-run.
  *
@@ -57,8 +57,8 @@ export async function seed(db: SeedDb, now: Date = new Date()): Promise<SeedSumm
     .insert(schema.tenants)
     .values({
       id: T,
-      name: "Kopi Kembali",
-      slug: "kopi-kembali",
+      name: "Corner Coffee",
+      slug: "corner-coffee",
       plan: "trial",
       billingStatus: "trialing",
       // Default theme = Pandan palette (BRAND.md); white-label overrides later.
@@ -71,7 +71,7 @@ export async function seed(db: SeedDb, now: Date = new Date()): Promise<SeedSumm
     .values({
       id: SEED_IDS.outlet,
       tenantId: T,
-      name: "Kopi Kembali — SS15 Subang Jaya",
+      name: "Corner Coffee — SS15 Subang Jaya",
       lat: 3.0762,
       lng: 101.5901,
       timezone: "Asia/Kuala_Lumpur",
@@ -84,7 +84,7 @@ export async function seed(db: SeedDb, now: Date = new Date()): Promise<SeedSumm
       {
         id: SEED_IDS.staffOwner,
         tenantId: T,
-        email: "nadia@kopikembali.example",
+        email: "nadia@cornercoffee.example",
         name: "Nadia Rahman",
         role: "owner",
         outletIds: [SEED_IDS.outlet],
@@ -92,7 +92,7 @@ export async function seed(db: SeedDb, now: Date = new Date()): Promise<SeedSumm
       {
         id: SEED_IDS.staffCashier,
         tenantId: T,
-        email: "farid@kopikembali.example",
+        email: "farid@cornercoffee.example",
         name: "Farid Iskandar",
         role: "cashier",
         outletIds: [SEED_IDS.outlet],
@@ -105,10 +105,10 @@ export async function seed(db: SeedDb, now: Date = new Date()): Promise<SeedSumm
     .values({
       id: SEED_IDS.program,
       tenantId: T,
-      name: "Kopi Card",
+      name: "Coffee Card",
       stampsRequired: 9,
       rewardDefinitions: [
-        { type: "free_drink", title: "Free kopi of your choice" },
+        { type: "free_drink", title: "Free coffee of your choice" },
       ],
       expiryRules: { rewardValidDays: 30 },
     })

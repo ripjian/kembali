@@ -90,8 +90,149 @@
 /* Loops pause until their section is in view (animation-play-state). */
 
 [data-inview="false"]
-  :is(.rm-stamp, .rm-bubble, .rm-bar, .rm-node, .rm-wallet, .rm-flow, .rm-slab) {
+  :is(.rm-stamp, .rm-bubble, .rm-bar, .rm-node, .rm-wallet, .rm-flow, .rm-slab, .rm-fill, .rm-pop, .rm-ring, .rm-toast, .rm-travel) {
   animation-play-state: paused;
+}
+
+/* ---------- phone showcase (steep-style scroll scenes) ---------------- */
+
+/* Scenes stack inside the phone screen; the active one fades/rises in.
+   Inactive scenes also pause their internal loops. */
+.scene {
+  opacity: 0;
+  transform: translateY(14px) scale(0.98);
+  transition:
+    opacity 350ms var(--ease-out-strong),
+    transform 350ms var(--ease-out-strong);
+  pointer-events: none;
+}
+.scene[data-active="true"] {
+  opacity: 1;
+  transform: none;
+}
+.scene[data-active="false"]
+  :is(.rm-stamp, .rm-fill, .rm-wallet, .rm-pop, .rm-ring, .rm-toast) {
+  animation-play-state: paused;
+}
+
+/* Progress bar breathing toward the next reward */
+@keyframes rm-fill {
+  0% {
+    transform: scaleX(0.12);
+  }
+  45% {
+    transform: scaleX(0.42);
+  }
+  70% {
+    transform: scaleX(0.4);
+  }
+  100% {
+    transform: scaleX(0.12);
+  }
+}
+.rm-fill {
+  transform-origin: left;
+  animation: rm-fill 5s var(--ease-in-out-strong) infinite;
+}
+
+/* A single new stamp landing, over and over */
+@keyframes rm-pop {
+  0%,
+  18% {
+    opacity: 0.15;
+    transform: scale(0.6);
+  }
+  26% {
+    opacity: 1;
+    transform: scale(1.12);
+  }
+  32% {
+    transform: scale(1);
+  }
+  86% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  96%,
+  100% {
+    opacity: 0.15;
+    transform: scale(0.6);
+  }
+}
+.rm-pop {
+  animation: rm-pop 4.5s var(--ease-out-strong) infinite;
+}
+
+/* Ripple ring behind the landing stamp */
+@keyframes rm-ring {
+  0%,
+  22% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  28% {
+    opacity: 0.5;
+    transform: scale(0.9);
+  }
+  55% {
+    opacity: 0;
+    transform: scale(1.9);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.9);
+  }
+}
+.rm-ring {
+  animation: rm-ring 4.5s var(--ease-out-strong) infinite;
+}
+
+/* Confirmation toast sliding up inside the phone */
+@keyframes rm-toast {
+  0%,
+  24% {
+    opacity: 0;
+    transform: translateY(120%);
+  }
+  32% {
+    opacity: 1;
+    transform: none;
+  }
+  82% {
+    opacity: 1;
+    transform: none;
+  }
+  92%,
+  100% {
+    opacity: 0;
+    transform: translateY(120%);
+  }
+}
+.rm-toast {
+  animation: rm-toast 4.5s var(--ease-out-strong) infinite;
+}
+
+/* Referral link travelling from sender to friend */
+@keyframes rm-travel {
+  0% {
+    opacity: 0;
+    transform: translateX(0);
+  }
+  12% {
+    opacity: 1;
+  }
+  48% {
+    opacity: 1;
+    transform: translateX(var(--travel, 88px));
+  }
+  60%,
+  100% {
+    opacity: 0;
+    transform: translateX(var(--travel, 88px));
+  }
+}
+.rm-travel {
+  animation: rm-travel 5s var(--ease-in-out-strong) infinite;
 }
 
 /* Phase 1 — stamps landing on a card, one by one (never from scale(0)).
@@ -281,9 +422,21 @@
   .rm-node,
   .rm-wallet,
   .rm-flow,
-  .rm-slab {
+  .rm-slab,
+  .rm-fill,
+  .rm-pop,
+  .rm-ring,
+  .rm-toast,
+  .rm-travel {
     animation: none;
     opacity: 1;
     transform: none;
+  }
+  .rm-ring {
+    opacity: 0;
+  }
+  .scene {
+    transform: none;
+    transition: opacity 200ms ease;
   }
 }

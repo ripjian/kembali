@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 
 import { DemoCard } from "@/components/marketing/demo-card";
+import { FeatureShowcase } from "@/components/marketing/feature-showcase";
 import { LeadQualifier } from "@/components/marketing/lead-qualifier";
 import { PillLink, Tag } from "@/components/marketing/pill";
 import { Reveal } from "@/components/marketing/reveal";
@@ -15,34 +16,22 @@ const STAFF_FLOW = ["Open camera", "Scan their QR", "Stamp — done"];
 
 const FEATURES = [
   {
-    glyph: "◍",
-    title: "A card they can't lose",
-    body: "The card lives on their phone as a web page — no app store, no download, nothing left at home.",
-    tag: "At launch",
-  },
-  {
-    glyph: "⌁",
-    title: "3-second stamping",
-    body: "Staff stamp with any phone camera. QR codes rotate and expire, so screenshots and shared codes don't work.",
-    tag: "At launch",
-  },
-  {
     glyph: "▤",
-    title: "Dashboard & customer list",
-    body: "See today's stamps, signups and redemptions as they happen, plus each customer's visit history.",
+    title: "Simple reports, not homework",
+    body: "Today's stamps, signups and redemptions, plus who keeps coming back. The numbers you check over morning coffee — deeper analytics comes later.",
     tag: "At launch",
   },
   {
     glyph: "✆",
     title: "WhatsApp campaigns",
     body: "Send birthday rewards, expiry reminders and win-back offers on WhatsApp. Every message is opt-in, as PDPA requires.",
-    tag: "Coming soon",
+    tag: "Planned",
   },
   {
     glyph: "⇄",
     title: "Referral rewards",
     body: "Customers share a personal link. When a friend joins, both of them get a reward.",
-    tag: "Coming soon",
+    tag: "Planned",
   },
 ];
 
@@ -174,7 +163,10 @@ export default function Home() {
             </h2>
           </Reveal>
 
-          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {/* Scroll showcase: sticky phone, scenes change per chapter */}
+          <FeatureShowcase />
+
+          <div className="mt-16 grid gap-6 sm:grid-cols-2">
             {FEATURES.map((feature, i) => (
               <Reveal key={feature.title} delay={(i % 3) * 70}>
                 <div className="flex h-full flex-col gap-4 rounded-[40px] border border-border p-10">

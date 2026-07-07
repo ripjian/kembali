@@ -4,10 +4,10 @@ import type { ReactNode } from "react";
 import { PillLink } from "@/components/marketing/pill";
 import { Reveal } from "@/components/marketing/reveal";
 import {
-  AnalyticsIllustration,
   FoundationsIllustration,
   MessagesIllustration,
   PlatformIllustration,
+  ReferralIllustration,
   StampsIllustration,
   WalletIllustration,
 } from "@/components/marketing/roadmap-illustrations";
@@ -18,14 +18,13 @@ export const metadata: Metadata = {
     "What we're building and when — the public, high-level Kembali roadmap.",
 };
 
-type Status = "shipped" | "now" | "next" | "later" | "backlog";
+type Status = "shipped" | "now" | "next" | "later";
 
 const STATUS_STYLE: Record<Status, string> = {
   shipped: "bg-primary text-on-primary",
   now: "bg-primary text-on-primary",
   next: "border border-text text-text",
   later: "border border-border text-text-secondary",
-  backlog: "border border-dashed border-border text-text-muted",
 };
 
 const STATUS_LABEL: Record<Status, string> = {
@@ -33,7 +32,6 @@ const STATUS_LABEL: Record<Status, string> = {
   now: "Building now",
   next: "Up next",
   later: "Later",
-  backlog: "Planned",
 };
 
 interface Phase {
@@ -55,51 +53,59 @@ const PHASES: Phase[] = [
   {
     status: "now",
     title: "The stamp card, done right",
-    body: "The first release: customers get a card from a QR in under 30 seconds, staff stamp it with any phone, and your dashboard shows it working.",
+    body: "The first release: customers get a card from a QR in under 30 seconds, staff stamp it with any phone, and simple reports show it working.",
     points: [
       "Customer card with live stamp animation",
       "3-second stamping with fraud-proof QR codes",
-      "Merchant onboarding, programs & dashboard",
+      "Merchant onboarding & program setup",
+      "Simple reports: stamps, signups, repeat visits",
       "Per-outlet subscription with a free trial",
     ],
     illustration: <StampsIllustration />,
   },
   {
     status: "next",
-    title: "Bring them back automatically",
-    body: "Messages that keep customers returning, sent on WhatsApp — the channel your customers actually read. Every message is opt-in, as PDPA requires.",
+    title: "Apple & Google Wallet passes",
+    body: "Cards that live in the phone's own wallet and update the moment a stamp lands — right next to their boarding passes.",
+    points: [
+      "Apple Wallet pass with live updates",
+      "Google Wallet loyalty cards",
+      "Appears on the lock screen near your outlet",
+    ],
+    illustration: <WalletIllustration />,
+  },
+  {
+    status: "later",
+    title: "Bring them back on WhatsApp",
+    body: "Messages that keep customers returning, sent on the channel they actually read. Every message is opt-in, as PDPA requires.",
     points: [
       "Welcome, birthday & milestone rewards",
       "Reward-expiry reminders & win-back offers",
-      "Referral rewards for both sides",
       "Templates in English, Bahasa Melayu and Chinese",
     ],
     illustration: <MessagesIllustration />,
   },
   {
     status: "later",
-    title: "Multi-outlet & analytics",
-    body: "For when one shop becomes three: stamps that work across branches, per-branch reporting, and the numbers that prove loyalty pays.",
+    title: "Referral rewards",
+    body: "Your regulars bring their friends. Everyone shares a personal link — when a friend joins and visits, both sides get a reward.",
     points: [
-      "Cross-outlet stamping & per-branch reports",
-      "Repeat-visit rate, member share, redemptions",
-      "Fraud alerts & custom domains",
+      "Personal referral links & QR codes",
+      "Rewards for the sender and the friend",
+      "Referral numbers in your reports",
     ],
-    illustration: <AnalyticsIllustration />,
+    illustration: <ReferralIllustration />,
   },
   {
     status: "later",
-    title: "Growth & platform",
-    body: "Kembali opens up: an API for POS integrations, points and tiers beyond stamps, and weekly reports in plain English.",
-    points: ["Public API & webhooks", "Points & tiers", "Weekly summary reports"],
+    title: "Connect your POS & deeper reports",
+    body: "Kembali opens up: an API and webhooks for POS integrations, plus the deeper numbers for growing chains — across every branch.",
+    points: [
+      "Public API & webhooks, POS integrations",
+      "Repeat-visit rate, member share, redemptions",
+      "Cross-outlet stamping & per-branch reports",
+    ],
     illustration: <PlatformIllustration />,
-  },
-  {
-    status: "backlog",
-    title: "Apple & Google Wallet passes",
-    body: "Cards that live in the phone's own wallet and update the moment a stamp lands. The design is ready — we're shipping the core card first.",
-    points: ["Apple Wallet pass with live updates", "Google Wallet loyalty cards", "Appears on the lock screen near your outlet"],
-    illustration: <WalletIllustration />,
   },
 ];
 
@@ -128,13 +134,7 @@ export default function RoadmapPage() {
       <div className="flex flex-col gap-8">
         {PHASES.map((phase, i) => (
           <Reveal key={phase.title} delay={60}>
-            <article
-              className={`grid gap-8 rounded-[40px] border p-8 sm:p-10 lg:grid-cols-2 lg:items-center ${
-                phase.status === "backlog"
-                  ? "border-dashed border-border"
-                  : "border-border"
-              }`}
-            >
+            <article className="grid gap-8 rounded-[40px] border border-border p-8 sm:p-10 lg:grid-cols-2 lg:items-center">
               <div className={i % 2 === 1 ? "lg:order-2" : undefined}>
                 <div className="flex items-center gap-3">
                   <span

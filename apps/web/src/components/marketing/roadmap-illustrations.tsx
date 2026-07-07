@@ -122,11 +122,50 @@ export function PlatformIllustration() {
   );
 }
 
-/** Backlog — the wallet pass, waiting patiently in its slot. */
+/** Referrals — a link travels from one customer to a friend; both win. */
+export function ReferralIllustration() {
+  return (
+    <div className={frame} aria-hidden>
+      <div>
+        <div className="flex items-center gap-3">
+          {/* sender */}
+          <div className="relative">
+            <span className="flex size-14 items-center justify-center rounded-full bg-primary font-mono text-xs text-on-primary">
+              A
+            </span>
+            <span
+              style={iVar(6)}
+              className="rm-stamp absolute -right-1 -top-1 size-5 rounded-full bg-accent"
+            />
+          </div>
+          {/* the shared link travelling across */}
+          <div className="relative h-px w-24 bg-border">
+            <span className="rm-travel absolute -top-1.5 left-0 size-3 rounded-full bg-leaf" />
+          </div>
+          {/* friend */}
+          <div className="relative">
+            <span className="flex size-14 items-center justify-center rounded-full border border-border bg-bg font-mono text-xs text-text">
+              B
+            </span>
+            <span
+              style={iVar(8)}
+              className="rm-stamp absolute -right-1 -top-1 size-5 rounded-full bg-accent"
+            />
+          </div>
+        </div>
+        <p className="mt-5 text-center font-mono text-xs uppercase tracking-tight text-text-muted">
+          Share a link, both get rewarded
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/** Wallet passes — the card sliding into the phone's own wallet. */
 export function WalletIllustration() {
   return (
     <div className={frame} aria-hidden>
-      <div className="rounded-3xl border-2 border-dashed border-border p-4">
+      <div className="rounded-3xl border border-border p-4">
         <div className="rm-wallet w-56 rounded-2xl bg-primary p-5">
           <div className="flex items-center justify-between">
             <span className="font-mono text-xs uppercase tracking-tight text-on-primary">
@@ -145,7 +184,7 @@ export function WalletIllustration() {
             ))}
           </div>
           <p className="mt-4 font-mono text-[10px] uppercase tracking-tight text-on-primary/70">
-            Add to Apple &amp; Google Wallet — planned
+            Add to Apple &amp; Google Wallet
           </p>
         </div>
       </div>

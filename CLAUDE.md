@@ -11,7 +11,7 @@ Multi-tenant SaaS digital stamp-card loyalty platform (Malaysia/SEA first). Cust
 4. `brand/DESIGN-Monad.md` — marketing-site style reference (serif+mono editorial).
 
 ## Current status
-Phase 0 (foundations) + Phase 0.5 (marketing landing, animated /roadmap, one-server routing, copy rules, security baseline) done as of 2026-07-07. **Next: Phase 1 MVP** — OTP auth, scan-to-stamp, merchant onboarding/dashboard, Stripe billing. Wallet passes are BACKLOG (ROADMAP §7) — do not build them.
+Phase 0 (foundations) + Phase 0.5 (marketing landing, animated /roadmap, one-server routing, copy rules, security baseline) done as of 2026-07-08. **Current: Phase 1 MVP** — OTP auth, scan-to-stamp, merchant onboarding, **basic reports** (simple numbers only — deep analytics is Phase 5), Stripe billing. Phase order after that (founder, 2026-07-08): **2 wallet passes → 3 WhatsApp → 4 referrals → 5 API/POS + advanced analytics** (ROADMAP §7). Never build a later phase early. Founder to-do during Phase 1: Apple Developer + Google Wallet Console applications (weeks of lead time).
 
 ## SOP 1 — How to plan any task
 1. Restate the request in one sentence. If two readings are plausible and they diverge materially, ask; otherwise pick the obvious one and say so.

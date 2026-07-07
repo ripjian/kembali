@@ -34,7 +34,7 @@
 
 **Our differentiation = Stampede's CX + merchant tooling AND wallet-native passes (which Stampede lacks), localized for MY/SEA (WhatsApp-first, BM/EN/CN, PDPA).**
 
-> **2026-07-07:** wallet-native passes remain the long-term differentiator but are **backlogged** (see §7 Backlog) — we validate core loyalty CX first. The web PWA card is the MVP surface.
+> **2026-07-08:** wallet-native passes are **Phase 2** — the MVP ships on the web PWA card first, wallet follows immediately after (§7). Still the differentiator vs Stampede.
 
 ### Feature/module inventory observed across the market
 
@@ -143,9 +143,9 @@ audit_log                       actor, action, entity, tenant_id
 
 ---
 
-## 6. Wallet Integration Design — **BACKLOG**
+## 6. Wallet Integration Design — **Phase 2**
 
-> **Status (2026-07-07):** deferred out of the MVP to the Backlog (§7). The design below is retained verbatim for when it's scheduled; nothing in Phases 1–3 may depend on it. The Apple/Google account applications (long lead time) should be started when wallet work is pulled off the backlog.
+> **Status (2026-07-08):** scheduled as Phase 2, right after the core loyalty MVP (was briefly backlogged on 2026-07-07). Nothing in Phase 1 may depend on it. The Apple Developer + Google Wallet Console applications have long lead times — **start them during Phase 1**.
 
 ### Apple Wallet (storeCard pass)
 1. Apple Developer account → **Pass Type ID** + certificate; download WWDR intermediate cert.
@@ -170,49 +170,54 @@ audit_log                       actor, action, entity, tenant_id
 ### Phase 0 — Foundations (Week 1–2) ✅ *done 2026-07-07*
 - Monorepo scaffold (Turborepo, Next.js apps, Drizzle, CI with GitHub Actions).
 - DB schema v1 + RLS; env validation; Sentry; seed scripts.
-- ~~Apple Developer + Google Wallet Console accounts~~ → moved to Backlog trigger (create when wallet work is scheduled).
+- Apple Developer + Google Wallet Console accounts → **now a Phase 1 to-do** (wallet is Phase 2; approvals take weeks — founder action).
 - **Exit criteria:** deploy pipeline green; schema migrated; hello-world on all 3 apps. ✅
 
-### Phase 0.5 — Public face (interleaved) ← *current*
+### Phase 0.5 — Public face (interleaved) ✅ *done 2026-07-08*
 - Marketing landing page at the base domain: what the system is, how it works, and an interactive reach-out section (3 multiple-choice questions narrowing business type + needs → tailored pitch + contact CTA).
 - `/roadmap` page: high-level public roadmap with per-phase animations.
-- Path-based routing wired: `/` marketing, `/app` customer PWA, `/admin` merchant admin.
+- One-server routing: `/` marketing, `/app` customer PWA, `/admin` merchant admin.
 
-### Phase 1 — MVP: Core loyalty (Week 3–8)
+> **Phase order re-set by founder 2026-07-08:** loyalty + basic reports → wallet passes → WhatsApp → referrals → API/POS. Complex analytics deferred to the platform phase. Supersedes the 2026-07-07 sequencing below the decision log.
+
+### Phase 1 — MVP: Core loyalty + basic reports ← *current*
 - **Customer PWA:** OTP login, branded stamp card, live stamp animation, reward list.
 - **Cashier flow:** staff login → camera QR scan → stamp/redeem in ≤3s, offline-tolerant retry.
-- **Merchant admin:** onboarding wizard (branding, program setup: X stamps → reward), outlet + staff management, customer list, basic dashboard (stamps/signups/redemptions today).
+- **Merchant admin:** onboarding wizard (branding, program setup: X stamps → reward), outlet + staff management, customer list.
+- **Basic reports** — the numbers a small business actually checks: stamps/signups/redemptions today and this week, simple repeat-visit count, reward redemptions. Nothing fancier — complex analytics live in Phase 5.
 - **Security:** rotating QR tokens, velocity rules v1, RLS, audit log.
 - **Billing:** Stripe subscription, 14-day trial, plan gate (1 outlet).
 - **Exit criteria:** 1 pilot merchant live; stamp→card-update round trip <5s in the web PWA; zero cross-tenant leakage (tested).
 
-### Phase 2 — Retention engine (Week 9–14)
-- Welcome / birthday / milestone rewards; coupon expiry reminders.
-- **WhatsApp Cloud API** notifications (opt-in), email fallback; message-credit metering.
-- Referral links (both-sides reward), win-back automation ("we miss you").
+### Phase 2 — Apple & Google Wallet passes *(pulled from backlog 2026-07-08)*
+- Full design already written in §6: Apple storeCard + PassKit web service + APNs updates; Google `loyaltyClass`/`loyaltyObject` + signed JWT links.
+- "Add to Apple Wallet / Google Wallet" buttons on the web card; web card stays the source of truth.
+- `/demo` marketing page issuing a real demo pass to the visitor's wallet — best growth asset.
+- **Prerequisite with lead time:** Apple Developer + Google Wallet Console accounts — **start applications now, during Phase 1** (approval takes weeks).
+- **Exit criteria:** stamp→wallet-update round trip <5s; passes survive cert rotation.
+
+### Phase 3 — WhatsApp retention engine
+- Welcome / birthday / milestone rewards; reward-expiry reminders; win-back automation ("we miss you").
+- **WhatsApp Cloud API** notifications (opt-in), email fallback; message-credit metering; template approval lead time.
 - Customer CRM: visit history, segments (active / slipping / lapsed).
-- Multi-language: EN + BM (+ CN templates).
+- Multi-language templates: EN + BM (+ CN).
 - **Exit criteria:** ≥1 automated campaign live per pilot merchant; opt-in/out fully honored.
 
-### Phase 3 — Multi-outlet & analytics (Week 15–20)
-- Cross-outlet stamping/redemption, per-branch reporting, staff-per-branch permissions.
-- Fraud dashboard (flags, per-cashier stats).
-- Analytics: repeat-visit rate, member share of transactions, redemption rate, time-between-visits.
-- Custom domains per merchant (white-label), theming polish.
-- Customer import (CSV) for merchants migrating from paper/other platforms.
-- **Exit criteria:** a 2+ outlet chain running; weekly merchant report email.
+### Phase 4 — Referrals
+- Personal referral links/QRs, both-sides rewards, anti-abuse rules (self-referral, velocity).
+- Referral performance in the merchant dashboard.
+- **Exit criteria:** measurable referred-signup rate at a pilot merchant.
 
-### Phase 4 — Growth & platform (Week 21+)
-- Public **API + webhooks** (POS integrations later: Square/StoreHub/Feedme are SEA-relevant).
-- Points/tiers mode (beyond stamps) — competitive gap vs Loopy Loyalty.
-- AI weekly plain-English reports; campaign send-time optimization.
-- Meta ads integration.
-- Reseller/agency (white-label) tier; SG/PH/ID expansion; local billing (FPX, TNG).
+### Phase 5 — Platform: API, POS & deeper analytics
+- Public **API + webhooks**; POS integrations (Square/StoreHub/Feedme are SEA-relevant).
+- **Advanced analytics** (deferred from early phases): repeat-visit rate, member share of transactions, redemption rate, time-between-visits, per-branch reporting, weekly report email.
+- Multi-outlet: cross-outlet stamping/redemption, staff-per-branch permissions; fraud dashboard; custom domains; CSV customer import.
+- **Exit criteria:** one external integration live; a 2+ outlet chain running on advanced reports.
 
-### Backlog (no committed week — pull when core loyalty is validated)
-- **Apple Wallet + Google Wallet passes** — full design in §6 (pass issue, APNs/PATCH updates, PassKit web service). Was the MVP differentiator; backlogged 2026-07-07 to ship core loyalty CX first. Pulling this item requires starting the Apple Developer + Google Wallet Console applications immediately (long approval lead time), and revisits §11's wallet KPIs and §12's pass-infra risk.
-- Google Wallet smart-tap/NFC exploration; lock-screen geo relevance (`locations[]`) — both depend on the item above.
-- `/demo` page issuing a real demo pass to the visitor's wallet (§10) — wallet-dependent; until then the landing page carries an interactive web demo card instead.
+### Backlog (no committed order)
+- Google Wallet smart-tap/NFC exploration; lock-screen geo relevance (`locations[]`).
+- Points/tiers mode (beyond stamps); AI weekly plain-English reports; campaign send-time optimization.
+- Meta ads integration; reseller/agency tier; SG/PH/ID expansion; local billing (FPX, TNG).
 
 ---
 
@@ -281,12 +286,12 @@ Super-admin (internal): /tenants, /usage, /billing-health, /feature-flags
 ## 11. KPIs
 
 - **Merchant-side:** trial→paid conversion, churn, outlets per tenant.
-- **Product:** join-flow completion rate (>80%), stamp→card-update latency (<5s), scan success rate. *(Wallet-add rate + wallet-update latency return with the §7 Backlog wallet item.)*
+- **Product:** join-flow completion rate (>80%), stamp→card-update latency (<5s), scan success rate. *(Wallet-add rate + wallet-update latency join in Phase 2.)*
 - **End-customer (the numbers merchants buy for):** repeat-visit rate, member share of transactions (target >33%), coupon redemption rate (Stampede benchmark: 59%).
 
 ## 12. Risks
 
-- ~~Apple pass update infra is the hardest MVP piece~~ → **de-risked by backlogging wallet passes (2026-07-07)**; the certs/APNs/web-service complexity now sits behind an explicit backlog pull. New risk: shipping without the wallet differentiator means MVP must win on CX + price alone.
+- **Apple pass update infra is the hardest Phase 2 piece** (certs, APNs, web service protocol). Its critical-path item is the **account approvals** — Apple Developer + Google Wallet Console applications must start during Phase 1 or Phase 2 slips.
 - **WhatsApp API costs/approval** — template approval lead time; meter credits from day one.
 - **QR fraud** — mitigated by rotating signed tokens + velocity rules (see §5).
 - **Incumbent moat (Stampede)** — compete on wallet-native passes + pricing + niche verticals first.
@@ -308,6 +313,7 @@ Super-admin (internal): /tenants, /usage, /billing-health, /feature-flags
 | 2026-07-07 | Marketing style = editorial serif+mono (DESIGN-Monad.md ref) on Kembali palette | Founder-supplied reference; brand colors stay Pandan |
 | 2026-07-07 | **English-only copy; "Kembali" only as brand name** | Founder call: don't force Malay/English mixing; ux-writing skill governs style (see §10 copy hard rules, BRAND.md §5) |
 | 2026-07-07 | **Security baseline codified in SECURITY.md** — ASVS 5.0 L2 as code standard, ISO 27001:2022 alignment, PDPA 2024 amendments; headers + CI audit + Dependabot added | Founder wants certification-ready posture; lower-grade models need explicit rules |
+| 2026-07-08 | **Phase order re-set:** loyalty + basic reports → wallet passes → WhatsApp → referrals → API/POS; complex analytics deferred to Phase 5 | Founder call: wallet differentiator right after MVP; small businesses need simple reports first, deep analytics later (supersedes 2026-07-07 wallet-backlog row) |
 
 ## 14. References
 

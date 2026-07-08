@@ -31,7 +31,7 @@ import {
  * always applies. Production login users are members of this role. */
 export const appRole = pgRole("kembali_app");
 
-const tenantMatch = sql`tenant_id = current_setting('app.tenant_id', true)::uuid`;
+const tenantMatch = sql`tenant_id = nullif(current_setting('app.tenant_id', true), '')::uuid`;
 
 /** Standard full-access-within-own-tenant policy for the app role. */
 function tenantPolicy(table: string) {
@@ -52,6 +52,7 @@ const tenantId = () =>
     .references(() => tenants.id);
 
 export const staffRole = pgEnum("staff_role", ["owner", "manager", "cashier"]);
+export const sessionKind = pgEnum("session_kind", ["customer", "staff", "platform"]);
 export const cardStatus = pgEnum("card_status", ["active", "completed", "revoked"]);
 export const stampSource = pgEnum("stamp_source", ["qr", "manual"]);
 export const rewardState = pgEnum("reward_state", ["earned", "redeemed", "expired"]);
@@ -70,6 +71,10 @@ export const tenants = pgTable(
     billingStatus: text("billing_status").notNull().default("trialing"),
     /** logo URL, brand colors, custom domain — white-label (ROADMAP §1) */
     branding: jsonb("branding").notNull().default({}),
+    /** Feature-module toggles managed by the platform admin. */
+    modules: jsonb("modules")
+      .notNull()
+      .default({ stamps: true, scan: true, reports: true }),
     createdAt: createdAt(),
   },
   () => [
@@ -77,7 +82,15 @@ export const tenants = pgTable(
     pgPolicy("tenants_tenant_isolation", {
       for: "select",
       to: appRole,
-      using: sql`id = current_setting('app.tenant_id', true)::uuid`,
+      using: sql`id = nullif(current_setting('app.tenant_id', true), '')::uuid`,
+    }),
+    // Platform admins manage all tenants — the app sets this GUC only
+    // after verifying a platform session (client.ts withPlatform).
+    pgPolicy("tenants_platform_all", {
+      for: "all",
+      to: appRole,
+      using: sql`current_setting('app.platform_admin', true) = 'true'`,
+      withCheck: sql`current_setting('app.platform_admin', true) = 'true'`,
     }),
   ],
 );
@@ -104,13 +117,68 @@ export const staffUsers = pgTable(
     email: text("email").notNull(),
     name: text("name").notNull(),
     role: staffRole("role").notNull().default("cashier"),
+    /** scrypt hash (packages/core auth) — null until an invite is accepted */
+    passwordHash: text("password_hash"),
     /** Cashiers are scoped to assigned outlets (ROADMAP §5). */
     outletIds: uuid("outlet_ids").array().notNull().default([]),
     createdAt: createdAt(),
   },
   (t) => [
     tenantPolicy("staff_users"),
+    // Platform admins create merchant logins and reset passwords.
+    pgPolicy("staff_users_platform_all", {
+      for: "all",
+      to: appRole,
+      using: sql`current_setting('app.platform_admin', true) = 'true'`,
+      withCheck: sql`current_setting('app.platform_admin', true) = 'true'`,
+    }),
     uniqueIndex("staff_users_tenant_email_uq").on(t.tenantId, t.email),
+  ],
+);
+
+/* ---- global auth tables (not tenant data: keyed by unguessable secrets,
+        accessed before a tenant context exists) ------------------------- */
+
+export const platformAdmins = pgTable(
+  "platform_admins",
+  {
+    id: id(),
+    email: text("email").notNull().unique(),
+    name: text("name").notNull(),
+    passwordHash: text("password_hash").notNull(),
+    createdAt: createdAt(),
+  },
+  () => [
+    pgPolicy("platform_admins_app_access", {
+      for: "all",
+      to: appRole,
+      using: sql`true`,
+      withCheck: sql`true`,
+    }),
+  ],
+);
+
+export const sessions = pgTable(
+  "sessions",
+  {
+    id: id(),
+    /** sha256 of the cookie token — the raw token never touches the DB */
+    tokenHash: text("token_hash").notNull().unique(),
+    kind: sessionKind("kind").notNull(),
+    subjectId: uuid("subject_id").notNull(),
+    /** null for platform sessions */
+    tenantId: uuid("tenant_id").references(() => tenants.id),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    pgPolicy("sessions_app_access", {
+      for: "all",
+      to: appRole,
+      using: sql`true`,
+      withCheck: sql`true`,
+    }),
+    index("sessions_expiry_idx").on(t.expiresAt),
   ],
 );
 
@@ -190,6 +258,9 @@ export const stampEvents = pgTable(
       .references(() => outlets.id),
     staffId: uuid("staff_id").references(() => staffUsers.id),
     source: stampSource("source").notNull(),
+    /** Transaction amount captured at the counter (sen). v1: lives on the
+     * ledger event; a dedicated payments table can come later. */
+    amountCents: integer("amount_cents"),
     createdAt: createdAt(),
   },
   (t) => [
@@ -285,6 +356,21 @@ export const deviceRegistrations = pgTable(
   ],
 );
 
+export const otpCodes = pgTable(
+  "otp_codes",
+  {
+    id: id(),
+    tenantId: tenantId(),
+    phone: text("phone").notNull(),
+    codeHash: text("code_hash").notNull(),
+    attempts: integer("attempts").notNull().default(0),
+    consumedAt: timestamp("consumed_at", { withTimezone: true }),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    createdAt: createdAt(),
+  },
+  (t) => [tenantPolicy("otp_codes"), index("otp_codes_phone_idx").on(t.tenantId, t.phone)],
+);
+
 export const messages = pgTable(
   "messages",
   {
@@ -324,6 +410,13 @@ export const auditLog = pgTable(
       for: "insert",
       to: appRole,
       withCheck: tenantMatch,
+    }),
+    // Platform actions (create tenant, reset password, toggle modules)
+    // must be auditable across tenants.
+    pgPolicy("audit_log_platform_insert", {
+      for: "insert",
+      to: appRole,
+      withCheck: sql`current_setting('app.platform_admin', true) = 'true'`,
     }),
     index("audit_log_tenant_idx").on(t.tenantId, t.createdAt),
   ],

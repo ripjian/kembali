@@ -31,6 +31,7 @@ Violating any of these fails review, no exceptions:
 10. **No PII in logs or error messages.** Phone numbers, emails, and names never go to console/Sentry. Log IDs, not identities.
 11. **PDPA is product behavior**: marketing messages only to explicitly opted-in channels (`customers.marketing_opt_ins`); data export and delete must always work; breach response within 72 hours (see §6).
 12. **Dependencies**: `pnpm audit` runs in CI; Dependabot PRs get reviewed, not rubber-stamped. New dependencies need a stated reason in the PR — prefer the platform/stdlib.
+13. **Dev conveniences never reach production.** The OTP bypass code (888888) is gated on `NODE_ENV !== "production"` (`apps/web/src/lib/config.ts`) — never widen that gate. Seeded demo credentials (`SEED_LOGINS` in `packages/db/src/seed-data.ts`) exist for local/pilot testing only: rotate or remove them before any deployment holding real customer data. The embedded PGlite dev database is refused in production (`lib/db.ts` throws without DATABASE_URL).
 
 ## 3. Feature security checklist (run before every merge)
 
@@ -52,13 +53,16 @@ Violating any of these fails review, no exceptions:
 | Input validation (ASVS V5) | zod at every boundary; `createEnv()` fails boot on bad env | typecheck + boot behavior |
 | Secure headers (ASVS V14/V50) | CSP, HSTS, nosniff, frame-ancestors, Permissions-Policy in `apps/web/next.config.ts` | `curl -I` in verification workflow |
 | Secrets management (A.8.24) | Env vars only; `.gitignore` blocks `.env*`, certs, keys; secrets manager in prod | repo scan; review |
-| Cryptography (ASVS V6) | QR tokens HMAC-signed (Phase 1); TLS everywhere (platform) | Phase 1 tests |
+| Cryptography (ASVS V6) | QR tokens HMAC-SHA256 (90s TTL), scrypt passwords, sha256-hashed session tokens — `packages/core/src/auth.ts` | `packages/core/src/auth.test.ts` |
+| Authentication (ASVS V2/V3) | Customer OTP (hashed, 5-min TTL, 5 attempts, 3-live-codes rate limit); staff/platform passwords; httpOnly/secure/lax cookies; sessions expire + delete on logout | core tests + manual flows |
+| Anti-fraud velocity (ASVS V11) | 60s min interval + 10/day per card enforced server-side on every stamp | `packages/core` tests |
+| Platform-admin separation | `app.platform_admin` GUC bypass limited to tenants/staff_users, set only by `withPlatform()` after a verified platform session; all uses audit-logged | code review + RLS suite |
 | Vulnerable components (A.8.8) | `pnpm audit` in CI + Dependabot weekly | CI |
 | Monitoring (A.8.16) | Sentry (DSN via env, no PII) | config review |
 | Backup/DR (A.8.13) | Postgres PITR (Neon/Supabase) + restore runbook | Phase 1 setup task |
 | Privacy & PDPA (A.5.34) | Per-channel opt-in field; export/delete endpoints (Phase 1); retention policy | schema now; endpoint tests Phase 1 |
 
-Gaps are listed honestly: rate limiting, OTP auth, nonce-based CSP, export/delete endpoints, and the DR runbook are **Phase 1 exit criteria**, not done.
+Gaps are listed honestly: real OTP delivery (SMS/WhatsApp), IP-level rate limiting on auth endpoints, nonce-based CSP, PDPA export/delete endpoints, TOTP 2FA for staff, and the DR runbook are **Phase 1 exit criteria**, not done. Global auth tables (`sessions`, `otp_codes` via tenant policy, `platform_admins`) are keyed by unguessable hashes and are deliberately outside tenant RLS.
 
 ## 5. Secrets & keys
 

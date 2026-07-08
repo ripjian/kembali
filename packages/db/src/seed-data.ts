@@ -6,6 +6,7 @@
  * Runs as the migration/owner role (RLS does not apply to seeding); the
  * apps themselves always go through `withTenant` + the `kembali_app` role.
  */
+import { hashPassword } from "@kembali/core";
 import type { PgDatabase, PgQueryResultHKT } from "drizzle-orm/pg-core";
 
 import * as schema from "./schema";
@@ -13,6 +14,15 @@ import * as schema from "./schema";
 type SeedDb = PgDatabase<PgQueryResultHKT, typeof schema>;
 
 const T = "11111111-1111-4111-8111-111111111111";
+
+/** DEV/DEMO credentials — for local testing only, never a production
+ * deployment. Rotate/remove before real customer data exists. */
+export const SEED_LOGINS = {
+  platformAdmin: { email: "admin@kembali.app", password: "KembaliAdmin1!" },
+  merchantOwner: { email: "nadia@cornercoffee.example", password: "CornerCoffee1!" },
+  merchantCashier: { email: "farid@cornercoffee.example", password: "CornerStaff1!" },
+  customerPhone: "+60123456701",
+} as const;
 
 export const SEED_IDS = {
   tenant: T,
@@ -31,6 +41,7 @@ export const SEED_IDS = {
     priya: "66666666-6666-4666-8666-666666666603",
   },
   reward: "77777777-7777-4777-8777-777777777701",
+  platformAdmin: "99999999-0000-4000-8000-000000000001",
 } as const;
 
 function eventId(n: number): string {
@@ -84,20 +95,32 @@ export async function seed(db: SeedDb, now: Date = new Date()): Promise<SeedSumm
       {
         id: SEED_IDS.staffOwner,
         tenantId: T,
-        email: "nadia@cornercoffee.example",
+        email: SEED_LOGINS.merchantOwner.email,
         name: "Nadia Rahman",
         role: "owner",
+        passwordHash: hashPassword(SEED_LOGINS.merchantOwner.password),
         outletIds: [SEED_IDS.outlet],
       },
       {
         id: SEED_IDS.staffCashier,
         tenantId: T,
-        email: "farid@cornercoffee.example",
+        email: SEED_LOGINS.merchantCashier.email,
         name: "Farid Iskandar",
         role: "cashier",
+        passwordHash: hashPassword(SEED_LOGINS.merchantCashier.password),
         outletIds: [SEED_IDS.outlet],
       },
     ])
+    .onConflictDoNothing();
+
+  await db
+    .insert(schema.platformAdmins)
+    .values({
+      id: SEED_IDS.platformAdmin,
+      email: SEED_LOGINS.platformAdmin.email,
+      name: "System Admin",
+      passwordHash: hashPassword(SEED_LOGINS.platformAdmin.password),
+    })
     .onConflictDoNothing();
 
   await db
@@ -178,6 +201,8 @@ export async function seed(db: SeedDb, now: Date = new Date()): Promise<SeedSumm
       outletId: SEED_IDS.outlet,
       staffId: SEED_IDS.staffCashier,
       source: "qr" as const,
+      // deterministic demo amounts: RM12.00–RM25.50
+      amountCents: 1200 + ((n * 150) % 1350),
       createdAt: daysAgo(now, (count - i) * 3),
     })),
   );

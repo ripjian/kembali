@@ -17,8 +17,8 @@ const frame =
 export function FoundationsIllustration() {
   const layers = [
     { label: "Your brand & card", width: "w-36", i: 2 },
-    { label: "Tamper-proof stamp ledger", width: "w-48", i: 1 },
-    { label: "Isolated data per merchant", width: "w-60", i: 0 },
+    { label: "Tamper-proof stamp ledger", width: "w-44 sm:w-48", i: 1 },
+    { label: "Isolated data per merchant", width: "w-52 sm:w-60", i: 0 },
   ];
   return (
     <div className={frame} aria-hidden>
@@ -44,10 +44,10 @@ export function FoundationsIllustration() {
 export function StampsIllustration() {
   return (
     <div className={frame} aria-hidden>
-      <div className="panel-ring rounded-xl border border-border bg-surface p-6">
-        <div className="grid grid-cols-5 gap-3">
+      <div className="panel-ring rounded-xl border border-border bg-surface p-4 sm:p-6">
+        <div className="grid grid-cols-5 gap-2 sm:gap-3">
           {Array.from({ length: 10 }, (_, i) => (
-            <span key={i} style={iVar(i)} className="rm-stamp size-9 rounded-full bg-accent" />
+            <span key={i} style={iVar(i)} className="rm-stamp size-7 rounded-full bg-accent sm:size-9" />
           ))}
         </div>
         <p className="mt-4 font-mono text-xs text-text-muted">
@@ -62,8 +62,8 @@ export function StampsIllustration() {
 export function WalletIllustration() {
   return (
     <div className={frame} aria-hidden>
-      <div className="panel-ring rounded-xl border border-border bg-surface p-4">
-        <div className="rm-wallet w-56 rounded-xl bg-primary p-5">
+      <div className="panel-ring w-full max-w-64 rounded-xl border border-border bg-surface p-3 sm:p-4">
+        <div className="rm-wallet w-full rounded-xl bg-primary p-4 sm:p-5">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-on-primary">Coffee Card</span>
             <span className="size-3 rounded-full bg-accent" />
@@ -91,7 +91,7 @@ export function WalletIllustration() {
 export function MessagesIllustration() {
   return (
     <div className={frame} aria-hidden>
-      <div className="flex w-64 flex-col gap-3 text-xs leading-snug">
+      <div className="flex w-full max-w-64 flex-col gap-3 px-3 text-xs leading-snug">
         <div style={iVar(0)} className="rm-bubble max-w-52 self-start rounded-2xl rounded-bl-md border border-border bg-surface px-4 py-2.5 text-text-secondary">
           Welcome! Your card is ready ☕
         </div>
@@ -121,7 +121,7 @@ export function ReferralIllustration() {
               className="rm-stamp absolute -right-1 -top-1 size-5 rounded-full bg-accent"
             />
           </div>
-          <div className="relative h-px w-24 bg-border">
+          <div className="relative h-px w-14 bg-border sm:w-24">
             <span className="rm-travel absolute -top-1.5 left-0 size-3 rounded-full bg-leaf" />
           </div>
           <div className="relative">
@@ -148,7 +148,7 @@ export function PlatformIllustration() {
   return (
     <div className={frame} aria-hidden>
       <div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center justify-center gap-2">
           {nodes.map((label, i) => (
             <span key={label} className="flex items-center gap-2">
               <span
@@ -157,7 +157,7 @@ export function PlatformIllustration() {
               >
                 {label}
               </span>
-              {i < nodes.length - 1 && <span className="h-px w-6 bg-border" />}
+              {i < nodes.length - 1 && <span className="hidden h-px w-6 bg-border sm:block" />}
             </span>
           ))}
         </div>

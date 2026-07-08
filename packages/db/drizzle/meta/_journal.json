@@ -15,6 +15,34 @@
       "when": 1783423021471,
       "tag": "0001_append_only_guards",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1783457591538,
+      "tag": "0002_auth_and_amounts",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1783457592268,
+      "tag": "0003_auth_grants",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1783477301558,
+      "tag": "0004_safe_guc_cast",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1783477657124,
+      "tag": "0005_audit_platform_insert",
+      "breakpoints": true
     }
   ]
 }

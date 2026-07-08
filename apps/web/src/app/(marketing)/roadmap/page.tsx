@@ -58,7 +58,7 @@ const PHASES: Phase[] = [
       "Customer card with live stamp animation",
       "3-second stamping with fraud-proof QR codes",
       "Merchant onboarding & program setup",
-      "Simple reports: stamps, signups, repeat visits",
+      "Simple reports: stamps, sales, repeat visits — already live in the pilot build",
       "Per-outlet subscription with a free trial",
     ],
     illustration: <StampsIllustration />,
@@ -129,48 +129,96 @@ export default function RoadmapPage() {
         </Reveal>
       </section>
 
-      <div className="flex flex-col gap-6">
-        {PHASES.map((phase, i) => (
-          <Reveal key={phase.title} delay={60}>
-            <article className="grid gap-8 rounded-2xl border border-border bg-surface p-6 sm:p-8 lg:grid-cols-2 lg:items-center">
-              <div className={i % 2 === 1 ? "lg:order-2" : undefined}>
-                <div className="flex items-center gap-3">
-                  <span
-                    className={`rounded-full px-3 py-1 text-xs font-medium ${STATUS_STYLE[phase.status]}`}
-                  >
-                    {STATUS_LABEL[phase.status]}
-                  </span>
-                  <span className="font-mono text-xs text-text-muted tabular-nums">
-                    {String(i).padStart(2, "0")}
-                  </span>
-                </div>
-                <h2 className="mt-3 text-2xl font-medium leading-tight tracking-[-0.02em] text-text sm:text-3xl">
-                  {phase.title}
-                </h2>
-                <p className="mt-3 text-sm leading-relaxed text-text-secondary sm:text-base">
-                  {phase.body}
-                </p>
-                <ul className="mt-4 flex flex-col gap-1.5">
-                  {phase.points.map((point) => (
-                    <li
-                      key={point}
-                      className="flex items-baseline gap-2.5 text-sm text-text-secondary"
-                    >
-                      <span aria-hidden className="size-1.5 shrink-0 translate-y-[-2px] rounded-full bg-leaf" />
-                      {point}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              {phase.illustration && (
-                <div className={i % 2 === 1 ? "lg:order-1" : undefined}>
-                  {phase.illustration}
-                </div>
+      {/* The line — every phase is a station on Kembali's return journey.
+          Solid track behind us, dashed track ahead, the current station
+          pings like a live train. */}
+      <ol className="relative">
+        {PHASES.map((phase, i) => {
+          const reached = phase.status === "shipped" || phase.status === "now";
+          const isLast = i === PHASES.length - 1;
+          return (
+            <li key={phase.title} className="relative pb-8 pl-10 sm:pl-14 last:pb-0">
+              {/* track segment down to the next station */}
+              {!isLast && (
+                <span
+                  aria-hidden
+                  className={`absolute left-[11px] top-6 bottom-0 sm:left-[15px] ${
+                    reached && (PHASES[i + 1]?.status === "shipped" || PHASES[i + 1]?.status === "now")
+                      ? "w-0.5 bg-primary"
+                      : "border-l-2 border-dashed border-border"
+                  }`}
+                />
               )}
-            </article>
-          </Reveal>
-        ))}
-      </div>
+              {/* station */}
+              <span aria-hidden className="absolute left-0 top-1.5 flex size-6 items-center justify-center sm:size-8">
+                {phase.status === "now" && (
+                  <span className="station-ping absolute inset-0 rounded-full border-2 border-primary" />
+                )}
+                <span
+                  className={`size-5 rounded-full border-2 sm:size-6 ${
+                    reached
+                      ? "border-primary bg-primary"
+                      : "border-border bg-surface"
+                  }`}
+                >
+                  {phase.status === "shipped" && (
+                    <span className="flex h-full w-full items-center justify-center text-[10px] text-on-primary">
+                      ✓
+                    </span>
+                  )}
+                </span>
+              </span>
+
+              <Reveal delay={60}>
+                <article className="grid gap-8 rounded-2xl border border-border bg-surface p-6 sm:p-8 lg:grid-cols-2 lg:items-center">
+                  <div>
+                    <div className="flex items-center gap-3">
+                      <span
+                        className={`rounded-full px-3 py-1 text-xs font-medium ${STATUS_STYLE[phase.status]}`}
+                      >
+                        {STATUS_LABEL[phase.status]}
+                      </span>
+                      <span className="font-mono text-xs text-text-muted tabular-nums">
+                        stop {String(i).padStart(2, "0")}
+                      </span>
+                    </div>
+                    <h2 className="mt-3 text-2xl font-medium leading-tight tracking-[-0.02em] text-text sm:text-3xl">
+                      {phase.title}
+                    </h2>
+                    <p className="mt-3 text-sm leading-relaxed text-text-secondary sm:text-base">
+                      {phase.body}
+                    </p>
+                    <ul className="mt-4 flex flex-col gap-1.5">
+                      {phase.points.map((point) => (
+                        <li
+                          key={point}
+                          className="flex items-baseline gap-2.5 text-sm text-text-secondary"
+                        >
+                          <span aria-hidden className="size-1.5 shrink-0 translate-y-[-2px] rounded-full bg-leaf" />
+                          {point}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  {phase.illustration && <div>{phase.illustration}</div>}
+                </article>
+              </Reveal>
+            </li>
+          );
+        })}
+        {/* terminus — the loop back */}
+        <li className="relative mt-2 pl-10 sm:pl-14">
+          <span
+            aria-hidden
+            className="absolute left-0 top-0 flex size-6 items-center justify-center rounded-full border-2 border-dashed border-border bg-surface text-xs text-text-muted sm:size-8"
+          >
+            ↺
+          </span>
+          <p className="pt-1 text-sm text-text-muted">
+            And then the loop continues — pilot merchants pick the next stop.
+          </p>
+        </li>
+      </ol>
 
       <section className="mt-16 flex flex-col items-center gap-5 rounded-2xl border border-border bg-surface-alt px-8 py-14 text-center">
         <Reveal>

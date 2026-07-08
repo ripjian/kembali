@@ -70,6 +70,44 @@
   mask-image: linear-gradient(to bottom, black 55%, transparent 100%);
 }
 
+/* Receipt cards (how-it-works) — the café's own artifact: perforated top,
+   torn zigzag bottom, dotted leaders between item and value. */
+.receipt-perforation {
+  background-image: radial-gradient(circle, var(--border) 2.2px, transparent 2.4px);
+  background-size: 14px 6px;
+  background-position: center;
+  background-repeat: repeat-x;
+}
+.receipt-tear {
+  height: 8px;
+  background:
+    linear-gradient(-45deg, var(--surface) 5.5px, transparent 0) 0 0 / 11px 8px repeat-x,
+    linear-gradient(45deg, var(--surface) 5.5px, transparent 0) 0 0 / 11px 8px repeat-x;
+  filter: drop-shadow(0 1px 0 var(--border));
+}
+.receipt-leader {
+  flex: 1;
+  margin: 0 6px;
+  border-bottom: 2px dotted var(--border);
+  transform: translateY(-4px);
+}
+
+/* Transit-line roadmap — the "now" station pings like a live train */
+@keyframes station-ping {
+  0% {
+    transform: scale(1);
+    opacity: 0.55;
+  }
+  75%,
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+.station-ping {
+  animation: station-ping 2.4s var(--ease-out-strong) infinite;
+}
+
 /* Scroll cue — slow, gentle, transform-only */
 @keyframes cue-bob {
   0%,
@@ -269,7 +307,13 @@
   }
 }
 .rm-travel {
+  --travel: 44px; /* matches the mobile w-14 line */
   animation: rm-travel 5s var(--ease-in-out-strong) infinite;
+}
+@media (min-width: 640px) {
+  .rm-travel {
+    --travel: 88px; /* matches the sm:w-24 line */
+  }
 }
 
 /* Phase 1 — stamps landing on a card, one by one (never from scale(0)).
@@ -476,7 +520,11 @@
     transform: none;
     transition: opacity 200ms ease;
   }
-  .scroll-cue {
+  .scroll-cue,
+  .station-ping {
     animation: none;
+  }
+  .station-ping {
+    opacity: 0;
   }
 }

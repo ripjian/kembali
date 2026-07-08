@@ -41,7 +41,9 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
-  transpilePackages: ["@kembali/ui", "@kembali/config", "@kembali/core"],
+  transpilePackages: ["@kembali/ui", "@kembali/config", "@kembali/core", "@kembali/db"],
+  // PGlite ships WASM that must not be bundled by the server compiler
+  serverExternalPackages: ["@electric-sql/pglite"],
   async headers() {
     return [{ source: "/(.*)", headers: securityHeaders }];
   },

@@ -1,0 +1,1 @@
+CREATE POLICY "audit_log_platform_insert" ON "audit_log" AS PERMISSIVE FOR INSERT TO "kembali_app" WITH CHECK (current_setting('app.platform_admin', true) = 'true');

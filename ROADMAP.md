@@ -180,13 +180,14 @@ audit_log                       actor, action, entity, tenant_id
 
 > **Phase order re-set by founder 2026-07-08:** loyalty + basic reports → wallet passes → WhatsApp → referrals → API/POS. Complex analytics deferred to the platform phase. Supersedes the 2026-07-07 sequencing below the decision log.
 
-### Phase 1 — MVP: Core loyalty + basic reports ← *current*
-- **Customer PWA:** OTP login, branded stamp card, live stamp animation, reward list.
-- **Cashier flow:** staff login → camera QR scan → stamp/redeem in ≤3s, offline-tolerant retry.
-- **Merchant admin:** onboarding wizard (branding, program setup: X stamps → reward), outlet + staff management, customer list.
-- **Basic reports** — the numbers a small business actually checks: stamps/signups/redemptions today and this week, simple repeat-visit count, reward redemptions. Nothing fancier — complex analytics live in Phase 5.
-- **Security:** rotating QR tokens, velocity rules v1, RLS, audit log.
-- **Billing:** Stripe subscription, 14-day trial, plan gate (1 outlet).
+### Phase 1 — MVP: Core loyalty + basic reports ← *current, first working build 2026-07-08*
+- ✅ **Customer PWA:** OTP login/register (dev bypass code, non-production only), branded stamp card, rotating QR, rewards + promo section, recent spends.
+- ✅ **Cashier flow:** staff login → camera QR scan (BarcodeDetector; paste fallback) → amount → stamp; velocity rules; daily view at the counter.
+- ✅ **Merchant admin:** customer list/detail/create (PDPA opt-ins), team roles, reward redemption. Platform admin: add merchants (tenant+outlet+program+owner login), module toggles, password resets — all audit-logged.
+- ✅ **Basic reports (shipped):** stamps/sales/new customers/repeat-rate/redemption-rate over 7/30 days, stamps-per-day, top regulars. Complex analytics stays Phase 5.
+- ✅ **Security:** rotating signed QR tokens (90s TTL), velocity rules v1, scrypt passwords, hashed session tokens, RLS, audit log.
+- ⬜ **Billing:** Stripe subscription, 14-day trial, plan gate (1 outlet).
+- ⬜ **Remaining:** real OTP delivery (SMS/WhatsApp provider), merchant onboarding wizard polish, printable QR kit.
 - **Exit criteria:** 1 pilot merchant live; stamp→card-update round trip <5s in the web PWA; zero cross-tenant leakage (tested).
 
 ### Phase 2 — Apple & Google Wallet passes *(pulled from backlog 2026-07-08)*
@@ -315,6 +316,11 @@ Super-admin (internal): /tenants, /usage, /billing-health, /feature-flags
 | 2026-07-07 | **Security baseline codified in SECURITY.md** — ASVS 5.0 L2 as code standard, ISO 27001:2022 alignment, PDPA 2024 amendments; headers + CI audit + Dependabot added | Founder wants certification-ready posture; lower-grade models need explicit rules |
 | 2026-07-08 | **Phase order re-set:** loyalty + basic reports → wallet passes → WhatsApp → referrals → API/POS; complex analytics deferred to Phase 5 | Founder call: wallet differentiator right after MVP; small businesses need simple reports first, deep analytics later (supersedes 2026-07-07 wallet-backlog row) |
 | 2026-07-08 | **Marketing restyled to DESIGN-dub.md** (frosted SaaS, Inter, hairlines, restrained glass); **tagline → "Loyalty your customers will love"**; copy re-toned warm/inviting | Founder disliked the Monad look and the commanding tagline; scroll-pull hero added per founder's exploration goal (supersedes Monad style row) |
+| 2026-07-08 | **PGlite as zero-setup dev database** — no DATABASE_URL → embedded Postgres, auto-migrate+seed, `SET ROLE kembali_app` so RLS applies; prod requires DATABASE_URL | No Docker/Postgres on the dev machine; identical RLS behavior to prod |
+| 2026-07-08 | **Transaction amount lives on `stamp_events.amount_cents`** (v1) | One counter action = one ledger event; a dedicated payments table can come when POS integration does |
+| 2026-07-08 | **Cashier scanner lives at `/admin/scan`** (staff surface), not `/app/scan` | One auth story for staff; supersedes §9's original placement |
+| 2026-07-08 | **OTP dev bypass 888888, hard-disabled in production builds** | Founder-requested test convenience; SECURITY.md §2 rule 13 governs it |
+| 2026-07-08 | **Platform-admin RLS bypass via `app.platform_admin` GUC** on tenants/staff_users only, set solely by `withPlatform()` after a verified platform session | System admin needs cross-tenant tenant/staff management without connecting as table owner |
 
 ## 14. References
 

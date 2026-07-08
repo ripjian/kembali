@@ -16,13 +16,14 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@electric-sql/pglite": "^0.5.4",
     "@kembali/config": "workspace:*",
+    "@kembali/core": "workspace:*",
     "drizzle-orm": "^0.45.2",
     "postgres": "^3.4.9",
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@electric-sql/pglite": "^0.5.4",
     "@types/node": "^24.13.2",
     "drizzle-kit": "^0.31.10",
     "eslint": "^10.6.0",

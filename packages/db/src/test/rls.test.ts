@@ -170,6 +170,17 @@ describe("RLS tenant isolation (as kembali_app)", () => {
   });
 });
 
+describe("GUC edge cases", () => {
+  it("returns zero rows (not an error) after a tenant transaction reverts", async () => {
+    // Postgres quirk: after a transaction-local set_config reverts, the GUC
+    // reads as '' (not NULL). Policies must nullif() the cast — regression
+    // for the '""::uuid' crash hit by platform-session queries.
+    await withTenant(db, TENANT_A, (tx) => tx.select().from(schema.customers));
+    const rows = await db.select().from(schema.staffUsers);
+    expect(rows).toHaveLength(0);
+  });
+});
+
 describe("stamp_events append-only ledger", () => {
   // As the app role, UPDATE/DELETE die on the missing grant (permission
   // denied) before the trigger can even fire — two independent layers.

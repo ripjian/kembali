@@ -1,18 +1,9 @@
-import type { CSSProperties } from "react";
-
 import { DemoCard } from "@/components/marketing/demo-card";
 import { FeatureShowcase } from "@/components/marketing/feature-showcase";
 import { LeadQualifier } from "@/components/marketing/lead-qualifier";
 import { ActionLink, Tag } from "@/components/marketing/pill";
+import { ReceiptCard } from "@/components/marketing/receipt-card";
 import { Reveal } from "@/components/marketing/reveal";
-
-/** Animation-order variable for the sequential flow-pill loop (rm-flow). */
-function flowDelay(i: number): CSSProperties {
-  return { "--i": i } as CSSProperties;
-}
-
-const CUSTOMER_FLOW = ["Scan the QR", "Card on phone", "Collect stamps", "Earn reward", "Come back ↺"];
-const STAFF_FLOW = ["Open camera", "Scan their QR", "Stamp — done"];
 
 const FEATURES = [
   {
@@ -159,55 +150,34 @@ export default function Home() {
             </h2>
           </Reveal>
 
-          <div className="mt-10 grid items-start gap-6 lg:grid-cols-2">
-            <div className="flex flex-col gap-6">
-              <Reveal delay={80}>
-                <div className="rounded-2xl border border-border bg-surface p-6 sm:p-8">
-                  <p className="text-sm font-medium text-text-muted">For your customers</p>
-                  <div className="mt-4 flex flex-wrap items-center gap-2">
-                    {CUSTOMER_FLOW.map((step, i) => (
-                      <span key={step} className="flex items-center gap-2">
-                        <Tag className="rm-flow" style={flowDelay(i)}>
-                          {step}
-                        </Tag>
-                        {i < CUSTOMER_FLOW.length - 1 && (
-                          <span aria-hidden className="text-text-muted">
-                            →
-                          </span>
-                        )}
-                      </span>
-                    ))}
-                  </div>
-                  <p className="mt-4 text-sm leading-relaxed text-text-secondary">
-                    Customers scan a QR at your counter and enter their phone
-                    number. That&apos;s it — the card is theirs, ready for
-                    every visit.
-                  </p>
-                </div>
+          {/* Two receipts — the café's own paper, itemized */}
+          <div className="mt-10 grid items-start gap-8 lg:grid-cols-2">
+            <div className="flex flex-col items-center gap-10">
+              <Reveal delay={80} className="flex w-full justify-center">
+                <ReceiptCard
+                  title="For your customers"
+                  tilt="-rotate-1"
+                  lines={[
+                    { item: "Scan the QR at the counter", value: "5 sec" },
+                    { item: "Card appears on their phone", value: "instant" },
+                    { item: "Collect a stamp each visit", value: "+1" },
+                    { item: "Free coffee on visit ten", value: "earned" },
+                  ]}
+                  total="One happy regular"
+                />
               </Reveal>
 
-              <Reveal delay={160}>
-                <div className="rounded-2xl border border-border bg-surface p-6 sm:p-8">
-                  <p className="text-sm font-medium text-text-muted">For your staff</p>
-                  <div className="mt-4 flex flex-wrap items-center gap-2">
-                    {STAFF_FLOW.map((step, i) => (
-                      <span key={step} className="flex items-center gap-2">
-                        <Tag className="rm-flow" style={flowDelay(i)}>
-                          {step}
-                        </Tag>
-                        {i < STAFF_FLOW.length - 1 && (
-                          <span aria-hidden className="text-text-muted">
-                            →
-                          </span>
-                        )}
-                      </span>
-                    ))}
-                  </div>
-                  <p className="mt-4 text-sm leading-relaxed text-text-secondary">
-                    Staff stamp cards with any phone camera. No POS
-                    integration, no terminal, no training needed.
-                  </p>
-                </div>
+              <Reveal delay={160} className="flex w-full justify-center">
+                <ReceiptCard
+                  title="For your staff"
+                  tilt="rotate-1"
+                  lines={[
+                    { item: "Open the camera", value: "any phone" },
+                    { item: "Scan the customer's QR", value: "3 sec" },
+                    { item: "Enter the amount, stamp", value: "done" },
+                  ]}
+                  total="No training needed"
+                />
               </Reveal>
             </div>
 

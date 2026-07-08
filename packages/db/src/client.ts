@@ -1,4 +1,5 @@
 import { sql, type SQL } from "drizzle-orm";
+import type { PgDatabase, PgQueryResultHKT } from "drizzle-orm/pg-core";
 import { drizzle, type PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import { z } from "zod";
@@ -6,6 +7,9 @@ import { z } from "zod";
 import * as schema from "./schema";
 
 export type Db = PostgresJsDatabase<typeof schema>;
+
+/** Driver-agnostic database type — postgres-js in prod, PGlite in dev/tests. */
+export type KembaliDb = PgDatabase<PgQueryResultHKT, typeof schema>;
 
 /** Create a postgres-js backed Drizzle client. The connection should log in
  * as a member of the `kembali_app` role (never the table owner) so RLS is
@@ -42,6 +46,23 @@ export async function withTenant<TTx extends TxLike, T>(
   return db.transaction(async (tx) => {
     await tx.execute(
       sql`select set_config('app.tenant_id', ${validTenantId}, true)`,
+    );
+    return fn(tx);
+  });
+}
+
+/**
+ * Run `fn` with the platform-admin RLS bypass (tenants + staff_users
+ * policies only). Call ONLY after verifying a `platform` session —
+ * privileged actions inside must be audit-logged (SECURITY.md rule 9).
+ */
+export async function withPlatform<TTx extends TxLike, T>(
+  db: DbLike<TTx>,
+  fn: (tx: TTx) => Promise<T>,
+): Promise<T> {
+  return db.transaction(async (tx) => {
+    await tx.execute(
+      sql`select set_config('app.platform_admin', 'true', true)`,
     );
     return fn(tx);
   });

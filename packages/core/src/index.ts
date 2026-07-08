@@ -23,3 +23,12 @@ export {
   MAX_STAMPS_PER_CARD_PER_DAY,
   type StampCheck,
 } from "./stamping";
+export {
+  PERMISSION_KEYS,
+  PERMISSION_LABELS,
+  DEFAULT_ROLE_PERMISSIONS,
+  resolveRolePermissions,
+  type PermissionKey,
+  type StaffRoleKey,
+  type RolePermissionMatrix,
+} from "./permissions";

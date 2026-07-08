@@ -42,6 +42,8 @@ Violating any of these fails review, no exceptions:
 - [ ] New external calls or embeds? → CSP `connect-src`/`img-src` reviewed, not wildcarded
 - [ ] Personal data touched? → covered by export/delete; not logged; opt-in respected
 - [ ] Errors? → user sees a safe message, logs get the ID, Sentry gets no PII
+- [ ] File uploads? → allow-list mime types, cap size, validate dimensions client AND server side (see merchant logo: PNG/JPG/WebP, square, ≤512 KB, data-URL prefix + length re-checked in the action)
+- [ ] Role-gated feature? → check the permission in the server action/API, not only the UI (nav hiding is cosmetic)
 - [ ] `pnpm turbo run typecheck lint test build` green
 
 ## 4. Control map (ISO 27001 Annex A / ASVS → this codebase)

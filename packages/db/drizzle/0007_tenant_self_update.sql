@@ -1,0 +1,1 @@
+CREATE POLICY "tenants_tenant_update" ON "tenants" AS PERMISSIVE FOR UPDATE TO "kembali_app" USING (id = nullif(current_setting('app.tenant_id', true), '')::uuid) WITH CHECK (id = nullif(current_setting('app.tenant_id', true), '')::uuid);

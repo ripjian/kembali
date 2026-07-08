@@ -1,22 +1,27 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 import { schema, withTenant } from "@kembali/db";
 import { desc, eq, ilike, or, sql } from "drizzle-orm";
 
-import { getAdminContext } from "@/lib/auth";
 import { getDb } from "@/lib/db";
 import { formatDate } from "@/lib/format";
+import { getPanelContext } from "@/lib/panel";
 
 export default async function CustomersPage({
+  params,
   searchParams,
 }: {
+  params: Promise<{ slug: string }>;
   searchParams: Promise<{ q?: string }>;
 }) {
-  const admin = (await getAdminContext())!;
+  const { slug } = await params;
+  const ctx = await getPanelContext(slug);
+  if (!ctx.can("manageCustomers")) redirect(ctx.base);
   const { q } = await searchParams;
   const db = await getDb();
 
-  const customers = await withTenant(db, admin.tenantId, (tx) =>
+  const customers = await withTenant(db, ctx.tenant.id, (tx) =>
     tx
       .select({
         id: schema.customers.id,
@@ -50,14 +55,14 @@ export default async function CustomersPage({
           </p>
         </div>
         <Link
-          href="/admin/customers/new"
+          href={`${ctx.base}/customers/new`}
           className="inline-flex h-11 items-center justify-center rounded-xl bg-primary px-5 text-sm font-semibold text-on-primary hover:bg-primary-hover"
         >
           Add customer
         </Link>
       </header>
 
-      <form className="flex gap-2" action="/admin/customers">
+      <form className="flex gap-2" action={`${ctx.base}/customers`}>
         <input
           type="search"
           name="q"
@@ -91,7 +96,10 @@ export default async function CustomersPage({
             {customers.map((c) => (
               <tr key={c.id} className="border-b border-border last:border-b-0">
                 <td className="px-4 py-3">
-                  <Link href={`/admin/customers/${c.id}`} className="font-medium text-text hover:underline">
+                  <Link
+                    href={`${ctx.base}/customers/${c.id}`}
+                    className="font-medium text-text hover:underline"
+                  >
                     {c.name ?? "—"}
                   </Link>
                 </td>

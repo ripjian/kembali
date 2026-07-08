@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 import { computeCardProgress } from "@kembali/core";
 import { schema, withTenant } from "@kembali/db";
@@ -7,21 +7,27 @@ import { desc, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
 import { redeemReward } from "@/lib/admin-actions";
-import { getAdminContext } from "@/lib/auth";
 import { getDb } from "@/lib/db";
 import { formatDate, formatDateTime, formatRM } from "@/lib/format";
+import { getPanelContext } from "@/lib/panel";
+
+import { CustomerEdit } from "./customer-edit";
 
 export default async function CustomerDetailPage({
   params,
+  searchParams,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ slug: string; id: string }>;
+  searchParams: Promise<{ saved?: string; error?: string }>;
 }) {
-  const admin = (await getAdminContext())!;
-  const { id } = await params;
+  const { slug, id } = await params;
+  const ctx = await getPanelContext(slug);
+  if (!ctx.can("manageCustomers")) redirect(ctx.base);
   if (!z.uuid().safeParse(id).success) notFound();
+  const { saved, error } = await searchParams;
 
   const db = await getDb();
-  const data = await withTenant(db, admin.tenantId, async (tx) => {
+  const data = await withTenant(db, ctx.tenant.id, async (tx) => {
     const [customer] = await tx
       .select()
       .from(schema.customers)
@@ -83,7 +89,10 @@ export default async function CustomerDetailPage({
   return (
     <main className="flex flex-col gap-6">
       <header>
-        <Link href="/admin/customers" className="text-xs font-medium text-text-muted hover:text-text">
+        <Link
+          href={`${ctx.base}/customers`}
+          className="text-xs font-medium text-text-muted hover:text-text"
+        >
           ← All customers
         </Link>
         <h1 className="mt-2 text-2xl font-semibold text-text">
@@ -93,6 +102,17 @@ export default async function CustomerDetailPage({
           Joined {formatDate(customer.createdAt)}
         </p>
       </header>
+
+      {saved && (
+        <p role="status" className="rounded-xl border border-leaf/50 bg-surface px-4 py-3 text-sm text-text">
+          Customer details saved.
+        </p>
+      )}
+      {error && (
+        <p role="alert" className="rounded-xl border border-error/40 bg-surface px-4 py-3 text-sm text-error">
+          Check the name and phone number, then try again.
+        </p>
+      )}
 
       <section className="grid gap-3 sm:grid-cols-3">
         <div className="rounded-xl border border-border bg-surface p-4">
@@ -116,7 +136,23 @@ export default async function CustomerDetailPage({
       </section>
 
       <section className="rounded-xl border border-border bg-surface p-4">
-        <h2 className="text-sm font-semibold text-text">Details</h2>
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <h2 className="text-sm font-semibold text-text">Details</h2>
+          {ctx.can("editCustomers") && (
+            <CustomerEdit
+              tenantId={ctx.tenant.id}
+              customer={{
+                id: customer.id,
+                name: customer.name,
+                phone: customer.phone,
+                email: customer.email,
+                birthday: customer.birthday,
+                optInWhatsapp: Boolean(optIns.whatsapp),
+                optInEmail: Boolean(optIns.email),
+              }}
+            />
+          )}
+        </div>
         <dl className="mt-3 grid gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
           <div className="flex justify-between gap-4 sm:block">
             <dt className="text-text-muted">Phone</dt>
@@ -159,9 +195,7 @@ export default async function CustomerDetailPage({
                     {reward.type === "free_drink" ? "Free drink" : "Reward"} ·{" "}
                     <span
                       className={
-                        reward.state === "earned"
-                          ? "text-accent-deep"
-                          : "text-text-muted"
+                        reward.state === "earned" ? "text-accent-deep" : "text-text-muted"
                       }
                     >
                       {reward.state}
@@ -175,8 +209,9 @@ export default async function CustomerDetailPage({
                         : ""}
                   </p>
                 </div>
-                {reward.state === "earned" && (
+                {reward.state === "earned" && ctx.can("redeemRewards") && (
                   <form action={redeemReward}>
+                    <input type="hidden" name="tenantId" value={ctx.tenant.id} />
                     <input type="hidden" name="rewardId" value={reward.id} />
                     <input type="hidden" name="customerId" value={customer.id} />
                     <button className="rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-on-primary hover:bg-primary-hover">

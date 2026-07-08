@@ -72,6 +72,10 @@ export async function seed(db: SeedDb, now: Date = new Date()): Promise<SeedSumm
       slug: "corner-coffee",
       plan: "trial",
       billingStatus: "trialing",
+      addressLine: "12 Jalan SS15/4",
+      city: "Subang Jaya",
+      state: "Selangor",
+      country: "Malaysia",
       // Default theme = Pandan palette (BRAND.md); white-label overrides later.
       branding: { primaryColor: "#0F3D32", accentColor: "#E0684B" },
     })

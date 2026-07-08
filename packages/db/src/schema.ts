@@ -71,10 +71,18 @@ export const tenants = pgTable(
     billingStatus: text("billing_status").notNull().default("trialing"),
     /** logo URL, brand colors, custom domain — white-label (ROADMAP §1) */
     branding: jsonb("branding").notNull().default({}),
+    /** Square brand logo — data URL in v1, object storage later. */
+    logoUrl: text("logo_url"),
+    addressLine: text("address_line"),
+    city: text("city"),
+    state: text("state"),
+    country: text("country").notNull().default("Malaysia"),
     /** Feature-module toggles managed by the platform admin. */
     modules: jsonb("modules")
       .notNull()
       .default({ stamps: true, scan: true, reports: true }),
+    /** Per-role permission overrides; defaults live in @kembali/core. */
+    rolePermissions: jsonb("role_permissions").notNull().default({}),
     createdAt: createdAt(),
   },
   () => [
@@ -83,6 +91,14 @@ export const tenants = pgTable(
       for: "select",
       to: appRole,
       using: sql`id = nullif(current_setting('app.tenant_id', true), '')::uuid`,
+    }),
+    // …and update it (role permissions, branding). App code gates WHO may
+    // (owners with manageTeam); RLS guarantees only the own row is reachable.
+    pgPolicy("tenants_tenant_update", {
+      for: "update",
+      to: appRole,
+      using: sql`id = nullif(current_setting('app.tenant_id', true), '')::uuid`,
+      withCheck: sql`id = nullif(current_setting('app.tenant_id', true), '')::uuid`,
     }),
     // Platform admins manage all tenants — the app sets this GUC only
     // after verifying a platform session (client.ts withPlatform).

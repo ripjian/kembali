@@ -3,18 +3,23 @@ import Link from "next/link";
 import { schema, withTenant } from "@kembali/db";
 import { and, desc, eq, gte, sql } from "drizzle-orm";
 
-import { getAdminContext } from "@/lib/auth";
 import { getDb } from "@/lib/db";
 import { formatDateTime, formatRM } from "@/lib/format";
+import { getPanelContext } from "@/lib/panel";
 
-export default async function AdminOverviewPage() {
-  const admin = (await getAdminContext())!; // layout guards
+export default async function AdminOverviewPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  const ctx = await getPanelContext(slug);
 
   const db = await getDb();
   const dayStart = new Date();
   dayStart.setHours(0, 0, 0, 0);
 
-  const data = await withTenant(db, admin.tenantId, async (tx) => {
+  const data = await withTenant(db, ctx.tenant.id, async (tx) => {
     const [today] = await tx
       .select({
         stamps: sql<number>`count(*)::int`,
@@ -55,10 +60,7 @@ export default async function AdminOverviewPage() {
 
   const tiles = [
     { label: "Stamps today", value: String(data.today?.stamps ?? 0) },
-    {
-      label: "Sales captured today",
-      value: formatRM(data.today?.revenue ?? 0),
-    },
+    { label: "Sales captured today", value: formatRM(data.today?.revenue ?? 0) },
     { label: "New customers today", value: String(data.signups?.n ?? 0) },
     { label: "Rewards redeemed today", value: String(data.redemptions?.n ?? 0) },
   ];
@@ -72,12 +74,14 @@ export default async function AdminOverviewPage() {
             Today at your counter, as it happens.
           </p>
         </div>
-        <Link
-          href="/admin/scan"
-          className="inline-flex h-11 items-center justify-center rounded-xl bg-primary px-5 text-sm font-semibold text-on-primary hover:bg-primary-hover"
-        >
-          Scan & stamp
-        </Link>
+        {ctx.can("scan") && ctx.tenant.modules.scan && (
+          <Link
+            href={`${ctx.base}/scan`}
+            className="inline-flex h-11 items-center justify-center rounded-xl bg-primary px-5 text-sm font-semibold text-on-primary hover:bg-primary-hover"
+          >
+            Scan & stamp
+          </Link>
+        )}
       </header>
 
       <section className="grid grid-cols-2 gap-3 lg:grid-cols-4">
@@ -94,9 +98,14 @@ export default async function AdminOverviewPage() {
       <section className="rounded-xl border border-border bg-surface">
         <div className="flex items-center justify-between border-b border-border px-4 py-3">
           <h2 className="text-sm font-semibold text-text">Latest transactions</h2>
-          <Link href="/admin/reports" className="text-xs font-medium text-text-muted hover:text-text">
-            See reports
-          </Link>
+          {ctx.can("viewReports") && ctx.tenant.modules.reports && (
+            <Link
+              href={`${ctx.base}/reports`}
+              className="text-xs font-medium text-text-muted hover:text-text"
+            >
+              See reports
+            </Link>
+          )}
         </div>
         {data.recent.length === 0 ? (
           <p className="px-4 py-6 text-sm text-text-muted">
@@ -110,14 +119,21 @@ export default async function AdminOverviewPage() {
                 className="flex items-center justify-between gap-3 border-b border-border px-4 py-3 text-sm last:border-b-0"
               >
                 <div className="min-w-0">
-                  <Link
-                    href={`/admin/customers/${row.customerId}`}
-                    className="font-medium text-text hover:underline"
-                  >
-                    {row.customerName ?? row.customerPhone ?? "Customer"}
-                  </Link>
+                  {ctx.can("manageCustomers") ? (
+                    <Link
+                      href={`${ctx.base}/customers/${row.customerId}`}
+                      className="font-medium text-text hover:underline"
+                    >
+                      {row.customerName ?? row.customerPhone ?? "Customer"}
+                    </Link>
+                  ) : (
+                    <span className="font-medium text-text">
+                      {row.customerName ?? row.customerPhone ?? "Customer"}
+                    </span>
+                  )}
                   <p className="text-xs text-text-muted">
-                    {formatDateTime(row.createdAt)} · {row.source === "qr" ? "scanned" : "manual"}
+                    {formatDateTime(row.createdAt)} ·{" "}
+                    {row.source === "qr" ? "scanned" : "manual"}
                   </p>
                 </div>
                 <span className="tabular-nums text-text" data-stat>

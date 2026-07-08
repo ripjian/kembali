@@ -4,6 +4,7 @@ import {
   checkStampVelocity,
   computeCardProgress,
   earnsReward,
+  resolveRolePermissions,
   verifyQrToken,
 } from "@kembali/core";
 import { schema, withTenant } from "@kembali/db";
@@ -15,9 +16,8 @@ import { qrTokenSecret } from "@/lib/config";
 import { getDb } from "@/lib/db";
 
 const bodySchema = z.object({
-  /** Signed QR token (camera/paste) — or a cardId for manual stamping. */
-  qrToken: z.string().optional(),
-  cardId: z.uuid().optional(),
+  /** Signed QR token from the customer's card (camera or paste). */
+  qrToken: z.string(),
   amountCents: z.number().int().min(0).max(5_000_00).optional(),
 });
 
@@ -30,40 +30,43 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Sign in to stamp cards." }, { status: 401 });
   }
   const parsed = bodySchema.safeParse(await req.json().catch(() => null));
-  if (!parsed.success || (!parsed.data.qrToken && !parsed.data.cardId)) {
+  if (!parsed.success) {
+    return NextResponse.json({ error: "Scan a code first." }, { status: 400 });
+  }
+
+  const verified = verifyQrToken(parsed.data.qrToken, qrTokenSecret());
+  if (!verified.ok) {
+    const message =
+      verified.reason === "expired"
+        ? "That code has expired. Ask the customer to refresh their card."
+        : "That code isn't valid. Scan the card again.";
+    return NextResponse.json({ error: message }, { status: 400 });
+  }
+  // The token names the store; staff may only stamp for their own store,
+  // platform admins for any.
+  if (admin.kind === "staff" && verified.payload.tenantId !== admin.tenantId) {
     return NextResponse.json(
-      { error: "Scan a code or choose a card first." },
-      { status: 400 },
+      { error: "That card belongs to a different store." },
+      { status: 403 },
     );
   }
-
-  let cardId = parsed.data.cardId ?? null;
-  let source: "qr" | "manual" = "manual";
-  if (parsed.data.qrToken) {
-    const verified = verifyQrToken(parsed.data.qrToken, qrTokenSecret());
-    if (!verified.ok) {
-      const message =
-        verified.reason === "expired"
-          ? "That code has expired. Ask the customer to refresh their card."
-          : "That code isn't valid. Scan the card again.";
-      return NextResponse.json({ error: message }, { status: 400 });
-    }
-    if (verified.payload.tenantId !== admin.tenantId) {
-      return NextResponse.json(
-        { error: "That card belongs to a different store." },
-        { status: 403 },
-      );
-    }
-    cardId = verified.payload.cardId;
-    source = "qr";
-  }
-  if (!cardId) {
-    return NextResponse.json({ error: "Scan a code or choose a card first." }, { status: 400 });
-  }
-  const resolvedCardId = cardId;
+  const tenantId = verified.payload.tenantId;
+  const resolvedCardId = verified.payload.cardId;
+  const source = "qr" as const;
 
   const db = await getDb();
-  const result = await withTenant(db, admin.tenantId, async (tx) => {
+  const result = await withTenant(db, tenantId, async (tx) => {
+    if (admin.kind === "staff") {
+      const [tenantRow] = await tx
+        .select({ rolePermissions: schema.tenants.rolePermissions })
+        .from(schema.tenants);
+      const matrix = resolveRolePermissions(tenantRow?.rolePermissions);
+      const role = admin.role as "owner" | "manager" | "cashier";
+      if (!matrix[role].scan) {
+        return { error: "Your role can't stamp cards. Ask the owner." };
+      }
+    }
+
     const [card] = await tx
       .select()
       .from(schema.cards)
@@ -107,7 +110,7 @@ export async function POST(req: Request) {
     if (!outlet) return { error: "This store has no outlet configured yet." };
 
     await tx.insert(schema.stampEvents).values({
-      tenantId: admin.tenantId,
+      tenantId,
       cardId: card.id,
       outletId: outlet.id,
       staffId: admin.kind === "staff" ? admin.subjectId : null,
@@ -128,7 +131,7 @@ export async function POST(req: Request) {
       const rules = rewardRules.safeParse(program.expiryRules);
       const validDays = rules.success ? (rules.data.rewardValidDays ?? 30) : 30;
       await tx.insert(schema.rewards).values({
-        tenantId: admin.tenantId,
+        tenantId,
         cardId: card.id,
         type: defs.success && defs.data[0] ? defs.data[0].type : "reward",
         expiresAt: new Date(Date.now() + validDays * 86_400_000),

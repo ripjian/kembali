@@ -1,14 +1,23 @@
+import { redirect } from "next/navigation";
+
 import { createCustomer } from "@/lib/admin-actions";
+import { getPanelContext } from "@/lib/panel";
 
 const inputClass =
   "h-11 w-full rounded-xl border border-border bg-surface px-4 text-sm text-text outline-none focus:border-primary";
 
 export default async function NewCustomerPage({
+  params,
   searchParams,
 }: {
+  params: Promise<{ slug: string }>;
   searchParams: Promise<{ error?: string }>;
 }) {
+  const { slug } = await params;
+  const ctx = await getPanelContext(slug);
+  if (!ctx.can("manageCustomers")) redirect(ctx.base);
   const { error } = await searchParams;
+
   return (
     <main className="flex max-w-lg flex-col gap-6">
       <header>
@@ -28,6 +37,7 @@ export default async function NewCustomerPage({
       )}
 
       <form action={createCustomer} className="flex flex-col gap-4">
+        <input type="hidden" name="tenantId" value={ctx.tenant.id} />
         <div>
           <label className="text-sm font-medium text-text" htmlFor="name">
             Full name

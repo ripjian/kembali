@@ -3,23 +3,26 @@ import { redirect } from "next/navigation";
 import { schema, withTenant } from "@kembali/db";
 import { desc, eq, gte, sql } from "drizzle-orm";
 
-import { getAdminContext } from "@/lib/auth";
 import { getDb } from "@/lib/db";
 import { formatDateTime, formatRM } from "@/lib/format";
-import { parseModules } from "@/lib/modules";
+import { getPanelContext } from "@/lib/panel";
 
 import { ScanClient } from "./scan-client";
 
-export default async function ScanPage() {
-  const admin = (await getAdminContext())!;
+export default async function ScanPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  const ctx = await getPanelContext(slug);
+  if (!ctx.tenant.modules.scan || !ctx.can("scan")) redirect(ctx.base);
+
   const db = await getDb();
   const dayStart = new Date();
   dayStart.setHours(0, 0, 0, 0);
 
-  const data = await withTenant(db, admin.tenantId, async (tx) => {
-    const [tenant] = await tx
-      .select({ modules: schema.tenants.modules })
-      .from(schema.tenants);
+  const data = await withTenant(db, ctx.tenant.id, async (tx) => {
     const todays = await tx
       .select({
         id: schema.stampEvents.id,
@@ -41,10 +44,8 @@ export default async function ScanPage() {
       })
       .from(schema.stampEvents)
       .where(gte(schema.stampEvents.createdAt, dayStart));
-    return { tenant, todays, totals };
+    return { todays, totals };
   });
-
-  if (!parseModules(data.tenant?.modules).scan) redirect("/admin");
 
   return (
     <main className="flex max-w-2xl flex-col gap-6">

@@ -20,7 +20,6 @@ import { DEMO_TENANT_ID, getDb } from "./db";
 
 const CUSTOMER_COOKIE = "kb_session";
 const ADMIN_COOKIE = "kb_admin";
-const ACTIVE_TENANT_COOKIE = "kb_tenant";
 
 type SessionKind = "customer" | "staff" | "platform";
 
@@ -97,8 +96,9 @@ export async function getCustomerSession() {
 export interface AdminContext {
   kind: "staff" | "platform";
   subjectId: string;
-  /** Tenant the panel is operating on (platform admins can switch). */
-  tenantId: string;
+  /** The staff member's own tenant; null for platform admins (their
+   * working tenant comes from the /admin/[slug] path). */
+  tenantId: string | null;
   name: string;
   email: string;
   role: "owner" | "manager" | "cashier" | "platform";
@@ -115,12 +115,10 @@ export async function getAdminContext(): Promise<AdminContext | null> {
       .from(schema.platformAdmins)
       .where(eq(schema.platformAdmins.id, session.subjectId));
     if (!admin) return null;
-    const store = await cookies();
-    const activeTenant = store.get(ACTIVE_TENANT_COOKIE)?.value ?? DEMO_TENANT_ID;
     return {
       kind: "platform",
       subjectId: admin.id,
-      tenantId: activeTenant,
+      tenantId: null,
       name: admin.name,
       email: admin.email,
       role: "platform",
@@ -147,10 +145,6 @@ export async function getAdminContext(): Promise<AdminContext | null> {
   };
 }
 
-export async function setActiveTenant(tenantId: string) {
-  await setCookie(ACTIVE_TENANT_COOKIE, tenantId, ADMIN_SESSION_TTL_HOURS * 3600);
-}
-
 export async function destroySessions() {
   const store = await cookies();
   const db = await getDb();
@@ -163,5 +157,4 @@ export async function destroySessions() {
       store.delete(name);
     }
   }
-  store.delete(ACTIVE_TENANT_COOKIE);
 }

@@ -6,31 +6,29 @@ import { usePathname } from "next/navigation";
 import type { TenantModules } from "@/lib/modules";
 
 export function AdminNav({
-  isPlatform,
+  base,
   modules,
+  allowed,
 }: {
-  isPlatform: boolean;
+  base: string;
   modules: TenantModules;
+  allowed: { scan: boolean; customers: boolean; reports: boolean; team: boolean };
 }) {
   const pathname = usePathname();
 
   const links = [
-    { href: "/admin", label: "Overview", show: true },
-    { href: "/admin/scan", label: "Scan & stamp", show: modules.scan },
-    { href: "/admin/customers", label: "Customers", show: true },
-    { href: "/admin/reports", label: "Reports", show: modules.reports },
-    { href: "/admin/team", label: "Team", show: true },
-    { href: "/admin/merchants", label: "Merchants", show: isPlatform },
-    { href: "/admin/modules", label: "Modules", show: isPlatform },
+    { href: base, label: "Overview", show: true },
+    { href: `${base}/scan`, label: "Scan & stamp", show: modules.scan && allowed.scan },
+    { href: `${base}/customers`, label: "Customers", show: allowed.customers },
+    { href: `${base}/reports`, label: "Reports", show: modules.reports && allowed.reports },
+    { href: `${base}/team`, label: "Team", show: allowed.team },
   ].filter((l) => l.show);
 
   return (
     <nav className="flex flex-row flex-wrap gap-1 md:flex-col">
       {links.map((link) => {
         const active =
-          link.href === "/admin"
-            ? pathname === "/admin"
-            : pathname.startsWith(link.href);
+          link.href === base ? pathname === base : pathname.startsWith(link.href);
         return (
           <Link
             key={link.href}

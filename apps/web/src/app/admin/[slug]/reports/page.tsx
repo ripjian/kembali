@@ -4,21 +4,24 @@ import { redirect } from "next/navigation";
 import { schema, withTenant } from "@kembali/db";
 import { desc, eq, gte, sql } from "drizzle-orm";
 
-import { getAdminContext } from "@/lib/auth";
 import { getDb } from "@/lib/db";
 import { formatRM } from "@/lib/format";
-import { parseModules } from "@/lib/modules";
+import { getPanelContext } from "@/lib/panel";
 
-/* Basic reports v1 (ROADMAP Phase 1) — the numbers a small business
- * actually checks: activity, sales captured, repeat behaviour, rewards,
- * top regulars. Deeper analytics is deliberately Phase 5. */
+/* Basic reports v1 (ROADMAP Phase 1) — activity, sales captured, repeat
+ * behaviour, rewards, top regulars. Deeper analytics is Phase 5. */
 
 export default async function ReportsPage({
+  params,
   searchParams,
 }: {
+  params: Promise<{ slug: string }>;
   searchParams: Promise<{ range?: string }>;
 }) {
-  const admin = (await getAdminContext())!;
+  const { slug } = await params;
+  const ctx = await getPanelContext(slug);
+  if (!ctx.tenant.modules.reports || !ctx.can("viewReports")) redirect(ctx.base);
+
   const { range } = await searchParams;
   const days = range === "30" ? 30 : 7;
   const since = new Date();
@@ -26,11 +29,7 @@ export default async function ReportsPage({
   since.setDate(since.getDate() - (days - 1));
 
   const db = await getDb();
-  const data = await withTenant(db, admin.tenantId, async (tx) => {
-    const [tenant] = await tx
-      .select({ modules: schema.tenants.modules })
-      .from(schema.tenants);
-
+  const data = await withTenant(db, ctx.tenant.id, async (tx) => {
     const [totals] = await tx
       .select({
         stamps: sql<number>`count(*)::int`,
@@ -41,9 +40,7 @@ export default async function ReportsPage({
       .where(gte(schema.stampEvents.createdAt, since));
 
     const [repeat] = await tx
-      .select({
-        n: sql<number>`count(*)::int`,
-      })
+      .select({ n: sql<number>`count(*)::int` })
       .from(
         tx
           .select({
@@ -97,10 +94,8 @@ export default async function ReportsPage({
       .orderBy(desc(sql`count(*)`))
       .limit(5);
 
-    return { tenant, totals, repeat, newCustomers, rewardsAgg, byDay, topCustomers };
+    return { totals, repeat, newCustomers, rewardsAgg, byDay, topCustomers };
   });
-
-  if (!parseModules(data.tenant?.modules).reports) redirect("/admin");
 
   const activeCards = data.totals?.cards ?? 0;
   const repeatCards = data.repeat?.n ?? 0;
@@ -133,7 +128,7 @@ export default async function ReportsPage({
           {[7, 30].map((d) => (
             <Link
               key={d}
-              href={`/admin/reports?range=${d}`}
+              href={`${ctx.base}/reports?range=${d}`}
               className={`rounded-lg px-3 py-1.5 text-xs font-medium ${
                 days === d
                   ? "bg-primary text-on-primary"
@@ -198,9 +193,18 @@ export default async function ReportsPage({
               >
                 <span className="flex min-w-0 items-center gap-3">
                   <span className="w-5 shrink-0 font-mono text-xs text-text-muted">{i + 1}</span>
-                  <Link href={`/admin/customers/${c.id}`} className="truncate font-medium text-text hover:underline">
-                    {c.name ?? c.phone ?? "Customer"}
-                  </Link>
+                  {ctx.can("manageCustomers") ? (
+                    <Link
+                      href={`${ctx.base}/customers/${c.id}`}
+                      className="truncate font-medium text-text hover:underline"
+                    >
+                      {c.name ?? c.phone ?? "Customer"}
+                    </Link>
+                  ) : (
+                    <span className="truncate font-medium text-text">
+                      {c.name ?? c.phone ?? "Customer"}
+                    </span>
+                  )}
                 </span>
                 <span className="shrink-0 text-xs text-text-secondary">
                   {c.visits} visits ·{" "}

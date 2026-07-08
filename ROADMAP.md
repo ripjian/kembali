@@ -321,6 +321,9 @@ Super-admin (internal): /tenants, /usage, /billing-health, /feature-flags
 | 2026-07-08 | **Cashier scanner lives at `/admin/scan`** (staff surface), not `/app/scan` | One auth story for staff; supersedes §9's original placement |
 | 2026-07-08 | **OTP dev bypass 888888, hard-disabled in production builds** | Founder-requested test convenience; SECURITY.md §2 rule 13 governs it |
 | 2026-07-08 | **Platform-admin RLS bypass via `app.platform_admin` GUC** on tenants/staff_users only, set solely by `withPlatform()` after a verified platform session | System admin needs cross-tenant tenant/staff management without connecting as table owner |
+| 2026-07-08 | **Path-based tenancy: merchant panels at `/admin/[slug]`**, platform area at `/admin/merchants`; staff locked to their own slug | Founder review: merchant paths must never share the system admin's path; slug is stable (never regenerated on rename) |
+| 2026-07-08 | **Role-permission matrix v1** (6 permission keys × 3 roles, tenant-overridable, defaults in `@kembali/core`); enforced in nav, pages, actions and the stamp API | Founder review: cashier/manager/owner capabilities must be manageable per store |
+| 2026-07-08 | **Merchant profile v1**: plan type, address (line/city/state/country), square logo ≤512KB stored as data URL in `tenants.logo_url` | Founder review; object storage (S3/R2) replaces data URLs when a provider is chosen |
 
 ## 14. References
 

@@ -21,6 +21,9 @@ export function SiteFooter() {
           <Link href="/#how-it-works" className="text-text-secondary hover:text-text">
             How it works
           </Link>
+          <Link href="/pricing" className="text-text-secondary hover:text-text">
+            Pricing
+          </Link>
           <Link href="/roadmap" className="text-text-secondary hover:text-text">
             What&apos;s coming next
           </Link>

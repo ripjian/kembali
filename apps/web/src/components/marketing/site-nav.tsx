@@ -6,6 +6,7 @@ import { ActionLink } from "./pill";
 const links = [
   { href: "/#showcase", label: "Product" },
   { href: "/#how-it-works", label: "How it works" },
+  { href: "/pricing", label: "Pricing" },
   { href: "/roadmap", label: "Roadmap" },
 ];
 

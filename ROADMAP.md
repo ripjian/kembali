@@ -374,8 +374,9 @@ Super-admin (internal): /tenants, /usage, /billing-health, /feature-flags
                   #   3 multiple-choice questions (business type → outlets → main goal)
                   #   narrowing to a tailored pitch + contact CTA (v1: WhatsApp/email)
 /roadmap          # public high-level roadmap, one animated illustration per phase
+                  #   (order re-synced 2026-07-10: points+rewards now Live, wallet+VIP tags Up next)
 /pricing          # Founding/Starter/Growth per PRICING.md §8; current features
-                  #   listed, unshipped greyed "Coming soon"                    [next build]
+                  #   listed, unshipped greyed "Coming soon"                    [shipped 2026-07-10]
 /blog             # SEO: "digital stamp card for <vertical> in <city>"          [later]
 /case-studies     # pilot merchant results (member count, redemption rate)      [later]
 /signup           # self-serve trial                                            [Phase 1]
@@ -443,6 +444,7 @@ Super-admin (internal): /tenants, /usage, /billing-health, /feature-flags
 | 2026-07-10 | **`points_balance` maintained by a DB trigger** on `point_events` insert; direct UPDATEs to the column rejected (pg_trigger_depth guard, migration 0009) | Stronger than app-side projection (used for `stamps_count`): read-only is enforced in the database and balance = Σ events by construction |
 | 2026-07-10 | **Points leave the balance at redemption CONFIRM, not reserve.** Coupon = KMB-XXXX-XXXX (no 0/O/1/I/L), 15-min TTL; confirm = atomic state-guarded UPDATE + row-locked balance re-check in one transaction | Abandoned/expired coupons need no refund ledger events; single-use proven under concurrent confirms in tests |
 | 2026-07-10 | **New permissions `adjustPoints` (owner-only default) + `manageRewards` (owner+manager default)**; `points`/`rewards` module toggles default ON for all tenants | Adjustments move balances → most sensitive; catalog editing is routine store management; matrix stays per-tenant editable |
+| 2026-07-10 | **Marketing site synced to shipped scope**: `/pricing` shipped (PRICING.md §8); `/roadmap` reordered — points+rewards now "Live", wallet+VIP tags "Up next"; landing hero pill/features/showcase updated. Pricing greys "Coming soon" ONLY for genuinely unshipped features — points+rewards is now an included Starter/Growth feature, not greyed | Docs must match reality; §8 spec predated Phase 2 shipping, so its "grey out points+rewards" line was corrected |
 
 ## 14. References
 

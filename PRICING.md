@@ -94,12 +94,13 @@ Style: `brand/DESIGN-dub.md`. Copy: SOP 3 / ux-writing — sentence case, no jar
 - CTA: "Become a founding merchant" → WhatsApp/email contact (no self-serve payment)
 
 **Starter — RM149 /outlet/month** *("At launch" badge, muted)*
-- Listed now: digital stamp card · QR scan to stamp · customer profiles · team roles · reports · free data export
-- Greyed with ✨ "Coming soon": points and rewards · Apple/Google Wallet cards
+- Listed now: digital stamp card · QR scan to stamp · **points and rewards** · customer profiles · team roles · reports · free data export
+- Greyed with ✨ "Coming soon": Apple/Google Wallet cards
 - CTA (secondary): "Join as a founding merchant instead"
+- *(2026-07-10: points+rewards shipped, so it moved from greyed to included — grey only what is genuinely unshipped.)*
 
 **Growth — RM279 /outlet/month** *("At launch" badge, muted)*
-- Everything in Starter, plus — all greyed ✨ "Coming soon": WhatsApp reminders and campaigns · VIP member tags · referral rewards · your own domain · RM30 monthly message credits
+- Everything in Starter, plus — all greyed ✨ "Coming soon": Apple/Google Wallet cards · WhatsApp reminders and campaigns · VIP member tags · referral rewards · your own domain · RM30 monthly message credits
 - CTA (secondary): "Join as a founding merchant instead"
 
 Below cards: annual note ("Pay for 10 months, get 12"), chains note ("5+ outlets: 20% off — talk to us"), FAQ (Do customers download an app? Do I need new hardware? What happens to my data if I leave? — free export, always). Prices in RM, per outlet, per month. No card required anywhere; payment is by invoice after the pilot.

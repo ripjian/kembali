@@ -18,16 +18,22 @@ const CHAPTERS = [
     body: "Customers open their card right in the browser — stamps, rewards and their personal QR code. No app store, no download, nothing to forget.",
   },
   {
-    id: "wallet",
-    tag: "Up next",
-    title: "Straight into their wallet",
-    body: "One tap adds the card to Apple Wallet or Google Wallet. It updates the moment a stamp lands — and sits next to their boarding passes.",
-  },
-  {
     id: "stamping",
     tag: "At launch",
     title: "Stamping in seconds",
     body: "Staff scan the customer's QR with any phone camera. The stamp lands instantly — and codes expire, so screenshots don't work.",
+  },
+  {
+    id: "rewards",
+    tag: "At launch",
+    title: "Points that become rewards",
+    body: "Every visit earns points. Customers spend them on rewards you choose, and redeem with a single-use code at your counter.",
+  },
+  {
+    id: "wallet",
+    tag: "Up next",
+    title: "Straight into their wallet",
+    body: "One tap adds the card to Apple Wallet or Google Wallet. It updates the moment a stamp lands — and sits next to their boarding passes.",
   },
 ];
 
@@ -107,8 +113,9 @@ function PhoneMock({ scene }: { scene: number }) {
       <div className="absolute left-1/2 top-3 z-10 h-5 w-20 -translate-x-1/2 rounded-full bg-text" />
       <div className="relative h-full w-full overflow-hidden bg-surface">
         <WebCardScene active={scene === 0} />
-        <WalletScene active={scene === 1} />
-        <StampingScene active={scene === 2} />
+        <StampingScene active={scene === 1} />
+        <RewardsScene active={scene === 2} />
+        <WalletScene active={scene === 3} />
       </div>
     </div>
   );
@@ -202,7 +209,7 @@ function WebCardScene({ active }: { active: boolean }) {
   );
 }
 
-/** Scene 2 — the same card, inside Apple/Google Wallet. */
+/** Scene 4 — the same card, inside Apple/Google Wallet. */
 function WalletScene({ active }: { active: boolean }) {
   return (
     <SceneShell active={active}>
@@ -241,7 +248,7 @@ function WalletScene({ active }: { active: boolean }) {
   );
 }
 
-/** Scene 3 — a new stamp landing after a scan. */
+/** Scene 2 — a new stamp landing after a scan. */
 function StampingScene({ active }: { active: boolean }) {
   return (
     <SceneShell active={active}>
@@ -256,6 +263,39 @@ function StampingScene({ active }: { active: boolean }) {
       <div className="rm-toast glass backdrop-blur-md mx-auto flex items-center gap-2 rounded-full px-4 py-2">
         <span className="size-2 rounded-full bg-leaf" />
         <span className="text-[10px] font-medium text-text">+1 stamp collected</span>
+      </div>
+    </SceneShell>
+  );
+}
+
+/** Scene 3 — points climbing, a reward ready to redeem. */
+function RewardsScene({ active }: { active: boolean }) {
+  return (
+    <SceneShell active={active}>
+      <MiniHeader label="Rewards" />
+      <div className="rounded-xl border border-border bg-bg p-4">
+        <div className="flex items-center justify-between">
+          <span className="text-[10px] text-text-secondary">Your points</span>
+          <span className="font-mono text-xs text-text tabular-nums">120</span>
+        </div>
+        <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-surface-alt">
+          <div className="rm-fill h-full w-full rounded-full bg-leaf" />
+        </div>
+      </div>
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center justify-between rounded-lg border border-border bg-bg px-3 py-2">
+          <span className="flex items-center gap-1.5">
+            <span className="size-2 rounded-full bg-accent" />
+            <span className="text-[10px] font-medium text-text">Free coffee</span>
+          </span>
+          <span className="rm-pop rounded-md bg-primary px-2 py-0.5 text-[9px] font-medium text-on-primary">
+            Redeem
+          </span>
+        </div>
+        <div className="flex items-center justify-between rounded-lg border border-border bg-bg px-3 py-2">
+          <span className="text-[10px] text-text-secondary">Pastry of the day</span>
+          <span className="font-mono text-[9px] text-text-muted">80 pts</span>
+        </div>
       </div>
     </SceneShell>
   );

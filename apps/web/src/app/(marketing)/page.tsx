@@ -7,6 +7,12 @@ import { Reveal } from "@/components/marketing/reveal";
 
 const FEATURES = [
   {
+    dot: "coral" as const,
+    title: "Points and rewards",
+    body: "Every ringgit spent earns points, and customers redeem them for rewards you choose — with a single-use code at your counter. Every point is logged to the cent.",
+    tag: "At launch",
+  },
+  {
     dot: "leaf" as const,
     title: "Simple reports, not homework",
     body: "Today's stamps, signups and redemptions, plus who keeps coming back. The numbers you check over morning coffee — deeper analytics comes later.",
@@ -36,7 +42,7 @@ export default function Home() {
           {/* floating feature pills — one accent each */}
           <div className="flex flex-wrap items-center justify-center gap-2">
             <Tag dot="coral">Stamp cards</Tag>
-            <Tag dot="pandan">Wallet passes</Tag>
+            <Tag dot="pandan">Points &amp; rewards</Tag>
             <Tag dot="leaf">Simple reports</Tag>
           </div>
 
@@ -192,7 +198,7 @@ export default function Home() {
       <section id="features" className="scroll-mt-20 border-b border-border">
         <div className="mx-auto w-full max-w-[1200px] px-6 py-16">
           <Reveal>
-            <p className="text-sm font-medium text-text-muted">And there&apos;s more coming</p>
+            <p className="text-sm font-medium text-text-muted">Features</p>
             <h2 className="mt-2 max-w-2xl text-3xl font-medium leading-tight tracking-[-0.02em] text-text sm:text-4xl">
               Everything a loyalty program needs, nothing that slows your
               counter down.
@@ -229,8 +235,8 @@ export default function Home() {
                   Your brand, not ours
                 </h3>
                 <p className="text-sm leading-relaxed text-on-primary/80 sm:text-base">
-                  Your logo, your colors, your domain. Customers see your
-                  brand — Kembali stays quietly behind the scenes.
+                  Your logo and your colors on every card. Customers see your
+                  brand — Kembali stays quietly in the background.
                 </p>
               </div>
             </Reveal>

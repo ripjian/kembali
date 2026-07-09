@@ -58,6 +58,33 @@ export function StampsIllustration() {
   );
 }
 
+/** Points & rewards (live) — points climb toward a reward that unlocks. */
+export function PointsIllustration() {
+  return (
+    <div className={frame} aria-hidden>
+      <div className="panel-ring w-full max-w-64 rounded-xl border border-border bg-surface p-4 sm:p-5">
+        <div className="flex items-center justify-between text-xs">
+          <span className="font-medium text-text-secondary">Points this visit</span>
+          <span className="font-mono text-text-muted tabular-nums">RM1 = 1</span>
+        </div>
+        <div className="mt-2.5 h-2 w-full overflow-hidden rounded-full bg-surface-alt">
+          <span className="rm-fill block h-full w-full rounded-full bg-leaf" />
+        </div>
+        <div className="mt-4 flex items-center gap-2.5 rounded-xl border border-accent/40 bg-surface p-2.5">
+          <span style={iVar(4)} className="rm-pop size-8 shrink-0 rounded-lg bg-accent" />
+          <div className="min-w-0">
+            <p className="text-xs font-medium text-accent-deep">Free coffee</p>
+            <p className="text-[10px] text-text-muted">Ready to redeem</p>
+          </div>
+        </div>
+        <p className="mt-4 font-mono text-xs text-text-muted">
+          spend → points → rewards
+        </p>
+      </div>
+    </div>
+  );
+}
+
 /** Phase 2 — the card sliding into the phone's own wallet. */
 export function WalletIllustration() {
   return (

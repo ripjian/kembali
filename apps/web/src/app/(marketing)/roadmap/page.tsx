@@ -7,6 +7,7 @@ import {
   FoundationsIllustration,
   MessagesIllustration,
   PlatformIllustration,
+  PointsIllustration,
   ReferralIllustration,
   StampsIllustration,
   WalletIllustration,
@@ -28,10 +29,10 @@ const STATUS_STYLE: Record<Status, string> = {
 };
 
 const STATUS_LABEL: Record<Status, string> = {
-  shipped: "Done",
-  now: "Building now",
+  shipped: "Live",
+  now: "New",
   next: "Up next",
-  later: "Later",
+  later: "Planned",
 };
 
 interface Phase {
@@ -51,26 +52,37 @@ const PHASES: Phase[] = [
     illustration: <FoundationsIllustration />,
   },
   {
-    status: "now",
+    status: "shipped",
     title: "The stamp card, done right",
-    body: "The first release: customers get a card from a QR in under 30 seconds, staff stamp it with any phone, and simple reports show it working.",
+    body: "Customers get a card from a QR in under 30 seconds, staff stamp it with any phone, and simple reports show it working.",
     points: [
       "Customer card with live stamp animation",
       "3-second stamping with fraud-proof QR codes",
       "Merchant onboarding & program setup",
-      "Simple reports: stamps, sales, repeat visits — already live in the pilot build",
-      "Per-outlet subscription with a free trial",
+      "Simple reports: stamps, sales and repeat visits",
     ],
     illustration: <StampsIllustration />,
   },
   {
+    status: "now",
+    title: "Points and rewards",
+    body: "Every visit earns points, and customers spend them on rewards you choose — redeemed with a single-use code at your counter.",
+    points: [
+      "Points from each visit, at a rate you set",
+      "A rewards catalog you control",
+      "One-tap redeem with a single-use coupon",
+      "Points earned and spent, in your reports",
+    ],
+    illustration: <PointsIllustration />,
+  },
+  {
     status: "next",
-    title: "Apple & Google Wallet passes",
-    body: "Cards that live in the phone's own wallet and update the moment a stamp lands — right next to their boarding passes.",
+    title: "Wallet cards & VIP tags",
+    body: "Cards that live in the phone's own wallet and update the moment a stamp lands — plus VIP and staff tags that earn points faster.",
     points: [
       "Apple Wallet pass with live updates",
       "Google Wallet loyalty cards",
-      "Appears on the lock screen near your outlet",
+      "VIP & staff tags with bonus points",
     ],
     illustration: <WalletIllustration />,
   },
@@ -123,8 +135,8 @@ export default function RoadmapPage() {
         </Reveal>
         <Reveal delay={160}>
           <p className="max-w-xl text-base leading-relaxed text-text-secondary sm:text-lg">
-            What&apos;s done, what we&apos;re building now, and what comes
-            next. Pilot merchants shape the order.
+            What&apos;s live today, what just landed, and what comes next.
+            Pilot merchants shape the order.
           </p>
         </Reveal>
       </section>

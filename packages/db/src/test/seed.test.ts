@@ -25,12 +25,22 @@ describe("seed script", () => {
     expect(summary.stampEvents).toBe(14);
   });
 
-  it("is idempotent — re-running does not duplicate rows", async () => {
+  it("is idempotent — re-running does not duplicate rows or balances", async () => {
     await seed(db);
     const customers = await db.select().from(schema.customers);
     const events = await db.select().from(schema.stampEvents);
+    const pointEvents = await db.select().from(schema.pointEvents);
     expect(customers).toHaveLength(3);
     expect(events).toHaveLength(14);
+    expect(pointEvents).toHaveLength(15);
+    // Re-running must not have re-fired the balance projection trigger.
+    for (const customer of customers) {
+      const [row] = await db
+        .select({ total: sql<number>`coalesce(sum(delta), 0)::int` })
+        .from(schema.pointEvents)
+        .where(sql`${schema.pointEvents.customerId} = ${customer.id}`);
+      expect(customer.pointsBalance).toBe(row?.total);
+    }
   });
 
   it("keeps stamps_count consistent with the stamp_events ledger", async () => {

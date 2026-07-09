@@ -42,10 +42,21 @@ export const SEED_IDS = {
   },
   reward: "77777777-7777-4777-8777-777777777701",
   platformAdmin: "99999999-0000-4000-8000-000000000001",
+  rewardItems: {
+    freeCoffee: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaa01",
+    pastry: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaa02",
+    toteBag: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaa03",
+    retiredMug: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaa04",
+  },
+  pointAdjustment: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbb01",
 } as const;
 
 function eventId(n: number): string {
   return `88888888-8888-4888-8888-8888888888${String(n).padStart(2, "0")}`;
+}
+
+function pointEventId(n: number): string {
+  return `bbbbbbbb-bbbb-4bbb-8bbb-cccccccccc${String(n).padStart(2, "0")}`;
 }
 
 function daysAgo(now: Date, days: number): Date {
@@ -61,6 +72,8 @@ export interface SeedSummary {
   cards: number;
   stampEvents: number;
   rewards: number;
+  rewardItems: number;
+  pointEvents: number;
 }
 
 export async function seed(db: SeedDb, now: Date = new Date()): Promise<SeedSummary> {
@@ -224,6 +237,72 @@ export async function seed(db: SeedDb, now: Date = new Date()): Promise<SeedSumm
     })
     .onConflictDoNothing();
 
+  const rewardItems = [
+    {
+      id: SEED_IDS.rewardItems.freeCoffee,
+      title: "Free coffee of your choice",
+      description: "Any drink on the menu, hot or iced.",
+      pointsCost: 120,
+      active: true,
+    },
+    {
+      id: SEED_IDS.rewardItems.pastry,
+      title: "Pastry of the day",
+      description: "One fresh pastry from the counter display.",
+      pointsCost: 80,
+      active: true,
+    },
+    {
+      id: SEED_IDS.rewardItems.toteBag,
+      title: "Corner Coffee tote bag",
+      description: "Canvas tote with the shop logo.",
+      pointsCost: 250,
+      active: true,
+    },
+    {
+      id: SEED_IDS.rewardItems.retiredMug,
+      title: "Ceramic mug (retired)",
+      description: "Old design — kept for redemption history.",
+      pointsCost: 200,
+      active: false,
+    },
+  ];
+  await db
+    .insert(schema.rewardItems)
+    .values(rewardItems.map((item) => ({ ...item, tenantId: T })))
+    .onConflictDoNothing();
+
+  // Points mirror the stamp ledger at the default 1 point per RM1 rate.
+  // ON CONFLICT DO NOTHING keeps re-runs from double-counting the
+  // points_balance projection (the trigger only fires on real inserts).
+  const stampsByCustomer = new Map(
+    stamps.map(({ cardId, customerId }) => [cardId, customerId]),
+  );
+  const pointEvents = events.map((event, i) => ({
+    id: pointEventId(i + 1),
+    tenantId: T,
+    customerId: stampsByCustomer.get(event.cardId)!,
+    delta: Math.floor(event.amountCents / 100),
+    source: "transaction" as const,
+    staffId: SEED_IDS.staffCashier,
+    stampEventId: event.id,
+    createdAt: event.createdAt,
+  }));
+  await db.insert(schema.pointEvents).values(pointEvents).onConflictDoNothing();
+  await db
+    .insert(schema.pointEvents)
+    .values({
+      id: SEED_IDS.pointAdjustment,
+      tenantId: T,
+      customerId: SEED_IDS.customers.aisyah,
+      delta: 25,
+      source: "adjustment",
+      reason: "Welcome bonus",
+      staffId: SEED_IDS.staffOwner,
+      createdAt: daysAgo(now, 10),
+    })
+    .onConflictDoNothing();
+
   return {
     tenants: 1,
     outlets: 1,
@@ -233,5 +312,7 @@ export async function seed(db: SeedDb, now: Date = new Date()): Promise<SeedSumm
     cards: 3,
     stampEvents: events.length,
     rewards: 1,
+    rewardItems: rewardItems.length,
+    pointEvents: pointEvents.length + 1,
   };
 }

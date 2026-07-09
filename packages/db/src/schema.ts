@@ -57,6 +57,17 @@ export const cardStatus = pgEnum("card_status", ["active", "completed", "revoked
 export const stampSource = pgEnum("stamp_source", ["qr", "manual"]);
 export const rewardState = pgEnum("reward_state", ["earned", "redeemed", "expired"]);
 export const referralState = pgEnum("referral_state", ["pending", "completed", "rewarded"]);
+export const pointEventSource = pgEnum("point_event_source", [
+  "transaction",
+  "adjustment",
+  "redemption",
+]);
+export const redemptionState = pgEnum("redemption_state", [
+  "reserved",
+  "redeemed",
+  "expired",
+  "cancelled",
+]);
 export const walletPlatform = pgEnum("wallet_platform", ["apple", "google"]);
 export const messageChannel = pgEnum("message_channel", ["whatsapp", "sms", "email", "push"]);
 export const messageStatus = pgEnum("message_status", ["queued", "sent", "delivered", "failed"]);
@@ -83,6 +94,9 @@ export const tenants = pgTable(
       .default({ stamps: true, scan: true, reports: true }),
     /** Per-role permission overrides; defaults live in @kembali/core. */
     rolePermissions: jsonb("role_permissions").notNull().default({}),
+    /** RM→points conversion: points earned per RM1 keyed in at the counter.
+     * 0 pauses earning without hiding balances (Phase 2). */
+    pointsPerRm: doublePrecision("points_per_rm").notNull().default(1),
     createdAt: createdAt(),
   },
   () => [
@@ -210,6 +224,9 @@ export const customers = pgTable(
     birthday: date("birthday"),
     /** PDPA: explicit opt-in per channel, e.g. {"whatsapp": true} (ROADMAP §5) */
     marketingOptIns: jsonb("marketing_opt_ins").notNull().default({}),
+    /** Projection of point_events, maintained ONLY by the DB trigger in
+     * migration 0009 — direct UPDATEs to this column are rejected. */
+    pointsBalance: integer("points_balance").notNull().default(0),
     createdAt: createdAt(),
   },
   (t) => [
@@ -311,6 +328,91 @@ export const rewards = pgTable(
     createdAt: createdAt(),
   },
   (t) => [tenantPolicy("rewards"), index("rewards_card_idx").on(t.cardId)],
+);
+
+/* ---- points & rewards catalog (Phase 2, ROADMAP §4) --------------------- */
+
+export const rewardItems = pgTable(
+  "reward_items",
+  {
+    id: id(),
+    tenantId: tenantId(),
+    title: text("title").notNull(),
+    description: text("description"),
+    /** Square image — data URL in v1, object storage later (same as logos). */
+    imageUrl: text("image_url"),
+    pointsCost: integer("points_cost").notNull(),
+    active: boolean("active").notNull().default(true),
+    createdAt: createdAt(),
+  },
+  (t) => [tenantPolicy("reward_items"), index("reward_items_tenant_idx").on(t.tenantId)],
+);
+
+export const redemptions = pgTable(
+  "redemptions",
+  {
+    id: id(),
+    tenantId: tenantId(),
+    rewardItemId: uuid("reward_item_id")
+      .notNull()
+      .references(() => rewardItems.id),
+    customerId: uuid("customer_id")
+      .notNull()
+      .references(() => customers.id),
+    /** Single-use coupon code shown as QR + text. Globally unique; the
+     * unique index is what makes concurrent confirms safe. */
+    code: text("code").notNull().unique(),
+    state: redemptionState("state").notNull().default("reserved"),
+    /** Price snapshot at reserve time — catalog edits don't reprice coupons. */
+    pointsCost: integer("points_cost").notNull(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    redeemedAt: timestamp("redeemed_at", { withTimezone: true }),
+    redeemedByStaffId: uuid("redeemed_by_staff_id").references(() => staffUsers.id),
+    outletId: uuid("outlet_id").references(() => outlets.id),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    tenantPolicy("redemptions"),
+    index("redemptions_customer_idx").on(t.customerId, t.createdAt),
+  ],
+);
+
+export const pointEvents = pgTable(
+  "point_events",
+  {
+    id: id(),
+    tenantId: tenantId(),
+    customerId: uuid("customer_id")
+      .notNull()
+      .references(() => customers.id),
+    /** Positive = earned/added, negative = spent/deducted. */
+    delta: integer("delta").notNull(),
+    source: pointEventSource("source").notNull(),
+    /** Required for adjustments — customer-visible in their history. */
+    reason: text("reason"),
+    staffId: uuid("staff_id").references(() => staffUsers.id),
+    /** Set for source=transaction: the stamp event the points came from. */
+    stampEventId: uuid("stamp_event_id").references(() => stampEvents.id),
+    /** Set for source=redemption: the coupon the points paid for. */
+    redemptionId: uuid("redemption_id").references(() => redemptions.id),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    // Append-only ledger, same treatment as stamp_events: SELECT + INSERT
+    // policies only; migration 0009 blocks UPDATE/DELETE with a trigger and
+    // maintains customers.points_balance.
+    pgPolicy("point_events_tenant_select", {
+      for: "select",
+      to: appRole,
+      using: tenantMatch,
+    }),
+    pgPolicy("point_events_tenant_insert", {
+      for: "insert",
+      to: appRole,
+      withCheck: tenantMatch,
+    }),
+    index("point_events_customer_idx").on(t.customerId, t.createdAt),
+  ],
 );
 
 export const referrals = pgTable(

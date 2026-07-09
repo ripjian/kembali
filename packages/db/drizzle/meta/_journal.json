@@ -57,6 +57,20 @@
       "when": 1783503961903,
       "tag": "0007_tenant_self_update",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1783627999371,
+      "tag": "0008_points_rewards",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1783628015083,
+      "tag": "0009_points_guards",
+      "breakpoints": true
     }
   ]
 }

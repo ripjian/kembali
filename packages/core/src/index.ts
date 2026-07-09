@@ -23,6 +23,14 @@ export {
   MAX_STAMPS_PER_CARD_PER_DAY,
   type StampCheck,
 } from "./stamping";
+export { pointsForAmount, sumPointDeltas } from "./points";
+export {
+  generateRedemptionCode,
+  isRedemptionCode,
+  normalizeRedemptionCode,
+  redemptionExpiry,
+  REDEMPTION_TTL_MINUTES,
+} from "./redemptions";
 export {
   PERMISSION_KEYS,
   PERMISSION_LABELS,

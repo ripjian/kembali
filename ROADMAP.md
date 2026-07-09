@@ -24,6 +24,8 @@
 
 ## 2. Market Research Summary
 
+> **Deep dive: `COMPETITORS.md`** (2026-07-09) — full SEA + global landscape (Advocado, Eber, Poket, StoreHub, Chopz, Loopy, Stamp Me), differentiation wedges, non-goals, threat watch. The table below is the original 2026-07-07 snapshot.
+
 | Platform | Model | Wallet passes | Notable | Weakness/gap |
 |---|---|---|---|---|
 | **Stampede (stampede.sg)** | Web-app card, ~$50/mo/outlet | ❌ (browser/PWA only) | WhatsApp/email/SMS campaigns, AI weekly reports, food AI photos, Meta ads, fraud detection, referrals, custom domain, multi-outlet, phone+4-digit-code login, 3-sec cashier scan | No Apple/Google Wallet |
@@ -101,6 +103,12 @@ cards                           customer_id, program_id, stamps_count, status
 programs                        tenant_id, stamps_required, reward_definitions[], expiry_rules
 stamp_events (append-only)      card_id, outlet_id, staff_id, source (qr|manual), created_at
 rewards / coupons               card_id, type, state (earned|redeemed|expired), expires_at
+point_events (append-only)      customer_id, delta, source (transaction|adjustment|redemption), reason, staff_id
+customers.points_balance        read-only projection = Σ point_events (never UPDATEd directly)
+reward_items                    tenant_id, title, description, image_url, points_cost, active
+redemptions                     reward_item_id, customer_id, code (unique, single-use), state (reserved|redeemed|expired|cancelled), redeemed_by_staff_id, outlet_id
+member_tags                     tenant_id, name, points_multiplier (REPLACES base rate), enabled
+customers.tag_id                nullable FK → member_tags; changes audit-logged
 referrals                       referrer_customer_id, referee_customer_id, state
 wallet_passes                   card_id, platform (apple|google), serial, auth_token, last_pushed_at
 device_registrations            (Apple PassKit web service: device ↔ pass)
@@ -108,7 +116,7 @@ messages                        channel, template, status, cost_credits
 audit_log                       actor, action, entity, tenant_id
 ```
 
-**Rules:** every stamp is an immutable ledger event (fraud analysis + audit). `stamps_count` is a denormalized projection. All tenant tables carry `tenant_id` with Postgres RLS.
+**Rules:** every stamp AND every point movement is an immutable ledger event (fraud analysis + audit). `stamps_count` and `points_balance` are denormalized projections. Point adjustments always carry a reason and are customer-visible. All tenant tables carry `tenant_id` with Postgres RLS.
 
 ---
 
@@ -143,9 +151,9 @@ audit_log                       actor, action, entity, tenant_id
 
 ---
 
-## 6. Wallet Integration Design — **Phase 2**
+## 6. Wallet Integration Design — **Phase 3**
 
-> **Status (2026-07-08):** scheduled as Phase 2, right after the core loyalty MVP (was briefly backlogged on 2026-07-07). Nothing in Phase 1 may depend on it. The Apple Developer + Google Wallet Console applications have long lead times — **start them during Phase 1**.
+> **Status (2026-07-09):** moved to Phase 3 — points & rewards became Phase 2. Nothing in Phases 1–2 may depend on it. The Apple Developer + Google Wallet Console applications have long lead times — **start them during Phase 1**.
 
 ### Apple Wallet (storeCard pass)
 1. Apple Developer account → **Pass Type ID** + certificate; download WWDR intermediate cert.
@@ -167,6 +175,18 @@ audit_log                       actor, action, entity, tenant_id
 
 ## 7. Phases
 
+### What each phase achieves (one line each)
+
+| Phase | Outcome |
+|---|---|
+| 0 + 0.5 ✅ | Rails and a public face: monorepo, schema + RLS, CI, marketing site live |
+| 1 ← *now* | A shop runs stamps end-to-end (sellable MVP; subscriptions invoiced manually) |
+| 2 | Spending becomes points, points become rewards — redeemed in-store with unique codes |
+| 3 | The card lives in Apple & Google Wallet, plus VIP member tags — the differentiator |
+| 4 | Retention on autopilot: WhatsApp brings lapsed customers back without merchant effort |
+| 5 | Growth loop: happy customers recruit new customers |
+| 6 | Platform: POS/API integrations, multi-outlet chains, deep analytics |
+
 ### Phase 0 — Foundations (Week 1–2) ✅ *done 2026-07-07*
 - Monorepo scaffold (Turborepo, Next.js apps, Drizzle, CI with GitHub Actions).
 - DB schema v1 + RLS; env validation; Sentry; seed scripts.
@@ -179,46 +199,130 @@ audit_log                       actor, action, entity, tenant_id
 - One-server routing: `/` marketing, `/app` customer PWA, `/admin` merchant admin.
 
 > **Phase order re-set by founder 2026-07-08:** loyalty + basic reports → wallet passes → WhatsApp → referrals → API/POS. Complex analytics deferred to the platform phase. Supersedes the 2026-07-07 sequencing below the decision log.
+> **Re-set again by founder 2026-07-09:** points + rewards inserted as **Phase 2**; wallet passes → Phase 3 (with member tags), WhatsApp → 4, referrals → 5, API/POS → 6. No payment processing in-product — subscriptions invoiced manually; Stripe deferred.
 
 ### Phase 1 — MVP: Core loyalty + basic reports ← *current, first working build 2026-07-08*
 - ✅ **Customer PWA:** OTP login/register (dev bypass code, non-production only), branded stamp card, rotating QR, rewards + promo section, recent spends.
 - ✅ **Cashier flow:** staff login → camera QR scan (BarcodeDetector; paste fallback) → amount → stamp; velocity rules; daily view at the counter.
 - ✅ **Merchant admin:** customer list/detail/create (PDPA opt-ins), team roles, reward redemption. Platform admin: add merchants (tenant+outlet+program+owner login), module toggles, password resets — all audit-logged.
-- ✅ **Basic reports (shipped):** stamps/sales/new customers/repeat-rate/redemption-rate over 7/30 days, stamps-per-day, top regulars. Complex analytics stays Phase 5.
+- ✅ **Basic reports (shipped):** stamps/sales/new customers/repeat-rate/redemption-rate over 7/30 days, stamps-per-day, top regulars. Complex analytics stays Phase 6.
 - ✅ **Security:** rotating signed QR tokens (90s TTL), velocity rules v1, scrypt passwords, hashed session tokens, RLS, audit log.
-- ⬜ **Billing:** Stripe subscription, 14-day trial, plan gate (1 outlet).
+- **Billing (re-decided 2026-07-09):** **no payment processing in-product.** Subscriptions collected by manual invoice (bank transfer/DuitNow). Stripe deferred until self-serve public launch at the earliest. Transaction key-in during stamping is record-keeping only (POS/payments = maybe, much later).
 - ⬜ **Remaining:** real OTP delivery (SMS/WhatsApp provider), merchant onboarding wizard polish, printable QR kit.
 - **Exit criteria:** 1 pilot merchant live; stamp→card-update round trip <5s in the web PWA; zero cross-tenant leakage (tested).
 
-### Phase 2 — Apple & Google Wallet passes *(pulled from backlog 2026-07-08)*
-- Full design already written in §6: Apple storeCard + PassKit web service + APNs updates; Google `loyaltyClass`/`loyaltyObject` + signed JWT links.
+### Phase 2 — Points & rewards *(inserted 2026-07-09, founder)*
+**Points**
+- Per-merchant **RM→points conversion rate** in merchant settings; points accrue from the transaction amount keyed in at scan-to-stamp (key-in stays record-keeping only — no payments).
+- Ledger pattern identical to stamps: append-only `point_events`; `points_balance` is a **read-only projection** (never edited directly).
+- **Point adjustments:** admin can add/deduct points (button on customer profile, reason required). Every adjustment is a ledger event, appears in transaction history, and is **visible to the customer** in their own view.
+- Customer profile/transactions show a points column per transaction + uneditable total points field.
+- Reports: points earned/spent per customer, adjustments log.
+**Rewards**
+- Merchant config: rewards catalog — title, description, image, points cost, active toggle.
+- Customer home after login: **stamp card first** with a "Show QR" CTA (modal: QR + fallback code + dismiss); **rewards section below** listing everything redeemable.
+- Reward detail page → redeem CTA at the bottom → friendly in-store confirmation ("Are you at the store right now?" pattern, ux-writing skill) → only then a **unique, single-use coupon code + QR** appears.
+- Cashier flow becomes **two big buttons**: **Scan member** (→ key in amount → stamp + points) and **Scan reward** (→ shows which reward + which member → confirm redemption).
+- Redemption states: reserved (QR shown) → redeemed (staff confirm) → expired/cancelled. Rewards reports: redemptions by reward, by outlet, by staff.
+- **Exit criteria:** full earn→redeem loop live at a pilot merchant; ledger reconciles in tests (balance = Σ events, stamps and points); redemption codes provably single-use under concurrent scans.
+
+### Phase 3 — Apple & Google Wallet passes + member tags
+- Full wallet design in §6: Apple storeCard + PassKit web service + APNs updates; Google `loyaltyClass`/`loyaltyObject` + signed JWT links.
 - "Add to Apple Wallet / Google Wallet" buttons on the web card; web card stays the source of truth.
 - `/demo` marketing page issuing a real demo pass to the visitor's wallet — best growth asset.
+- **Member tags (VIP/Staff):** created under points settings as inline rows — tag name, points multiplier, enable/disable. Multiplier **replaces** the base rate, not stacks (info "i" tooltip must say exactly that). Customer profile gets a tag dropdown. Tag assignments and changes are audit-logged.
 - **Prerequisite with lead time:** Apple Developer + Google Wallet Console accounts — **start applications now, during Phase 1** (approval takes weeks).
-- **Exit criteria:** stamp→wallet-update round trip <5s; passes survive cert rotation.
+- **Exit criteria:** stamp→wallet-update round trip <5s; passes survive cert rotation; tagged member earns multiplied points correctly.
 
-### Phase 3 — WhatsApp retention engine
+### Phase 4 — WhatsApp retention engine
 - Welcome / birthday / milestone rewards; reward-expiry reminders; win-back automation ("we miss you").
 - **WhatsApp Cloud API** notifications (opt-in), email fallback; message-credit metering; template approval lead time.
 - Customer CRM: visit history, segments (active / slipping / lapsed).
 - Multi-language templates: EN + BM (+ CN).
 - **Exit criteria:** ≥1 automated campaign live per pilot merchant; opt-in/out fully honored.
 
-### Phase 4 — Referrals
+### Phase 5 — Referrals
 - Personal referral links/QRs, both-sides rewards, anti-abuse rules (self-referral, velocity).
 - Referral performance in the merchant dashboard.
 - **Exit criteria:** measurable referred-signup rate at a pilot merchant.
 
-### Phase 5 — Platform: API, POS & deeper analytics
+### Phase 6 — Platform: API, POS & deeper analytics
 - Public **API + webhooks**; POS integrations (Square/StoreHub/Feedme are SEA-relevant).
 - **Advanced analytics** (deferred from early phases): repeat-visit rate, member share of transactions, redemption rate, time-between-visits, per-branch reporting, weekly report email.
 - Multi-outlet: cross-outlet stamping/redemption, staff-per-branch permissions; fraud dashboard; custom domains; CSV customer import.
+- Maybe: POS-tied transactions or payments (founder 2026-07-09: "who knows — for now, no").
 - **Exit criteria:** one external integration live; a 2+ outlet chain running on advanced reports.
 
 ### Backlog (no committed order)
 - Google Wallet smart-tap/NFC exploration; lock-screen geo relevance (`locations[]`).
 - Points/tiers mode (beyond stamps); AI weekly plain-English reports; campaign send-time optimization.
 - Meta ads integration; reseller/agency tier; SG/PH/ID expansion; local billing (FPX, TNG).
+
+### Surface evolution by phase
+
+What is new on each surface, per phase. **➕ = proposed addition (2026-07-09), pending founder approval** — everything unmarked is already shipped or already planned. Approved ➕ items move into the phase bullets above; rejected ones get a Decision Log row.
+
+#### Phase 1 (current)
+**Customer PWA (`/app`)**
+- Shipped: OTP login (dev bypass non-prod), branded stamp card, rotating QR (90s), promos, recent spends.
+- ➕ Stamp-earned + reward-unlocked celebration moments (animation, then clear next goal: "2 more for a free coffee").
+- ➕ Add-to-home-screen prompt after second visit (not first — don't nag strangers).
+- ➕ Offline view of last-known card state (connectivity drops at the counter).
+- ➕ Email OTP fallback for tourists/no-SMS users.
+**Cashier (`/admin/[slug]/scan`)**
+- Shipped: camera scan (BarcodeDetector + paste fallback), amount input, velocity rules, daily counter view.
+- ➕ Undo last stamp (5-min window; compensating ledger event, audit-logged — mistakes happen at rush hour).
+- ➕ Customer lookup by phone when the QR won't scan (screen glare, cracked phone).
+- ➕ "Reward ready" banner on scan result so the cashier can offer redemption unprompted.
+**Merchant admin (`/admin/[slug]`)**
+- Shipped: dashboard, customer list/detail/create (PDPA opt-ins), team + role matrix, reward redemption, basic reports (7/30d).
+- Planned: onboarding wizard, printable QR kit. (Stripe billing screen dropped 2026-07-09 — manual invoicing.)
+- ➕ Live card preview while editing the program (see what customers see).
+- ➕ Customer tags + private notes ("regular, oat milk").
+- ➕ Customer CSV export (PDPA access requests need it anyway).
+**Platform admin (`/admin/merchants`)**
+- Shipped: merchant directory (search/filter/sort/pagination), create/edit (plan, address, logo, modules), password resets, audit-logged.
+- ➕ Read-only "view as merchant" with audit trail (support without password sharing).
+- ➕ System health page (DB, OTP provider, error rate).
+**Marketing (`/`)**
+- Shipped: landing + reach-out quiz, /roadmap.
+- Planned: /pricing (Founding/Starter/Growth per `PRICING.md` §8 — current features listed, unshipped ones greyed "Coming soon"), /signup (self-serve trial).
+
+#### Phase 2 — Points & rewards
+- **Customer:** home after login = stamp card first + "Show QR" CTA (modal: QR, fallback code, dismiss); rewards section below. Reward detail → redeem CTA → "Are you at the store right now?" confirm → unique single-use coupon QR + code. Points column per transaction; read-only total points on profile; adjustments visible in history.
+- **Cashier:** two big buttons — **Scan member** (amount → stamp + points) and **Scan reward** (shows reward + member → confirm). Redeemed coupons marked instantly.
+- **Merchant admin:** points settings (RM→points rate); rewards catalog CRUD (title, desc, image, points cost, active); point adjustment button on customer profile (reason required, always ledgered); reports: points earned/spent, redemptions by reward/outlet/staff.
+- **Platform admin:** points/rewards module toggles per tenant (existing module system).
+- **Marketing:** /pricing page ships alongside this phase.
+
+#### Phase 3 — Wallet passes + member tags
+- **Customer:** Add to Apple Wallet / Google Wallet buttons on `/card`; pass auto-updates on stamp/reward. ➕ Back-of-pass links (rewards, refer). ➕ Wallet hint shown from second visit onward.
+- **Cashier:** no new screens — wallet pass barcode carries the same token; scanner just works. ➕ Test that explicitly.
+- **Merchant admin:** ➕ Pass designer preview (merchant branding on a mock iPhone/Android pass). ➕ Wallet metrics tile: adds, removals, active passes.
+- **Platform admin:** ➕ Certificate health panel — Apple cert + APNs key expiry countdowns with alerts (a lapsed cert bricks every pass), Google service-account status.
+- **Marketing:** /demo issues a real pass to the visitor's own wallet; /integrations page (Apple, Google, WhatsApp-soon).
+- **Member tags:** merchant admin — inline tag rows under points settings (name, multiplier, enable/disable; "i" tooltip: replaces base rate); customer profile tag dropdown; audit-logged.
+
+#### Phase 4 — WhatsApp retention
+- **Customer:** notification preference center in profile (per-channel opt-in/out); reward-expiry reminders. ➕ Language choice (EN/BM/CN) drives template language.
+- **Cashier:** no change.
+- **Merchant admin:** automations (welcome/birthday/milestone/win-back toggles), campaign builder, segments (active/slipping/lapsed), template library, credits balance. ➕ Quiet hours + per-customer frequency cap (no 3am pings, no spam). ➕ Test-send to own phone before enabling. ➕ Audience preview count ("this will reach 143 customers"). ➕ Message history on the customer detail page.
+- **Platform admin:** ➕ Template approval tracker (Meta review status), deliverability monitor, credit ledger across tenants.
+- **Marketing:** blog engine + first SEO posts ("digital stamp card for <vertical> in <city>").
+
+#### Phase 5 — Referrals
+- **Customer:** `/refer` — personal link/QR, native share sheet. ➕ Referral status tracker ("Aisyah joined — your reward arrives on her first stamp").
+- **Cashier:** referral-reward redemption appears in the existing claim flow.
+- **Merchant admin:** referral program config (both-sides rewards), performance stats. ➕ Top-referrer list. ➕ Anti-abuse settings surfaced (self-referral, velocity, same-device).
+- **Platform admin:** referral fraud flags in the existing audit/flag stream.
+- **Marketing:** case study with pilot referral numbers.
+
+#### Phase 6 — Platform
+- **Customer:** ➕ Nearest-outlet finder for chains. ➕ Card switcher when one phone number holds cards from several Kembali merchants.
+- **Cashier:** ➕ Offline stamp queue (sync when signal returns). ➕ Quick cashier-switch PIN on a shared counter device.
+- **Merchant admin:** advanced analytics (repeat-visit, member share, time-between-visits, per-branch), fraud dashboard, custom domain settings, CSV import, API keys + webhooks UI, weekly report email, cross-outlet staff permissions.
+- **Platform admin:** usage metering + billing health, feature flags, API rate-limit monitor.
+- **Marketing:** developer docs portal; POS integration pages (StoreHub/Feedme/Square).
 
 ---
 
@@ -229,9 +333,11 @@ audit_log                       actor, action, entity, tenant_id
 /dashboard                    # today: stamps, signups, redemptions, referrals (realtime)
 /customers                    # list, segments, search
 /customers/[id]               # visit history, stamps, coupons, messages
-/programs                     # stamp card config: milestones, rewards, expiry, welcome/birthday
+/programs                     # stamp card config: milestones, expiry, welcome/birthday
+/rewards                      # rewards catalog: title, desc, image, points cost, active; redemption reports
 /outlets                      # branches, geo, QR posters (printable PDF)
 /staff                        # invites, roles, branch assignment
+/settings/points              # RM→points rate; member tags (name, multiplier — replaces base, enable/disable)
 /campaigns                    # WhatsApp/email/SMS builder, templates, credits balance
 /automations                  # birthday, win-back, milestone nudges (toggle + edit)
 /analytics                    # retention, per-branch, redemption, cohort charts
@@ -245,11 +351,13 @@ Super-admin (internal): /tenants, /usage, /billing-health, /feature-flags
 ```
 /                             # merchant-branded landing → "Join & get your card"
 /join                         # phone → OTP → (name, birthday optional) → card issued
-/card                         # THE screen: stamp grid, animated progress, personal QR
-                              #   (Add to Apple/Google Wallet buttons ship in Phase 2)
-/rewards                      # earned coupons, expiry countdown, redemption state
-/refer                        # personal referral link/QR, reward explainer
-/profile                      # language, notification opt-ins (WhatsApp/email), delete account
+/card (home after login)      # 1) stamp card + "Show QR" CTA → modal (QR, fallback code, dismiss)
+                              # 2) rewards section below: all redeemable rewards
+                              #   (Add to Apple/Google Wallet buttons ship in Phase 3)
+/rewards/[id]                 # reward detail → redeem CTA → "at the store?" confirm → unique coupon QR + code
+/rewards                      # earned/reserved coupons, expiry countdown, redemption state
+/refer                        # personal referral link/QR, reward explainer (Phase 5)
+/profile                      # language, tag (read-only), points total (read-only), notification opt-ins, delete account
 (cashier scanner lives at /admin/scan — moved per Decision Log 2026-07-08)
 ```
 - Installable PWA (manifest + service worker); works fully in browser per CX principle #1.
@@ -265,7 +373,8 @@ Super-admin (internal): /tenants, /usage, /billing-health, /feature-flags
                   #   3 multiple-choice questions (business type → outlets → main goal)
                   #   narrowing to a tailored pitch + contact CTA (v1: WhatsApp/email)
 /roadmap          # public high-level roadmap, one animated illustration per phase
-/pricing          # per-outlet/month, trial, FAQ (no app? no hardware? PDPA?)   [later]
+/pricing          # Founding/Starter/Growth per PRICING.md §8; current features
+                  #   listed, unshipped greyed "Coming soon"                    [next build]
 /blog             # SEO: "digital stamp card for <vertical> in <city>"          [later]
 /case-studies     # pilot merchant results (member count, redemption rate)      [later]
 /signup           # self-serve trial                                            [Phase 1]
@@ -285,12 +394,13 @@ Super-admin (internal): /tenants, /usage, /billing-health, /feature-flags
 ## 11. KPIs
 
 - **Merchant-side:** trial→paid conversion, churn, outlets per tenant.
-- **Product:** join-flow completion rate (>80%), stamp→card-update latency (<5s), scan success rate. *(Wallet-add rate + wallet-update latency join in Phase 2.)*
+- **Product:** join-flow completion rate (>80%), stamp→card-update latency (<5s), scan success rate. *(Phase 2 adds: points-redemption rate, reward-redemption completion. Wallet-add rate + wallet-update latency join in Phase 3.)*
 - **End-customer (the numbers merchants buy for):** repeat-visit rate, member share of transactions (target >33%), coupon redemption rate (Stampede benchmark: 59%).
 
 ## 12. Risks
 
-- **Apple pass update infra is the hardest Phase 2 piece** (certs, APNs, web service protocol). Its critical-path item is the **account approvals** — Apple Developer + Google Wallet Console applications must start during Phase 1 or Phase 2 slips.
+- **Apple pass update infra is the hardest Phase 3 piece** (certs, APNs, web service protocol). Its critical-path item is the **account approvals** — Apple Developer + Google Wallet Console applications must start during Phase 1 or Phase 3 slips.
+- **Points liability drift** — if adjustments were editable in place, balances would become untrustworthy; mitigated by the append-only ledger + customer-visible adjustments (§4).
 - **WhatsApp API costs/approval** — template approval lead time; meter credits from day one.
 - **QR fraud** — mitigated by rotating signed tokens + velocity rules (see §5).
 - **Incumbent moat (Stampede)** — compete on wallet-native passes + pricing + niche verticals first.
@@ -322,6 +432,13 @@ Super-admin (internal): /tenants, /usage, /billing-health, /feature-flags
 | 2026-07-08 | **Path-based tenancy: merchant panels at `/admin/[slug]`**, platform area at `/admin/merchants`; staff locked to their own slug | Founder review: merchant paths must never share the system admin's path; slug is stable (never regenerated on rename) |
 | 2026-07-08 | **Role-permission matrix v1** (6 permission keys × 3 roles, tenant-overridable, defaults in `@kembali/core`); enforced in nav, pages, actions and the stamp API | Founder review: cashier/manager/owner capabilities must be manageable per store |
 | 2026-07-08 | **Merchant profile v1**: plan type, address (line/city/state/country), square logo ≤512KB stored as data URL in `tenants.logo_url` | Founder review; object storage (S3/R2) replaces data URLs when a provider is chosen |
+| 2026-07-09 | **§7 "Surface evolution by phase" added**; ➕-marked UX proposals per surface/phase await founder approval | Founder asked for per-surface deltas + per-phase outcomes; proposals kept separate from committed scope |
+| 2026-07-09 | **No payment processing in-product.** Subscriptions by manual invoice (bank transfer/DuitNow); Stripe deferred to self-serve launch at earliest. Transaction key-in = record-keeping only | Founder call: payments complicate everything; POS/payment integration is a distant maybe (Phase 6+) |
+| 2026-07-09 | **Points system in Phase 2**: per-merchant RM→points rate, append-only `point_events`, read-only `points_balance` projection, admin adjustments (reason required) customer-visible in history | Founder spec; same ledger discipline as stamps |
+| 2026-07-09 | **Rewards in Phase 2**: catalog (title/desc/image/points cost), customer home = card + Show-QR modal + rewards list, redeem flow with in-store confirm → unique single-use coupon QR/code; cashier = two buttons (Scan member / Scan reward); rewards reports | Founder spec; earn→redeem loop completes the loyalty story before wallet |
+| 2026-07-09 | **Phase order re-set:** 2 points+rewards → 3 wallet passes + member tags → 4 WhatsApp → 5 referrals → 6 API/POS (supersedes 2026-07-08 row) | Founder call |
+| 2026-07-09 | **Member tags (VIP/Staff) in Phase 3**: tag rows under points settings (name, multiplier, enable/disable); multiplier REPLACES base rate (tooltip explains); tag dropdown on customer profile | Founder spec; benefits tiers without a full tier system |
+| 2026-07-09 | **Pricing approved** (PRICING.md): Founding RM99 → Starter RM149/Growth RM279 at launch → RM179/RM349 ceiling; `/pricing` page ships next build showing current features, unshipped greyed "Coming soon" | Founder approved 2026-07-09; page copy must follow SOP 3 |
 
 ## 14. References
 

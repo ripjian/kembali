@@ -6,8 +6,10 @@ export const modulesSchema = z
     stamps: z.boolean().default(true),
     scan: z.boolean().default(true),
     reports: z.boolean().default(true),
+    points: z.boolean().default(true),
+    rewards: z.boolean().default(true),
   })
-  .catch({ stamps: true, scan: true, reports: true });
+  .catch({ stamps: true, scan: true, reports: true, points: true, rewards: true });
 
 export type TenantModules = z.infer<typeof modulesSchema>;
 

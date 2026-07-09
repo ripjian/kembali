@@ -124,6 +124,8 @@ function readMerchantProfile(formData: FormData) {
       stamps: formData.get("mod_stamps") === "on",
       scan: formData.get("mod_scan") === "on",
       reports: formData.get("mod_reports") === "on",
+      points: formData.get("mod_points") === "on",
+      rewards: formData.get("mod_rewards") === "on",
     },
   });
 }
@@ -476,6 +478,162 @@ export async function updateCustomer(formData: FormData) {
     });
   });
   redirect(`/admin/${slug}/customers/${customerId.data}?saved=1`);
+}
+
+/* ---- points (Phase 2) ---------------------------------------------------- */
+
+export async function updatePointsRate(formData: FormData) {
+  const tenantId = z.uuid().safeParse(formData.get("tenantId"));
+  const rate = z.coerce.number().min(0).max(1000).safeParse(formData.get("pointsPerRm"));
+  if (!tenantId.success) redirect("/admin");
+  const { admin, slug } = await authorizeTenantAction(tenantId.data, "manageRewards");
+  if (!rate.success) redirect(`/admin/${slug}/rewards?error=rate`);
+
+  const db = await getDb();
+  await withTenant(db, tenantId.data, async (tx) => {
+    await tx
+      .update(schema.tenants)
+      .set({ pointsPerRm: rate.data })
+      .where(eq(schema.tenants.id, tenantId.data));
+    await audit(tx, {
+      tenantId: tenantId.data,
+      actorType: admin.kind,
+      actorId: admin.subjectId,
+      action: "tenant.points_rate_changed",
+      entity: "tenant",
+      entityId: tenantId.data,
+      meta: { pointsPerRm: rate.data },
+    });
+  });
+  redirect(`/admin/${slug}/rewards?saved=rate`);
+}
+
+const adjustmentSchema = z.object({
+  direction: z.enum(["add", "deduct"]),
+  points: z.coerce.number().int().min(1).max(100_000),
+  reason: z.string().trim().min(3).max(200),
+});
+
+export async function adjustCustomerPoints(formData: FormData) {
+  const tenantId = z.uuid().safeParse(formData.get("tenantId"));
+  const customerId = z.uuid().safeParse(formData.get("customerId"));
+  if (!tenantId.success || !customerId.success) redirect("/admin");
+  const { admin, slug } = await authorizeTenantAction(tenantId.data, "adjustPoints");
+  const parsed = adjustmentSchema.safeParse({
+    direction: formData.get("direction"),
+    points: formData.get("points"),
+    reason: formData.get("reason"),
+  });
+  if (!parsed.success) {
+    redirect(`/admin/${slug}/customers/${customerId.data}?error=adjust`);
+  }
+  const delta =
+    parsed.data.direction === "add" ? parsed.data.points : -parsed.data.points;
+
+  const db = await getDb();
+  const ok = await withTenant(db, tenantId.data, async (tx) => {
+    if (delta < 0) {
+      // Never let an adjustment push a member below zero.
+      const [customer] = await tx
+        .select({ balance: schema.customers.pointsBalance })
+        .from(schema.customers)
+        .where(eq(schema.customers.id, customerId.data))
+        .for("update");
+      if (!customer || customer.balance + delta < 0) return false;
+    }
+    const [event] = await tx
+      .insert(schema.pointEvents)
+      .values({
+        tenantId: tenantId.data,
+        customerId: customerId.data,
+        delta,
+        source: "adjustment",
+        reason: parsed.data.reason,
+        staffId: admin.kind === "staff" ? admin.subjectId : null,
+      })
+      .returning({ id: schema.pointEvents.id });
+    await audit(tx, {
+      tenantId: tenantId.data,
+      actorType: admin.kind,
+      actorId: admin.subjectId,
+      action: "points.adjusted",
+      entity: "point_event",
+      entityId: event?.id,
+      meta: { delta, reason: parsed.data.reason, customerId: customerId.data },
+    });
+    return true;
+  });
+  redirect(
+    `/admin/${slug}/customers/${customerId.data}?${ok ? "adjusted=1" : "error=balance"}`,
+  );
+}
+
+/* ---- rewards catalog (Phase 2) ------------------------------------------- */
+
+const rewardItemSchema = z.object({
+  title: z.string().trim().min(2).max(120),
+  description: z.string().trim().max(400),
+  pointsCost: z.coerce.number().int().min(1).max(1_000_000),
+  active: z.boolean(),
+  imageDataUrl: logoSchema,
+});
+
+export async function saveRewardItem(formData: FormData) {
+  const tenantId = z.uuid().safeParse(formData.get("tenantId"));
+  const rewardItemId = z.uuid().optional().safeParse(formData.get("rewardItemId") || undefined);
+  if (!tenantId.success) redirect("/admin");
+  const { admin, slug } = await authorizeTenantAction(tenantId.data, "manageRewards");
+  const parsed = rewardItemSchema.safeParse({
+    title: formData.get("title"),
+    description: formData.get("description") ?? "",
+    pointsCost: formData.get("pointsCost"),
+    active: formData.get("active") === "on",
+    imageDataUrl: formData.get("imageDataUrl") ?? "",
+  });
+  if (!parsed.success || !rewardItemId.success) {
+    redirect(`/admin/${slug}/rewards?error=invalid`);
+  }
+  const input = parsed.data;
+
+  const db = await getDb();
+  await withTenant(db, tenantId.data, async (tx) => {
+    let entityId = rewardItemId.data ?? null;
+    if (entityId) {
+      await tx
+        .update(schema.rewardItems)
+        .set({
+          title: input.title,
+          description: input.description || null,
+          pointsCost: input.pointsCost,
+          active: input.active,
+          ...(input.imageDataUrl ? { imageUrl: input.imageDataUrl } : {}),
+        })
+        .where(eq(schema.rewardItems.id, entityId));
+    } else {
+      const [row] = await tx
+        .insert(schema.rewardItems)
+        .values({
+          tenantId: tenantId.data,
+          title: input.title,
+          description: input.description || null,
+          pointsCost: input.pointsCost,
+          active: input.active,
+          imageUrl: input.imageDataUrl || null,
+        })
+        .returning({ id: schema.rewardItems.id });
+      entityId = row?.id ?? null;
+    }
+    await audit(tx, {
+      tenantId: tenantId.data,
+      actorType: admin.kind,
+      actorId: admin.subjectId,
+      action: rewardItemId.data ? "reward_item.updated" : "reward_item.created",
+      entity: "reward_item",
+      entityId: entityId ?? undefined,
+      meta: { title: input.title, pointsCost: input.pointsCost, active: input.active },
+    });
+  });
+  redirect(`/admin/${slug}/rewards?saved=1`);
 }
 
 export async function redeemReward(formData: FormData) {

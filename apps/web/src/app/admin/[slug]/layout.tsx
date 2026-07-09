@@ -56,6 +56,7 @@ export default async function PanelLayout({
           allowed={{
             scan: ctx.can("scan"),
             customers: ctx.can("manageCustomers"),
+            rewards: ctx.can("manageRewards"),
             reports: ctx.can("viewReports"),
             team: ctx.can("manageTeam") || admin.kind === "platform",
           }}

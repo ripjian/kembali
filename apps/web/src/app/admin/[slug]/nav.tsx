@@ -12,7 +12,13 @@ export function AdminNav({
 }: {
   base: string;
   modules: TenantModules;
-  allowed: { scan: boolean; customers: boolean; reports: boolean; team: boolean };
+  allowed: {
+    scan: boolean;
+    customers: boolean;
+    rewards: boolean;
+    reports: boolean;
+    team: boolean;
+  };
 }) {
   const pathname = usePathname();
 
@@ -20,6 +26,7 @@ export function AdminNav({
     { href: base, label: "Overview", show: true },
     { href: `${base}/scan`, label: "Scan & stamp", show: modules.scan && allowed.scan },
     { href: `${base}/customers`, label: "Customers", show: allowed.customers },
+    { href: `${base}/rewards`, label: "Rewards", show: modules.rewards && allowed.rewards },
     { href: `${base}/reports`, label: "Reports", show: modules.reports && allowed.reports },
     { href: `${base}/team`, label: "Team", show: allowed.team },
   ].filter((l) => l.show);

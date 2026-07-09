@@ -3,9 +3,11 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
-/* Scan & stamp: camera scanning via the native BarcodeDetector where the
- * browser supports it, with a paste-the-code fallback that works
- * everywhere. Amount is optional — it feeds the sales numbers in reports. */
+/* Counter flow, two jobs two buttons (Phase 2):
+ *  - Scan member: customer QR → optional amount → stamp + points.
+ *  - Scan reward: coupon QR/code → see which reward & member → confirm.
+ * Camera scanning uses the native BarcodeDetector where supported, with a
+ * paste/type fallback that works everywhere. */
 
 interface StampResult {
   customerName: string;
@@ -13,27 +15,209 @@ interface StampResult {
   stampsRequired: number;
   stampsRemaining: number;
   rewardEarned: boolean;
+  pointsEarned: number;
+  pointsBalance: number;
+}
+
+interface CouponInfo {
+  code: string;
+  state: "reserved" | "redeemed" | "expired" | "cancelled";
+  title: string;
+  customerName: string;
+  pointsCost: number;
+  balanceOk: boolean;
+}
+
+interface ConfirmResult {
+  title: string;
+  customerName: string;
+  pointsCost: number;
+  newBalance: number;
 }
 
 type BarcodeDetectorLike = {
   detect(source: CanvasImageSource): Promise<Array<{ rawValue: string }>>;
 };
 
-export function ScanClient() {
-  const router = useRouter();
+type CameraState = "idle" | "on" | "unsupported" | "denied";
+
+function useCamera(onCode: (value: string) => Promise<void>) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [cameraState, setCameraState] = useState<"idle" | "on" | "unsupported" | "denied">("idle");
+  const [state, setState] = useState<CameraState>("idle");
+  const stopRef = useRef<() => void>(() => {});
+  const busyRef = useRef(false);
+
+  async function start() {
+    const Detector = (
+      globalThis as { BarcodeDetector?: new (opts: { formats: string[] }) => BarcodeDetectorLike }
+    ).BarcodeDetector;
+    if (!Detector || !navigator.mediaDevices?.getUserMedia) {
+      setState("unsupported");
+      return;
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "environment" },
+      });
+      const video = videoRef.current;
+      if (!video) return;
+      video.srcObject = stream;
+      await video.play();
+      setState("on");
+      const detector = new Detector({ formats: ["qr_code"] });
+      let raf = 0;
+      const tick = async () => {
+        if (!busyRef.current && video.readyState >= 2) {
+          try {
+            const codes = await detector.detect(video);
+            const value = codes[0]?.rawValue;
+            if (value) {
+              busyRef.current = true;
+              await onCode(value);
+              busyRef.current = false;
+            }
+          } catch {
+            /* detection errors are transient — keep scanning */
+          }
+        }
+        raf = requestAnimationFrame(() => void tick());
+      };
+      raf = requestAnimationFrame(() => void tick());
+      stopRef.current = () => {
+        cancelAnimationFrame(raf);
+        stream.getTracks().forEach((t) => t.stop());
+        setState("idle");
+      };
+    } catch {
+      setState("denied");
+    }
+  }
+
+  useEffect(() => () => stopRef.current(), []);
+  return { videoRef, state, start, stop: () => stopRef.current() };
+}
+
+function CameraBox({
+  hint,
+  camera,
+}: {
+  hint: string;
+  camera: ReturnType<typeof useCamera>;
+}) {
+  return (
+    <div className="rounded-xl border border-border bg-surface p-4">
+      <div className="flex items-center justify-between">
+        <p className="text-sm font-medium text-text">Camera scan</p>
+        {camera.state !== "on" ? (
+          <button
+            type="button"
+            onClick={() => void camera.start()}
+            className="rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-on-primary hover:bg-primary-hover"
+          >
+            Start camera
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={camera.stop}
+            className="rounded-lg border border-border px-4 py-2 text-xs font-medium text-text hover:bg-surface-alt"
+          >
+            Stop
+          </button>
+        )}
+      </div>
+      <video
+        ref={camera.videoRef}
+        muted
+        playsInline
+        className={`mt-3 aspect-video w-full rounded-xl bg-surface-alt object-cover ${
+          camera.state === "on" ? "" : "hidden"
+        }`}
+      />
+      {camera.state === "unsupported" && (
+        <p className="mt-2 text-xs text-text-muted">
+          This browser can&apos;t scan directly. {hint}
+        </p>
+      )}
+      {camera.state === "denied" && (
+        <p className="mt-2 text-xs text-text-muted">
+          Camera access was blocked. Allow it in the browser settings, or {hint.toLowerCase()}
+        </p>
+      )}
+    </div>
+  );
+}
+
+const bigButton =
+  "flex flex-col items-center justify-center gap-2 rounded-2xl border border-border bg-surface p-8 text-center hover:border-primary hover:bg-surface-alt";
+
+export function ScanClient({
+  tenantId,
+  canRedeem,
+}: {
+  tenantId: string;
+  canRedeem: boolean;
+}) {
+  const [mode, setMode] = useState<"member" | "reward" | null>(null);
+
+  if (mode === "member") {
+    return <MemberScan onBack={() => setMode(null)} showBack={canRedeem} />;
+  }
+  if (mode === "reward") {
+    return <RewardScan tenantId={tenantId} onBack={() => setMode(null)} />;
+  }
+  if (!canRedeem) {
+    // Only one job available — skip the chooser.
+    return <MemberScan onBack={() => {}} showBack={false} />;
+  }
+
+  return (
+    <div className="grid gap-3 sm:grid-cols-2" data-scan-chooser>
+      <button type="button" onClick={() => setMode("member")} className={bigButton}>
+        <span className="text-3xl" aria-hidden>
+          🪪
+        </span>
+        <span className="text-base font-semibold text-text">Scan member</span>
+        <span className="text-xs text-text-muted">
+          Stamp their card and add points from the sale
+        </span>
+      </button>
+      <button type="button" onClick={() => setMode("reward")} className={bigButton}>
+        <span className="text-3xl" aria-hidden>
+          🎁
+        </span>
+        <span className="text-base font-semibold text-text">Scan reward</span>
+        <span className="text-xs text-text-muted">
+          Check a coupon and confirm the redemption
+        </span>
+      </button>
+    </div>
+  );
+}
+
+function BackLink({ onBack }: { onBack: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onBack}
+      className="self-start text-xs font-medium text-text-muted hover:text-text"
+    >
+      ← Back to scan options
+    </button>
+  );
+}
+
+/* ---- member: stamp + points ---------------------------------------------- */
+
+function MemberScan({ onBack, showBack }: { onBack: () => void; showBack: boolean }) {
+  const router = useRouter();
   const [manualToken, setManualToken] = useState("");
   const [amount, setAmount] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<StampResult | null>(null);
-  const stopRef = useRef<() => void>(() => {});
-  const busyRef = useRef(false);
 
   async function stamp(qrToken: string) {
-    if (busyRef.current) return;
-    busyRef.current = true;
     setBusy(true);
     setError(null);
     const rm = amount.trim() === "" ? undefined : Number.parseFloat(amount);
@@ -43,13 +227,10 @@ export function ScanClient() {
       body: JSON.stringify({
         qrToken,
         amountCents:
-          rm !== undefined && Number.isFinite(rm)
-            ? Math.round(rm * 100)
-            : undefined,
+          rm !== undefined && Number.isFinite(rm) ? Math.round(rm * 100) : undefined,
       }),
     });
     const data = await res.json();
-    busyRef.current = false;
     setBusy(false);
     if (!res.ok) {
       setError(data.error ?? "Couldn't stamp that card. Try again.");
@@ -61,53 +242,11 @@ export function ScanClient() {
     router.refresh();
   }
 
-  async function startCamera() {
-    setError(null);
-    const Detector = (
-      globalThis as { BarcodeDetector?: new (opts: { formats: string[] }) => BarcodeDetectorLike }
-    ).BarcodeDetector;
-    if (!Detector || !navigator.mediaDevices?.getUserMedia) {
-      setCameraState("unsupported");
-      return;
-    }
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "environment" },
-      });
-      const video = videoRef.current;
-      if (!video) return;
-      video.srcObject = stream;
-      await video.play();
-      setCameraState("on");
-      const detector = new Detector({ formats: ["qr_code"] });
-      let raf = 0;
-      const tick = async () => {
-        if (!busyRef.current && video.readyState >= 2) {
-          try {
-            const codes = await detector.detect(video);
-            const value = codes[0]?.rawValue;
-            if (value) await stamp(value);
-          } catch {
-            /* detection errors are transient — keep scanning */
-          }
-        }
-        raf = requestAnimationFrame(() => void tick());
-      };
-      raf = requestAnimationFrame(() => void tick());
-      stopRef.current = () => {
-        cancelAnimationFrame(raf);
-        stream.getTracks().forEach((t) => t.stop());
-        setCameraState("idle");
-      };
-    } catch {
-      setCameraState("denied");
-    }
-  }
-
-  useEffect(() => () => stopRef.current(), []);
+  const camera = useCamera(stamp);
 
   return (
     <div className="flex flex-col gap-4">
+      {showBack && <BackLink onBack={onBack} />}
       {/* amount first — cashiers key it in while the customer opens their code */}
       <div className="rounded-xl border border-border bg-surface p-4">
         <label className="text-sm font-medium text-text" htmlFor="amount">
@@ -123,48 +262,7 @@ export function ScanClient() {
         />
       </div>
 
-      <div className="rounded-xl border border-border bg-surface p-4">
-        <div className="flex items-center justify-between">
-          <p className="text-sm font-medium text-text">Camera scan</p>
-          {cameraState !== "on" ? (
-            <button
-              type="button"
-              onClick={() => void startCamera()}
-              className="rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-on-primary hover:bg-primary-hover"
-            >
-              Start camera
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={() => stopRef.current()}
-              className="rounded-lg border border-border px-4 py-2 text-xs font-medium text-text hover:bg-surface-alt"
-            >
-              Stop
-            </button>
-          )}
-        </div>
-        <video
-          ref={videoRef}
-          muted
-          playsInline
-          className={`mt-3 aspect-video w-full rounded-xl bg-surface-alt object-cover ${
-            cameraState === "on" ? "" : "hidden"
-          }`}
-        />
-        {cameraState === "unsupported" && (
-          <p className="mt-2 text-xs text-text-muted">
-            This browser can&apos;t scan directly. Paste the customer&apos;s
-            code below instead.
-          </p>
-        )}
-        {cameraState === "denied" && (
-          <p className="mt-2 text-xs text-text-muted">
-            Camera access was blocked. Allow it in the browser settings, or
-            paste the code below.
-          </p>
-        )}
-      </div>
+      <CameraBox hint="Paste the customer's code below instead." camera={camera} />
 
       <form
         onSubmit={(e) => {
@@ -216,6 +314,161 @@ export function ScanClient() {
               : `${result.stampsRemaining} more ${
                   result.stampsRemaining === 1 ? "stamp" : "stamps"
                 } to their reward.`}
+          </p>
+          {result.pointsEarned > 0 && (
+            <p className="mt-1 text-sm text-text-secondary" data-points-earned>
+              +{result.pointsEarned} points · balance now{" "}
+              <span className="tabular-nums">{result.pointsBalance}</span>
+            </p>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ---- reward: lookup then confirm ----------------------------------------- */
+
+function RewardScan({ tenantId, onBack }: { tenantId: string; onBack: () => void }) {
+  const router = useRouter();
+  const [manualCode, setManualCode] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [coupon, setCoupon] = useState<CouponInfo | null>(null);
+  const [confirmed, setConfirmed] = useState<ConfirmResult | null>(null);
+
+  async function lookup(code: string) {
+    setBusy(true);
+    setError(null);
+    setConfirmed(null);
+    const res = await fetch("/api/admin/redemption", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ tenantId, code }),
+    });
+    const data = await res.json();
+    setBusy(false);
+    if (!res.ok) {
+      setCoupon(null);
+      setError(data.error ?? "Couldn't check that coupon. Try again.");
+      return;
+    }
+    setCoupon(data as CouponInfo);
+    setManualCode("");
+  }
+
+  async function confirm() {
+    if (!coupon) return;
+    setBusy(true);
+    setError(null);
+    const res = await fetch("/api/admin/redemption/confirm", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ tenantId, code: coupon.code }),
+    });
+    const data = await res.json();
+    setBusy(false);
+    if (!res.ok) {
+      setError(data.error ?? "Couldn't confirm that coupon. Scan it again.");
+      setCoupon(null);
+      return;
+    }
+    setCoupon(null);
+    setConfirmed(data as ConfirmResult);
+    router.refresh();
+  }
+
+  const camera = useCamera(lookup);
+
+  return (
+    <div className="flex flex-col gap-4">
+      <BackLink onBack={onBack} />
+      <CameraBox hint="Type the coupon code below instead." camera={camera} />
+
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (manualCode.trim()) void lookup(manualCode.trim());
+        }}
+        className="rounded-xl border border-border bg-surface p-4"
+      >
+        <label className="text-sm font-medium text-text" htmlFor="coupon-code">
+          Or type the coupon code
+        </label>
+        <p className="mt-1 text-xs text-text-muted">
+          Under the QR on the customer&apos;s coupon, like KMB-XXXX-XXXX.
+        </p>
+        <input
+          id="coupon-code"
+          value={manualCode}
+          onChange={(e) => setManualCode(e.target.value)}
+          placeholder="KMB-"
+          autoCapitalize="characters"
+          className="mt-2 h-11 w-full rounded-xl border border-border bg-bg px-3 font-mono text-sm uppercase text-text outline-none focus:border-primary"
+        />
+        <button
+          type="submit"
+          disabled={busy || !manualCode.trim()}
+          className="mt-2 inline-flex h-11 w-full items-center justify-center rounded-xl bg-primary text-sm font-semibold text-on-primary hover:bg-primary-hover disabled:opacity-60"
+        >
+          {busy ? "Checking…" : "Check this coupon"}
+        </button>
+      </form>
+
+      {error && (
+        <p role="alert" className="rounded-xl border border-error/40 bg-surface px-4 py-3 text-sm text-error">
+          {error}
+        </p>
+      )}
+
+      {coupon && (
+        <div className="rounded-xl border border-border bg-surface p-4" data-coupon-info>
+          <p className="text-sm font-semibold text-text">{coupon.title}</p>
+          <p className="mt-1 text-sm text-text-secondary">
+            For {coupon.customerName} ·{" "}
+            <span className="tabular-nums" data-stat>
+              {coupon.pointsCost}
+            </span>{" "}
+            points
+          </p>
+          {coupon.state === "reserved" && coupon.balanceOk ? (
+            <button
+              type="button"
+              onClick={() => void confirm()}
+              disabled={busy}
+              className="mt-3 inline-flex h-11 w-full items-center justify-center rounded-xl bg-primary text-sm font-semibold text-on-primary hover:bg-primary-hover disabled:opacity-60"
+            >
+              {busy ? "Confirming…" : "Confirm — hand over the reward"}
+            </button>
+          ) : (
+            <p role="alert" className="mt-3 rounded-lg bg-surface-alt px-3 py-2 text-sm text-text-secondary">
+              {coupon.state === "redeemed" && "This coupon was already used."}
+              {coupon.state === "expired" &&
+                "This coupon expired. Ask the customer to redeem again."}
+              {coupon.state === "cancelled" && "The customer cancelled this coupon."}
+              {coupon.state === "reserved" &&
+                !coupon.balanceOk &&
+                "The member doesn't have enough points anymore."}
+            </p>
+          )}
+        </div>
+      )}
+
+      {confirmed && (
+        <div
+          role="status"
+          className="rounded-xl border border-leaf/50 bg-surface p-4"
+          data-redeem-result
+        >
+          <p className="text-sm font-semibold text-text">
+            Redeemed — hand {confirmed.customerName} their{" "}
+            {confirmed.title.toLowerCase()}.
+          </p>
+          <p className="mt-1 text-sm text-text-secondary">
+            −{confirmed.pointsCost} points · balance now{" "}
+            <span className="tabular-nums" data-stat>
+              {confirmed.newBalance}
+            </span>
           </p>
         </div>
       )}

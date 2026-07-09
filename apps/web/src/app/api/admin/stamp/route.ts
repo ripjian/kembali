@@ -4,6 +4,7 @@ import {
   checkStampVelocity,
   computeCardProgress,
   earnsReward,
+  pointsForAmount,
   resolveRolePermissions,
   verifyQrToken,
 } from "@kembali/core";
@@ -14,6 +15,7 @@ import { z } from "zod";
 import { getAdminContext } from "@/lib/auth";
 import { qrTokenSecret } from "@/lib/config";
 import { getDb } from "@/lib/db";
+import { parseModules } from "@/lib/modules";
 
 const bodySchema = z.object({
   /** Signed QR token from the customer's card (camera or paste). */
@@ -56,10 +58,14 @@ export async function POST(req: Request) {
 
   const db = await getDb();
   const result = await withTenant(db, tenantId, async (tx) => {
+    const [tenantRow] = await tx
+      .select({
+        rolePermissions: schema.tenants.rolePermissions,
+        pointsPerRm: schema.tenants.pointsPerRm,
+        modules: schema.tenants.modules,
+      })
+      .from(schema.tenants);
     if (admin.kind === "staff") {
-      const [tenantRow] = await tx
-        .select({ rolePermissions: schema.tenants.rolePermissions })
-        .from(schema.tenants);
       const matrix = resolveRolePermissions(tenantRow?.rolePermissions);
       const role = admin.role as "owner" | "manager" | "cashier";
       if (!matrix[role].scan) {
@@ -109,14 +115,34 @@ export async function POST(req: Request) {
       .limit(1);
     if (!outlet) return { error: "This store has no outlet configured yet." };
 
-    await tx.insert(schema.stampEvents).values({
-      tenantId,
-      cardId: card.id,
-      outletId: outlet.id,
-      staffId: admin.kind === "staff" ? admin.subjectId : null,
-      source,
-      amountCents: parsed.data.amountCents ?? null,
-    });
+    const [stampEvent] = await tx
+      .insert(schema.stampEvents)
+      .values({
+        tenantId,
+        cardId: card.id,
+        outletId: outlet.id,
+        staffId: admin.kind === "staff" ? admin.subjectId : null,
+        source,
+        amountCents: parsed.data.amountCents ?? null,
+      })
+      .returning({ id: schema.stampEvents.id });
+
+    // Points accrue from the keyed-in amount (Phase 2). The ledger insert
+    // moves customers.points_balance via the DB projection trigger.
+    const modules = parseModules(tenantRow?.modules);
+    const pointsEarned = modules.points
+      ? pointsForAmount(parsed.data.amountCents ?? 0, tenantRow?.pointsPerRm ?? 0)
+      : 0;
+    if (pointsEarned > 0 && stampEvent) {
+      await tx.insert(schema.pointEvents).values({
+        tenantId,
+        customerId: card.customerId,
+        delta: pointsEarned,
+        source: "transaction",
+        staffId: admin.kind === "staff" ? admin.subjectId : null,
+        stampEventId: stampEvent.id,
+      });
+    }
 
     const newCount = card.stampsCount + 1;
     await tx
@@ -142,12 +168,18 @@ export async function POST(req: Request) {
       stampsCount: newCount,
       stampsRequired: program.stampsRequired,
     });
+    const [balanceRow] = await tx
+      .select({ balance: schema.customers.pointsBalance })
+      .from(schema.customers)
+      .where(eq(schema.customers.id, card.customerId));
     return {
       customerName: customer.name ?? customer.phone ?? "Customer",
       stampsCount: newCount,
       stampsRequired: program.stampsRequired,
       stampsRemaining: progress.stampsRemaining,
       rewardEarned,
+      pointsEarned,
+      pointsBalance: balanceRow?.balance ?? 0,
     };
   });
 

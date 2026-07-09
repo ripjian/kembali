@@ -11,6 +11,7 @@ import { getDb } from "@/lib/db";
 import { formatDate, formatDateTime, formatRM } from "@/lib/format";
 import { getPanelContext } from "@/lib/panel";
 
+import { AdjustPointsButton } from "./adjust-points";
 import { CustomerEdit } from "./customer-edit";
 
 export default async function CustomerDetailPage({
@@ -18,13 +19,13 @@ export default async function CustomerDetailPage({
   searchParams,
 }: {
   params: Promise<{ slug: string; id: string }>;
-  searchParams: Promise<{ saved?: string; error?: string }>;
+  searchParams: Promise<{ saved?: string; adjusted?: string; error?: string }>;
 }) {
   const { slug, id } = await params;
   const ctx = await getPanelContext(slug);
   if (!ctx.can("manageCustomers")) redirect(ctx.base);
   if (!z.uuid().safeParse(id).success) notFound();
-  const { saved, error } = await searchParams;
+  const { saved, adjusted, error } = await searchParams;
 
   const db = await getDb();
   const data = await withTenant(db, ctx.tenant.id, async (tx) => {
@@ -69,10 +70,49 @@ export default async function CustomerDetailPage({
           .from(schema.stampEvents)
           .where(eq(schema.stampEvents.cardId, card.id))
       : [{ visits: 0, spend: 0 }];
-    return { customer, card, program, events, rewards, lifetime };
+    const pointEvents = await tx
+      .select()
+      .from(schema.pointEvents)
+      .where(eq(schema.pointEvents.customerId, customer.id))
+      .orderBy(desc(schema.pointEvents.createdAt))
+      .limit(60);
+    return { customer, card, program, events, rewards, lifetime, pointEvents };
   });
   if (!data) notFound();
-  const { customer, card, program, events, rewards, lifetime } = data;
+  const { customer, card, program, events, rewards, lifetime, pointEvents } = data;
+
+  // Points earned per visit (keyed by stamp event) + standalone ledger rows
+  // (adjustments, redemptions) merged into one customer-visible timeline.
+  const pointsByStampEvent = new Map(
+    pointEvents
+      .filter((e) => e.stampEventId)
+      .map((e) => [e.stampEventId as string, e.delta]),
+  );
+  const history = [
+    ...events.map((event) => ({
+      key: `visit-${event.id}`,
+      createdAt: event.createdAt,
+      label: event.source === "qr" ? "Visit — scanned" : "Visit — manual",
+      amountCents: event.amountCents,
+      points: pointsByStampEvent.get(event.id) ?? 0,
+      stamp: true,
+    })),
+    ...pointEvents
+      .filter((e) => e.source !== "transaction")
+      .map((event) => ({
+        key: `points-${event.id}`,
+        createdAt: event.createdAt,
+        label:
+          event.source === "adjustment"
+            ? `Points adjustment — ${event.reason ?? "no reason given"}`
+            : `Reward redeemed${event.reason ? ` — ${event.reason}` : ""}`,
+        amountCents: null,
+        points: event.delta,
+        stamp: false,
+      })),
+  ]
+    .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+    .slice(0, 30);
 
   const optIns = z
     .object({ whatsapp: z.boolean().optional(), email: z.boolean().optional() })
@@ -108,13 +148,29 @@ export default async function CustomerDetailPage({
           Customer details saved.
         </p>
       )}
-      {error && (
+      {error === "invalid" && (
         <p role="alert" className="rounded-xl border border-error/40 bg-surface px-4 py-3 text-sm text-error">
           Check the name and phone number, then try again.
         </p>
       )}
 
-      <section className="grid gap-3 sm:grid-cols-3">
+      {adjusted && (
+        <p role="status" className="rounded-xl border border-leaf/50 bg-surface px-4 py-3 text-sm text-text">
+          Points adjusted — it&apos;s in the customer&apos;s history.
+        </p>
+      )}
+      {error === "adjust" && (
+        <p role="alert" className="rounded-xl border border-error/40 bg-surface px-4 py-3 text-sm text-error">
+          Enter the points and a short reason, then try again.
+        </p>
+      )}
+      {error === "balance" && (
+        <p role="alert" className="rounded-xl border border-error/40 bg-surface px-4 py-3 text-sm text-error">
+          That deduction is more than the customer&apos;s balance.
+        </p>
+      )}
+
+      <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <div className="rounded-xl border border-border bg-surface p-4">
           <p className="text-2xl font-semibold tabular-nums text-text" data-stat>
             {lifetime?.visits ?? 0}
@@ -133,11 +189,31 @@ export default async function CustomerDetailPage({
           </p>
           <p className="mt-1 text-xs text-text-muted">Current card</p>
         </div>
+        {ctx.tenant.modules.points && (
+          <div className="rounded-xl border border-border bg-surface p-4">
+            <p
+              className="text-2xl font-semibold tabular-nums text-text"
+              data-stat
+              data-points-balance
+            >
+              {customer.pointsBalance}
+            </p>
+            <p className="mt-1 text-xs text-text-muted">Points balance</p>
+          </div>
+        )}
       </section>
 
       <section className="rounded-xl border border-border bg-surface p-4">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <h2 className="text-sm font-semibold text-text">Details</h2>
+          <div className="flex gap-2">
+          {ctx.tenant.modules.points && ctx.can("adjustPoints") && (
+            <AdjustPointsButton
+              tenantId={ctx.tenant.id}
+              customerId={customer.id}
+              balance={customer.pointsBalance}
+            />
+          )}
           {ctx.can("editCustomers") && (
             <CustomerEdit
               tenantId={ctx.tenant.id}
@@ -152,6 +228,7 @@ export default async function CustomerDetailPage({
               }}
             />
           )}
+          </div>
         </div>
         <dl className="mt-3 grid gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
           <div className="flex justify-between gap-4 sm:block">
@@ -229,28 +306,43 @@ export default async function CustomerDetailPage({
         <h2 className="border-b border-border px-4 py-3 text-sm font-semibold text-text">
           Transactions
         </h2>
-        {events.length === 0 ? (
+        {history.length === 0 ? (
           <p className="px-4 py-5 text-sm text-text-muted">No visits recorded yet.</p>
         ) : (
           <ul>
-            {events.map((event) => (
+            {history.map((row) => (
               <li
-                key={event.id}
-                className="flex items-center justify-between border-b border-border px-4 py-2.5 text-sm last:border-b-0"
+                key={row.key}
+                className="flex items-center justify-between gap-3 border-b border-border px-4 py-2.5 text-sm last:border-b-0"
               >
-                <span className="text-text-secondary">
-                  {formatDateTime(event.createdAt)}
-                  <span className="ml-2 text-xs text-text-muted">
-                    {event.source === "qr" ? "scanned" : "manual"}
-                  </span>
+                <span className="min-w-0 text-text-secondary">
+                  {formatDateTime(row.createdAt)}
+                  <span className="ml-2 text-xs text-text-muted">{row.label}</span>
                 </span>
-                <span className="flex items-center gap-3">
+                <span className="flex shrink-0 items-center gap-3">
                   <span className="tabular-nums text-text" data-stat>
-                    {event.amountCents != null ? formatRM(event.amountCents) : "—"}
+                    {row.amountCents != null ? formatRM(row.amountCents) : "—"}
                   </span>
-                  <span className="rounded-full bg-surface-alt px-2 py-0.5 text-xs text-text-secondary">
-                    +1
-                  </span>
+                  {ctx.tenant.modules.points && (
+                    <span
+                      className={`w-14 text-right tabular-nums text-xs ${
+                        row.points > 0
+                          ? "text-success"
+                          : row.points < 0
+                            ? "text-text-secondary"
+                            : "text-text-muted"
+                      }`}
+                      data-stat
+                    >
+                      {row.points > 0 ? `+${row.points}` : row.points !== 0 ? row.points : "—"}{" "}
+                      pts
+                    </span>
+                  )}
+                  {row.stamp && (
+                    <span className="rounded-full bg-surface-alt px-2 py-0.5 text-xs text-text-secondary">
+                      +1
+                    </span>
+                  )}
                 </span>
               </li>
             ))}

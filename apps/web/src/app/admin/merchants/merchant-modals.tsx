@@ -1,8 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useRef, useState, type ReactNode } from "react";
+import { useRef } from "react";
 
+import { ImageDataUrlInput, inputClass, Modal } from "@/components/admin/form-bits";
 import { createTenant, updateTenant } from "@/lib/admin-actions";
 import type { TenantModules } from "@/lib/modules";
 import { PLAN_LABELS, PLAN_TYPES } from "@/lib/plans";
@@ -11,114 +12,6 @@ import { PLAN_LABELS, PLAN_TYPES } from "@/lib/plans";
  * <dialog>) and the Manage Merchant confirmation. Forms submit to server
  * actions; the logo input converts a validated square image to a data URL
  * in a hidden field. */
-
-const inputClass =
-  "h-10 w-full rounded-lg border border-border bg-surface px-3 text-sm text-text outline-none focus:border-primary";
-
-function Modal({
-  title,
-  buttonLabel,
-  buttonClass,
-  children,
-}: {
-  title: string;
-  buttonLabel: string;
-  buttonClass: string;
-  children: ReactNode;
-}) {
-  const ref = useRef<HTMLDialogElement>(null);
-  return (
-    <>
-      <button type="button" className={buttonClass} onClick={() => ref.current?.showModal()}>
-        {buttonLabel}
-      </button>
-      <dialog
-        ref={ref}
-        className="m-auto w-[min(92vw,540px)] rounded-2xl border border-border bg-surface p-0 text-text backdrop:bg-black/40"
-      >
-        <div className="flex items-center justify-between border-b border-border px-5 py-3">
-          <h2 className="text-sm font-semibold text-text">{title}</h2>
-          <button
-            type="button"
-            onClick={() => ref.current?.close()}
-            aria-label="Close"
-            className="rounded-lg px-2 py-1 text-text-muted hover:bg-surface-alt hover:text-text"
-          >
-            ✕
-          </button>
-        </div>
-        <div className="max-h-[75vh] overflow-y-auto p-5">{children}</div>
-      </dialog>
-    </>
-  );
-}
-
-const MAX_LOGO_BYTES = 512 * 1024;
-
-function LogoInput({ initialUrl }: { initialUrl?: string | null }) {
-  const [dataUrl, setDataUrl] = useState<string>("");
-  const [error, setError] = useState<string | null>(null);
-
-  async function onFile(file: File | undefined) {
-    setError(null);
-    if (!file) return;
-    if (!/^image\/(png|jpeg|webp)$/.test(file.type)) {
-      setError("Use a PNG, JPG or WebP image.");
-      return;
-    }
-    if (file.size > MAX_LOGO_BYTES) {
-      setError("That file is over 512 KB. Export a smaller version.");
-      return;
-    }
-    const url = await new Promise<string>((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(String(reader.result));
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-    const ok = await new Promise<boolean>((resolve) => {
-      const img = new Image();
-      img.onload = () => resolve(img.width === img.height);
-      img.onerror = () => resolve(false);
-      img.src = url;
-    });
-    if (!ok) {
-      setError("The logo must be square (same width and height).");
-      return;
-    }
-    setDataUrl(url);
-  }
-
-  const preview = dataUrl || initialUrl || null;
-  return (
-    <div>
-      <label className="text-xs font-medium text-text" htmlFor="logo-file">
-        Brand logo
-      </label>
-      <p className="mt-0.5 text-xs italic text-text-muted">
-        Square image · PNG, JPG or WebP · up to 512 KB
-      </p>
-      <div className="mt-2 flex items-center gap-3">
-        {preview && (
-          <img
-            src={preview}
-            alt="Logo preview"
-            className="size-12 rounded-lg border border-border object-cover"
-          />
-        )}
-        <input
-          id="logo-file"
-          type="file"
-          accept="image/png,image/jpeg,image/webp"
-          onChange={(e) => void onFile(e.target.files?.[0])}
-          className="text-xs text-text-secondary file:mr-3 file:rounded-lg file:border file:border-border file:bg-surface file:px-3 file:py-1.5 file:text-xs file:font-medium file:text-text"
-        />
-      </div>
-      {error && <p className="mt-1 text-xs text-error">{error}</p>}
-      <input type="hidden" name="logoDataUrl" value={dataUrl} />
-    </div>
-  );
-}
 
 function ProfileFields({
   defaults,
@@ -134,7 +27,13 @@ function ProfileFields({
     modules: TenantModules;
   };
 }) {
-  const m = defaults?.modules ?? { stamps: true, scan: true, reports: true };
+  const m = defaults?.modules ?? {
+    stamps: true,
+    scan: true,
+    reports: true,
+    points: true,
+    rewards: true,
+  };
   return (
     <>
       <label className="text-xs font-medium text-text">
@@ -151,7 +50,11 @@ function ProfileFields({
           ))}
         </select>
       </label>
-      <LogoInput initialUrl={defaults?.logoUrl} />
+      <ImageDataUrlInput
+        label="Brand logo"
+        fieldName="logoDataUrl"
+        initialUrl={defaults?.logoUrl}
+      />
       <label className="text-xs font-medium text-text">
         Address
         <input name="addressLine" defaultValue={defaults?.addressLine ?? ""} placeholder="12 Jalan SS15/4" className={`mt-1 ${inputClass}`} />
@@ -177,6 +80,8 @@ function ProfileFields({
             ["mod_stamps", "Stamp cards", m.stamps],
             ["mod_scan", "Scan & stamp", m.scan],
             ["mod_reports", "Reports", m.reports],
+            ["mod_points", "Points", m.points],
+            ["mod_rewards", "Rewards", m.rewards],
           ] as const
         ).map(([name, label, checked]) => (
           <label key={name} className="mr-4 inline-flex items-center gap-1.5 text-xs text-text-secondary">

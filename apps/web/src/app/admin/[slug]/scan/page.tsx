@@ -52,12 +52,14 @@ export default async function ScanPage({
       <header>
         <h1 className="text-2xl font-semibold text-text">Scan & stamp</h1>
         <p className="mt-1 text-sm text-text-secondary">
-          Point the camera at the customer&apos;s code, key in the amount,
-          done.
+          Stamp a member&apos;s card, or confirm a reward coupon.
         </p>
       </header>
 
-      <ScanClient />
+      <ScanClient
+        tenantId={ctx.tenant.id}
+        canRedeem={ctx.tenant.modules.rewards && ctx.can("redeemRewards")}
+      />
 
       <section className="rounded-xl border border-border bg-surface">
         <div className="flex items-center justify-between border-b border-border px-4 py-3">

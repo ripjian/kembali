@@ -1,15 +1,17 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { computeCardProgress } from "@kembali/core";
 import { schema, withTenant } from "@kembali/db";
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq, gt } from "drizzle-orm";
 import { Button, LogoMark, StampGrid } from "@kembali/ui";
 
 import { destroySessions, getCustomerSession } from "@/lib/auth";
 import { getDb } from "@/lib/db";
 import { formatDateTime, formatDate, formatRM } from "@/lib/format";
+import { parseModules } from "@/lib/modules";
 
-import { QrPanel } from "./qr-panel";
+import { ShowQrButton } from "./show-qr";
 
 export const dynamic = "force-dynamic";
 
@@ -42,7 +44,7 @@ export default async function CardPage() {
       .from(schema.programs)
       .where(eq(schema.programs.id, card.programId));
     const [tenant] = await tx
-      .select({ name: schema.tenants.name })
+      .select({ name: schema.tenants.name, modules: schema.tenants.modules })
       .from(schema.tenants);
     const events = await tx
       .select({
@@ -53,13 +55,50 @@ export default async function CardPage() {
       .from(schema.stampEvents)
       .where(eq(schema.stampEvents.cardId, card.id))
       .orderBy(desc(schema.stampEvents.createdAt))
-      .limit(10);
+      .limit(20);
     const rewards = await tx
       .select()
       .from(schema.rewards)
       .where(eq(schema.rewards.cardId, card.id))
       .orderBy(desc(schema.rewards.createdAt));
-    return { customer, card, program, tenant, events, rewards } as const;
+    const pointEvents = await tx
+      .select()
+      .from(schema.pointEvents)
+      .where(eq(schema.pointEvents.customerId, customer.id))
+      .orderBy(desc(schema.pointEvents.createdAt))
+      .limit(40);
+    const rewardItems = await tx
+      .select()
+      .from(schema.rewardItems)
+      .where(eq(schema.rewardItems.active, true))
+      .orderBy(schema.rewardItems.pointsCost);
+    const [openCoupon] = await tx
+      .select({ id: schema.redemptions.id, title: schema.rewardItems.title })
+      .from(schema.redemptions)
+      .innerJoin(
+        schema.rewardItems,
+        eq(schema.redemptions.rewardItemId, schema.rewardItems.id),
+      )
+      .where(
+        and(
+          eq(schema.redemptions.customerId, customer.id),
+          eq(schema.redemptions.state, "reserved"),
+          gt(schema.redemptions.expiresAt, new Date()),
+        ),
+      )
+      .orderBy(desc(schema.redemptions.createdAt))
+      .limit(1);
+    return {
+      customer,
+      card,
+      program,
+      tenant,
+      events,
+      rewards,
+      pointEvents,
+      rewardItems,
+      openCoupon,
+    } as const;
   });
 
   if (!data) redirect("/app/login");
@@ -73,7 +112,18 @@ export default async function CardPage() {
       </main>
     );
   }
-  const { customer, card, program, tenant, events, rewards } = data;
+  const {
+    customer,
+    card,
+    program,
+    tenant,
+    events,
+    rewards,
+    pointEvents,
+    rewardItems,
+    openCoupon,
+  } = data;
+  const modules = parseModules(tenant?.modules);
   const progress = computeCardProgress({
     stampsCount: card.stampsCount,
     stampsRequired: program.stampsRequired,
@@ -86,6 +136,39 @@ export default async function CardPage() {
       ? String((program.rewardDefinitions[0] as { title?: string }).title ?? "a reward")
       : "a reward";
   const openRewards = rewards.filter((r) => r.state === "earned");
+
+  // One customer-visible history: visits (with the points they earned) +
+  // adjustments and redemptions from the points ledger.
+  const pointsByStampEvent = new Map(
+    pointEvents
+      .filter((e) => e.stampEventId)
+      .map((e) => [e.stampEventId as string, e.delta]),
+  );
+  const history = [
+    ...events.map((event) => ({
+      key: `visit-${event.id}`,
+      createdAt: event.createdAt,
+      label: "Visit",
+      amountCents: event.amountCents,
+      points: pointsByStampEvent.get(event.id) ?? 0,
+      stamp: true,
+    })),
+    ...pointEvents
+      .filter((e) => e.source !== "transaction")
+      .map((event) => ({
+        key: `points-${event.id}`,
+        createdAt: event.createdAt,
+        label:
+          event.source === "adjustment"
+            ? event.reason ?? "Points adjustment"
+            : "Reward redeemed",
+        amountCents: null,
+        points: event.delta,
+        stamp: false,
+      })),
+  ]
+    .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+    .slice(0, 12);
 
   return (
     <main className="mx-auto flex min-h-dvh max-w-sm flex-col gap-6 px-5 py-8">
@@ -109,7 +192,17 @@ export default async function CardPage() {
         </form>
       </header>
 
-      {/* The card */}
+      {openCoupon && (
+        <Link
+          href={`/app/coupons/${openCoupon.id}`}
+          className="rounded-xl border border-accent/40 bg-surface p-3 text-sm font-medium text-accent-deep"
+        >
+          Your coupon for {openCoupon.title.toLowerCase()} is ready — show it
+          at the counter →
+        </Link>
+      )}
+
+      {/* The card, front and centre, with the Show QR call to action */}
       <section className="rounded-2xl border border-border bg-surface p-6 shadow-sm">
         <div className="flex items-baseline justify-between">
           <h2 className="text-sm font-semibold text-text">{program.name}</h2>
@@ -136,17 +229,77 @@ export default async function CardPage() {
           more {progress.stampsRemaining === 1 ? "stamp" : "stamps"} to{" "}
           {rewardTitle.toLowerCase()}
         </p>
+        <div className="mt-5">
+          <ShowQrButton />
+        </div>
+        {modules.points && (
+          <p className="mt-3 text-center text-xs text-text-muted">
+            Points balance:{" "}
+            <span
+              className="font-semibold tabular-nums text-text"
+              data-stat
+              data-points-balance
+            >
+              {customer.pointsBalance}
+            </span>
+          </p>
+        )}
       </section>
 
-      {/* Rotating QR */}
-      <section className="rounded-2xl border border-border bg-surface p-6 shadow-sm">
-        <h2 className="mb-4 text-center text-sm font-semibold text-text">
-          Show this at the counter
-        </h2>
-        <QrPanel />
-      </section>
+      {/* Redeemable rewards */}
+      {modules.rewards && rewardItems.length > 0 && (
+        <section className="rounded-2xl border border-border bg-surface p-6 shadow-sm">
+          <h2 className="text-sm font-semibold text-text">Treat yourself</h2>
+          <p className="mt-1 text-xs text-text-muted">
+            Spend your points on something nice.
+          </p>
+          <div className="mt-3 flex flex-col gap-2">
+            {rewardItems.map((item) => {
+              const affordable = customer.pointsBalance >= item.pointsCost;
+              return (
+                <Link
+                  key={item.id}
+                  href={`/app/rewards/${item.id}`}
+                  className="flex items-center gap-3 rounded-xl border border-border p-3 hover:bg-surface-alt"
+                >
+                  {item.imageUrl ? (
+                    // data URL, nothing to optimize
+                    <img
+                      src={item.imageUrl}
+                      alt=""
+                      className="size-11 shrink-0 rounded-lg border border-border object-cover"
+                    />
+                  ) : (
+                    <span className="grid size-11 shrink-0 place-items-center rounded-lg bg-surface-alt text-lg">
+                      🎁
+                    </span>
+                  )}
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-sm font-medium text-text">
+                      {item.title}
+                    </span>
+                    <span
+                      className={`block text-xs ${affordable ? "text-success" : "text-text-muted"}`}
+                    >
+                      {affordable
+                        ? "You have enough points"
+                        : `${item.pointsCost - customer.pointsBalance} more points to go`}
+                    </span>
+                  </span>
+                  <span
+                    className="shrink-0 rounded-full bg-surface-alt px-2.5 py-1 text-xs font-semibold tabular-nums text-text"
+                    data-stat
+                  >
+                    {item.pointsCost} pts
+                  </span>
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
-      {/* Promos & rewards */}
+      {/* Stamp-card rewards already earned */}
       <section className="rounded-2xl border border-border bg-surface p-6 shadow-sm">
         <h2 className="text-sm font-semibold text-text">Your rewards</h2>
         <div className="mt-3 flex flex-col gap-2">
@@ -186,30 +339,45 @@ export default async function CardPage() {
         </div>
       </section>
 
-      {/* Recent spends */}
+      {/* History */}
       <section className="rounded-2xl border border-border bg-surface p-6 shadow-sm">
         <h2 className="text-sm font-semibold text-text">Recent visits</h2>
-        {events.length === 0 ? (
+        {history.length === 0 ? (
           <p className="mt-3 text-xs text-text-muted">
             Your visits will show here after your first stamp.
           </p>
         ) : (
           <ul className="mt-3 flex flex-col">
-            {events.map((event) => (
+            {history.map((row) => (
               <li
-                key={event.id}
-                className="flex items-center justify-between border-b border-border py-2.5 text-sm last:border-b-0"
+                key={row.key}
+                className="flex items-center justify-between gap-2 border-b border-border py-2.5 text-sm last:border-b-0"
               >
-                <span className="text-text-secondary">
-                  {formatDateTime(event.createdAt)}
+                <span className="min-w-0 text-text-secondary">
+                  {formatDateTime(row.createdAt)}
+                  {!row.stamp && (
+                    <span className="block truncate text-xs text-text-muted">
+                      {row.label}
+                    </span>
+                  )}
                 </span>
-                <span className="flex items-center gap-3">
+                <span className="flex shrink-0 items-center gap-2.5">
                   <span className="tabular-nums text-text" data-stat>
-                    {event.amountCents != null ? formatRM(event.amountCents) : "—"}
+                    {row.amountCents != null ? formatRM(row.amountCents) : ""}
                   </span>
-                  <span className="rounded-full bg-surface-alt px-2 py-0.5 text-xs text-text-secondary">
-                    +1
-                  </span>
+                  {modules.points && row.points !== 0 && (
+                    <span
+                      className={`tabular-nums text-xs ${row.points > 0 ? "text-success" : "text-text-secondary"}`}
+                      data-stat
+                    >
+                      {row.points > 0 ? `+${row.points}` : row.points} pts
+                    </span>
+                  )}
+                  {row.stamp && (
+                    <span className="rounded-full bg-surface-alt px-2 py-0.5 text-xs text-text-secondary">
+                      +1
+                    </span>
+                  )}
                 </span>
               </li>
             ))}

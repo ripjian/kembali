@@ -5,7 +5,7 @@ import { schema, withTenant } from "@kembali/db";
 import { desc, eq, gte, sql } from "drizzle-orm";
 
 import { getDb } from "@/lib/db";
-import { formatRM } from "@/lib/format";
+import { formatDateTime, formatRM } from "@/lib/format";
 import { getPanelContext } from "@/lib/panel";
 
 /* Basic reports v1 (ROADMAP Phase 1) — activity, sales captured, repeat
@@ -94,7 +94,105 @@ export default async function ReportsPage({
       .orderBy(desc(sql`count(*)`))
       .limit(5);
 
-    return { totals, repeat, newCustomers, rewardsAgg, byDay, topCustomers };
+    // Points & redemptions (Phase 2)
+    const [pointsAgg] = await tx
+      .select({
+        earned: sql<number>`coalesce(sum(${schema.pointEvents.delta}) filter (where ${schema.pointEvents.delta} > 0), 0)::int`,
+        spent: sql<number>`coalesce(-sum(${schema.pointEvents.delta}) filter (where ${schema.pointEvents.delta} < 0), 0)::int`,
+      })
+      .from(schema.pointEvents)
+      .where(gte(schema.pointEvents.createdAt, since));
+
+    const pointsByCustomer = await tx
+      .select({
+        id: schema.customers.id,
+        name: schema.customers.name,
+        phone: schema.customers.phone,
+        earned: sql<number>`coalesce(sum(${schema.pointEvents.delta}) filter (where ${schema.pointEvents.delta} > 0), 0)::int`,
+        spent: sql<number>`coalesce(-sum(${schema.pointEvents.delta}) filter (where ${schema.pointEvents.delta} < 0), 0)::int`,
+      })
+      .from(schema.pointEvents)
+      .innerJoin(schema.customers, eq(schema.pointEvents.customerId, schema.customers.id))
+      .where(gte(schema.pointEvents.createdAt, since))
+      .groupBy(schema.customers.id)
+      .orderBy(desc(sql`sum(${schema.pointEvents.delta}) filter (where ${schema.pointEvents.delta} > 0)`))
+      .limit(5);
+
+    const adjustments = await tx
+      .select({
+        id: schema.pointEvents.id,
+        delta: schema.pointEvents.delta,
+        reason: schema.pointEvents.reason,
+        createdAt: schema.pointEvents.createdAt,
+        customerName: schema.customers.name,
+        customerPhone: schema.customers.phone,
+        staffName: schema.staffUsers.name,
+      })
+      .from(schema.pointEvents)
+      .innerJoin(schema.customers, eq(schema.pointEvents.customerId, schema.customers.id))
+      .leftJoin(schema.staffUsers, eq(schema.pointEvents.staffId, schema.staffUsers.id))
+      .where(
+        sql`${schema.pointEvents.source} = 'adjustment' and ${schema.pointEvents.createdAt} >= ${since}`,
+      )
+      .orderBy(desc(schema.pointEvents.createdAt))
+      .limit(10);
+
+    const redemptionsByReward = await tx
+      .select({
+        title: schema.rewardItems.title,
+        redeemed: sql<number>`count(*)::int`,
+        points: sql<number>`coalesce(sum(${schema.redemptions.pointsCost}), 0)::int`,
+      })
+      .from(schema.redemptions)
+      .innerJoin(
+        schema.rewardItems,
+        eq(schema.redemptions.rewardItemId, schema.rewardItems.id),
+      )
+      .where(
+        sql`${schema.redemptions.state} = 'redeemed' and ${schema.redemptions.redeemedAt} >= ${since}`,
+      )
+      .groupBy(schema.rewardItems.id)
+      .orderBy(desc(sql`count(*)`));
+
+    const recentRedemptions = await tx
+      .select({
+        id: schema.redemptions.id,
+        redeemedAt: schema.redemptions.redeemedAt,
+        pointsCost: schema.redemptions.pointsCost,
+        title: schema.rewardItems.title,
+        customerName: schema.customers.name,
+        customerPhone: schema.customers.phone,
+        staffName: schema.staffUsers.name,
+      })
+      .from(schema.redemptions)
+      .innerJoin(
+        schema.rewardItems,
+        eq(schema.redemptions.rewardItemId, schema.rewardItems.id),
+      )
+      .innerJoin(schema.customers, eq(schema.redemptions.customerId, schema.customers.id))
+      .leftJoin(
+        schema.staffUsers,
+        eq(schema.redemptions.redeemedByStaffId, schema.staffUsers.id),
+      )
+      .where(
+        sql`${schema.redemptions.state} = 'redeemed' and ${schema.redemptions.redeemedAt} >= ${since}`,
+      )
+      .orderBy(desc(schema.redemptions.redeemedAt))
+      .limit(10);
+
+    return {
+      totals,
+      repeat,
+      newCustomers,
+      rewardsAgg,
+      byDay,
+      topCustomers,
+      pointsAgg,
+      pointsByCustomer,
+      adjustments,
+      redemptionsByReward,
+      recentRedemptions,
+    };
   });
 
   const activeCards = data.totals?.cards ?? 0;
@@ -112,6 +210,12 @@ export default async function ReportsPage({
     { label: "Visiting customers", value: String(activeCards) },
     { label: "Came back twice or more", value: `${repeatRate}%` },
     { label: "Rewards redeemed", value: `${redeemed}/${earned} (${redemptionRate}%)` },
+    ...(ctx.tenant.modules.points
+      ? [
+          { label: "Points earned", value: String(data.pointsAgg?.earned ?? 0) },
+          { label: "Points spent", value: String(data.pointsAgg?.spent ?? 0) },
+        ]
+      : []),
   ];
 
   return (
@@ -217,6 +321,150 @@ export default async function ReportsPage({
           </ul>
         )}
       </section>
+
+      {ctx.tenant.modules.points && (
+        <section className="rounded-xl border border-border bg-surface">
+          <h2 className="border-b border-border px-4 py-3 text-sm font-semibold text-text">
+            Points by customer
+          </h2>
+          {data.pointsByCustomer.length === 0 ? (
+            <p className="px-4 py-5 text-sm text-text-muted">
+              No points activity in this period yet.
+            </p>
+          ) : (
+            <ul>
+              {data.pointsByCustomer.map((c) => (
+                <li
+                  key={c.id}
+                  className="flex items-center justify-between gap-3 border-b border-border px-4 py-3 text-sm last:border-b-0"
+                >
+                  {ctx.can("manageCustomers") ? (
+                    <Link
+                      href={`${ctx.base}/customers/${c.id}`}
+                      className="truncate font-medium text-text hover:underline"
+                    >
+                      {c.name ?? c.phone ?? "Customer"}
+                    </Link>
+                  ) : (
+                    <span className="truncate font-medium text-text">
+                      {c.name ?? c.phone ?? "Customer"}
+                    </span>
+                  )}
+                  <span className="shrink-0 text-xs text-text-secondary">
+                    <span className="tabular-nums text-success" data-stat>
+                      +{c.earned}
+                    </span>{" "}
+                    earned ·{" "}
+                    <span className="tabular-nums" data-stat>
+                      −{c.spent}
+                    </span>{" "}
+                    spent
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      )}
+
+      {ctx.tenant.modules.points && (
+        <section className="rounded-xl border border-border bg-surface">
+          <h2 className="border-b border-border px-4 py-3 text-sm font-semibold text-text">
+            Points adjustments
+          </h2>
+          {data.adjustments.length === 0 ? (
+            <p className="px-4 py-5 text-sm text-text-muted">
+              No manual adjustments in this period.
+            </p>
+          ) : (
+            <ul>
+              {data.adjustments.map((a) => (
+                <li
+                  key={a.id}
+                  className="flex items-center justify-between gap-3 border-b border-border px-4 py-3 text-sm last:border-b-0"
+                >
+                  <span className="min-w-0">
+                    <span className="font-medium text-text">
+                      {a.customerName ?? a.customerPhone ?? "Customer"}
+                    </span>
+                    <span className="ml-2 text-xs text-text-muted">
+                      {a.reason ?? ""} · by {a.staffName ?? "system admin"} ·{" "}
+                      {formatDateTime(a.createdAt)}
+                    </span>
+                  </span>
+                  <span
+                    className={`shrink-0 tabular-nums ${a.delta > 0 ? "text-success" : "text-text-secondary"}`}
+                    data-stat
+                  >
+                    {a.delta > 0 ? `+${a.delta}` : a.delta} pts
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      )}
+
+      {ctx.tenant.modules.rewards && (
+        <section className="rounded-xl border border-border bg-surface">
+          <h2 className="border-b border-border px-4 py-3 text-sm font-semibold text-text">
+            Redemptions by reward
+          </h2>
+          {data.redemptionsByReward.length === 0 ? (
+            <p className="px-4 py-5 text-sm text-text-muted">
+              No rewards redeemed in this period yet.
+            </p>
+          ) : (
+            <ul>
+              {data.redemptionsByReward.map((r) => (
+                <li
+                  key={r.title}
+                  className="flex items-center justify-between gap-3 border-b border-border px-4 py-3 text-sm last:border-b-0"
+                >
+                  <span className="truncate font-medium text-text">{r.title}</span>
+                  <span className="shrink-0 text-xs text-text-secondary">
+                    <span className="tabular-nums" data-stat>
+                      {r.redeemed}
+                    </span>{" "}
+                    redeemed ·{" "}
+                    <span className="tabular-nums" data-stat>
+                      {r.points}
+                    </span>{" "}
+                    pts
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+          {data.recentRedemptions.length > 0 && (
+            <>
+              <h3 className="border-y border-border bg-surface-alt px-4 py-2 text-xs font-semibold text-text-secondary">
+                Latest redemptions
+              </h3>
+              <ul>
+                {data.recentRedemptions.map((r) => (
+                  <li
+                    key={r.id}
+                    className="flex items-center justify-between gap-3 border-b border-border px-4 py-2.5 text-sm last:border-b-0"
+                  >
+                    <span className="min-w-0">
+                      <span className="font-medium text-text">{r.title}</span>
+                      <span className="ml-2 text-xs text-text-muted">
+                        {r.customerName ?? r.customerPhone ?? "Customer"} · confirmed
+                        by {r.staffName ?? "system admin"}
+                        {r.redeemedAt ? ` · ${formatDateTime(r.redeemedAt)}` : ""}
+                      </span>
+                    </span>
+                    <span className="shrink-0 tabular-nums text-xs text-text-secondary" data-stat>
+                      −{r.pointsCost} pts
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+        </section>
+      )}
     </main>
   );
 }

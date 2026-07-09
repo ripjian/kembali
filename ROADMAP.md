@@ -211,20 +211,21 @@ audit_log                       actor, action, entity, tenant_id
 - ⬜ **Remaining:** real OTP delivery (SMS/WhatsApp provider), merchant onboarding wizard polish, printable QR kit.
 - **Exit criteria:** 1 pilot merchant live; stamp→card-update round trip <5s in the web PWA; zero cross-tenant leakage (tested).
 
-### Phase 2 — Points & rewards *(inserted 2026-07-09, founder)*
+### Phase 2 — Points & rewards *(inserted 2026-07-09, founder)* ← *core shipped 2026-07-10*
 **Points**
-- Per-merchant **RM→points conversion rate** in merchant settings; points accrue from the transaction amount keyed in at scan-to-stamp (key-in stays record-keeping only — no payments).
-- Ledger pattern identical to stamps: append-only `point_events`; `points_balance` is a **read-only projection** (never edited directly).
-- **Point adjustments:** admin can add/deduct points (button on customer profile, reason required). Every adjustment is a ledger event, appears in transaction history, and is **visible to the customer** in their own view.
-- Customer profile/transactions show a points column per transaction + uneditable total points field.
-- Reports: points earned/spent per customer, adjustments log.
+- ✅ Per-merchant **RM→points conversion rate** on the admin Rewards page (0 pauses earning); points accrue from the transaction amount keyed in at scan-to-stamp (key-in stays record-keeping only — no payments).
+- ✅ Ledger pattern identical to stamps: append-only `point_events`; `points_balance` is a **read-only projection** — a DB trigger maintains it and rejects direct UPDATEs, so balance = Σ events by construction.
+- ✅ **Point adjustments:** add/deduct on the customer profile (reason required, `adjustPoints` permission, can't push below zero). Every adjustment is a ledger event, audit-logged, and **visible to the customer** in their own history.
+- ✅ Customer profile/transactions show a points column per transaction + uneditable total points field (admin and customer views).
+- ✅ Reports: points earned/spent tiles, points by customer, adjustments log.
 **Rewards**
-- Merchant config: rewards catalog — title, description, image, points cost, active toggle.
-- Customer home after login: **stamp card first** with a "Show QR" CTA (modal: QR + fallback code + dismiss); **rewards section below** listing everything redeemable.
-- Reward detail page → redeem CTA at the bottom → friendly in-store confirmation ("Are you at the store right now?" pattern, ux-writing skill) → only then a **unique, single-use coupon code + QR** appears.
-- Cashier flow becomes **two big buttons**: **Scan member** (→ key in amount → stamp + points) and **Scan reward** (→ shows which reward + which member → confirm redemption).
-- Redemption states: reserved (QR shown) → redeemed (staff confirm) → expired/cancelled. Rewards reports: redemptions by reward, by outlet, by staff.
-- **Exit criteria:** full earn→redeem loop live at a pilot merchant; ledger reconciles in tests (balance = Σ events, stamps and points); redemption codes provably single-use under concurrent scans.
+- ✅ Merchant config: rewards catalog — title, description, square image ≤512 KB, points cost, active toggle (`manageRewards` permission).
+- ✅ Customer home after login: **stamp card first** with a "Show QR" CTA (modal: QR + fallback code + dismiss); **rewards section below** with affordability hints.
+- ✅ Reward detail page → redeem CTA at the bottom → "Are you at the store right now?" confirmation → only then a **unique, single-use coupon code + QR** (KMB-XXXX-XXXX, 15-min TTL; customer can cancel; screen flips live when staff confirm).
+- ✅ Cashier flow is **two big buttons**: **Scan member** (→ key in amount → stamp + points) and **Scan reward** (→ shows which reward + which member → confirm redemption). Points leave the balance at confirm, not reserve — abandoned coupons cost nothing.
+- ✅ Redemption states: reserved (QR shown) → redeemed (staff confirm) → expired/cancelled. Rewards reports: redemptions by reward + latest redemptions with staff. (Per-outlet split arrives with multi-outlet in Phase 6 — single-outlet merchants today.)
+- ✅ Platform admin: points/rewards module toggles in merchant create/edit.
+- **Exit criteria:** ⬜ full earn→redeem loop live at a pilot merchant; ✅ ledger reconciles in tests (balance = Σ events, stamps and points); ✅ redemption codes provably single-use under concurrent scans (`packages/db/src/test/points.test.ts`).
 
 ### Phase 3 — Apple & Google Wallet passes + member tags
 - Full wallet design in §6: Apple storeCard + PassKit web service + APNs updates; Google `loyaltyClass`/`loyaltyObject` + signed JWT links.
@@ -439,6 +440,9 @@ Super-admin (internal): /tenants, /usage, /billing-health, /feature-flags
 | 2026-07-09 | **Phase order re-set:** 2 points+rewards → 3 wallet passes + member tags → 4 WhatsApp → 5 referrals → 6 API/POS (supersedes 2026-07-08 row) | Founder call |
 | 2026-07-09 | **Member tags (VIP/Staff) in Phase 3**: tag rows under points settings (name, multiplier, enable/disable); multiplier REPLACES base rate (tooltip explains); tag dropdown on customer profile | Founder spec; benefits tiers without a full tier system |
 | 2026-07-09 | **Pricing approved** (PRICING.md): Founding RM99 → Starter RM149/Growth RM279 at launch → RM179/RM349 ceiling; `/pricing` page ships next build showing current features, unshipped greyed "Coming soon" | Founder approved 2026-07-09; page copy must follow SOP 3 |
+| 2026-07-10 | **`points_balance` maintained by a DB trigger** on `point_events` insert; direct UPDATEs to the column rejected (pg_trigger_depth guard, migration 0009) | Stronger than app-side projection (used for `stamps_count`): read-only is enforced in the database and balance = Σ events by construction |
+| 2026-07-10 | **Points leave the balance at redemption CONFIRM, not reserve.** Coupon = KMB-XXXX-XXXX (no 0/O/1/I/L), 15-min TTL; confirm = atomic state-guarded UPDATE + row-locked balance re-check in one transaction | Abandoned/expired coupons need no refund ledger events; single-use proven under concurrent confirms in tests |
+| 2026-07-10 | **New permissions `adjustPoints` (owner-only default) + `manageRewards` (owner+manager default)**; `points`/`rewards` module toggles default ON for all tenants | Adjustments move balances → most sensitive; catalog editing is routine store management; matrix stays per-tenant editable |
 
 ## 14. References
 

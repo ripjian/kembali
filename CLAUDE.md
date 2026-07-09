@@ -1,6 +1,6 @@
 # Kembali — Claude Code instructions & SOP
 
-Multi-tenant SaaS digital stamp-card loyalty platform (Malaysia/SEA first). Customer cards live in a web PWA; Apple/Google Wallet passes are backlogged. Staff stamp via QR scan on any phone. Solo founder; you are the engineering team.
+Multi-tenant SaaS digital stamp-card loyalty platform (Malaysia/SEA first). Customer cards live in a web PWA; Apple/Google Wallet passes are Phase 2 (next after Phase 1 completes). Staff stamp via QR scan on any phone. Solo founder; you are the engineering team.
 
 **This file is the standard operating procedure.** It is written so any model — including smaller ones — can plan, build, verify, and communicate the same way. Follow it literally. When this file and your instinct disagree, follow this file.
 

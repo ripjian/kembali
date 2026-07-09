@@ -246,11 +246,11 @@ Super-admin (internal): /tenants, /usage, /billing-health, /feature-flags
 /                             # merchant-branded landing → "Join & get your card"
 /join                         # phone → OTP → (name, birthday optional) → card issued
 /card                         # THE screen: stamp grid, animated progress, personal QR
-                              #   (wallet add-buttons return when §7 Backlog wallet item ships)
+                              #   (Add to Apple/Google Wallet buttons ship in Phase 2)
 /rewards                      # earned coupons, expiry countdown, redemption state
 /refer                        # personal referral link/QR, reward explainer
 /profile                      # language, notification opt-ins (WhatsApp/email), delete account
-/scan (staff-only route)      # cashier camera scanner + claim-coupon panel
+(cashier scanner lives at /admin/scan — moved per Decision Log 2026-07-08)
 ```
 - Installable PWA (manifest + service worker); works fully in browser per CX principle #1.
 - Loads <2s on mid-range Android over 4G (performance budget).
@@ -269,7 +269,7 @@ Super-admin (internal): /tenants, /usage, /billing-health, /feature-flags
 /blog             # SEO: "digital stamp card for <vertical> in <city>"          [later]
 /case-studies     # pilot merchant results (member count, redemption rate)      [later]
 /signup           # self-serve trial                                            [Phase 1]
-/demo             # demo pass into the visitor's own wallet                     [Backlog — wallet]
+/demo             # demo pass into the visitor's own wallet                     [Phase 2]
 /privacy, /terms
 ```
 **Positioning line:** *"Kembali — the stamp card that lives on your customers' phones. No app for your customers, no hardware for your staff, set up in 10 minutes."* Tagline: *"Loyalty your customers will love."* (replaced "Make them come back" 2026-07-08 — founder found it too direct/commanding; wallet-first positioning returns with Phase 2)
@@ -277,8 +277,6 @@ Super-admin (internal): /tenants, /usage, /billing-health, /feature-flags
 **Copy hard rules (2026-07-07, non-negotiable):**
 1. All product and marketing copy is **English only**. "Kembali" appears **only as the brand name** — never as a verb, pun, or tagline word, and no other Malay words in UI copy ("kopi", "Selamat datang", etc.). Feature *support* for BM/CN templates (Phase 2) is unaffected — that's localization, not brand voice.
 2. Copy follows the `ux-writing` skill (`.claude/skills/ux-writing/`): purposeful, concise, conversational, clear; sentence case; verb-first buttons (2–4 words); no idioms; no internal jargon in public copy (no "MVP", "backlog", "Phase 0" — say "At launch", "Planned", "Preview").
-
-**Marketing visual language:** Pandan palette on sand canvas; the archived stamp-grid mark (`brand/logo-c-last-stamp.svg` — 8 stamps + return arrow) is the hero illustration motif; serif display (Fraunces/Lora) for headlines, Plus Jakarta Sans for UI.
 
 **Best growth asset:** the `/demo` page issues a real demo pass to the visitor's wallet — the product sells itself.
 

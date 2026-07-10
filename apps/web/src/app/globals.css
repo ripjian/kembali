@@ -108,7 +108,39 @@
   animation: station-ping 2.4s var(--ease-out-strong) infinite;
 }
 
-/* Scroll cue — slow, gentle, transform-only */
+/* Hero glass cards — gentle, continuous drift (transform-only). Two curves
+   in opposite phase so the pair floats independently. Paused off-screen via
+   the [data-inview="false"] rule below. */
+@keyframes rm-drift {
+  0% {
+    transform: translate(0, 0) rotate(-0.4deg);
+  }
+  50% {
+    transform: translate(3px, -7px) rotate(0.4deg);
+  }
+  100% {
+    transform: translate(0, 0) rotate(-0.4deg);
+  }
+}
+.rm-drift {
+  animation: rm-drift 4.5s var(--ease-in-out-strong) infinite;
+}
+@keyframes rm-drift-slow {
+  0% {
+    transform: translate(0, 0) rotate(0.3deg);
+  }
+  50% {
+    transform: translate(-3px, 7px) rotate(-0.3deg);
+  }
+  100% {
+    transform: translate(0, 0) rotate(0.3deg);
+  }
+}
+.rm-drift-slow {
+  animation: rm-drift-slow 5.5s var(--ease-in-out-strong) infinite;
+}
+
+/* Scroll cue - slow, gentle, transform-only */
 @keyframes cue-bob {
   0%,
   100% {
@@ -203,7 +235,7 @@
 /* Loops pause until their section is in view (animation-play-state). */
 
 [data-inview="false"]
-  :is(.rm-stamp, .rm-bubble, .rm-bar, .rm-node, .rm-wallet, .rm-flow, .rm-slab, .rm-fill, .rm-pop, .rm-ring, .rm-toast, .rm-travel) {
+  :is(.rm-stamp, .rm-bubble, .rm-bar, .rm-node, .rm-wallet, .rm-flow, .rm-slab, .rm-fill, .rm-pop, .rm-ring, .rm-toast, .rm-travel, .rm-drift, .rm-drift-slow) {
   animation-play-state: paused;
 }
 
@@ -552,7 +584,9 @@
   .rm-pop,
   .rm-ring,
   .rm-toast,
-  .rm-travel {
+  .rm-travel,
+  .rm-drift,
+  .rm-drift-slow {
     animation: none;
     opacity: 1;
     transform: none;

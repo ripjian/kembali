@@ -45,7 +45,7 @@ export function SiteFooter() {
 
       <div className="mx-auto flex w-full max-w-[1200px] flex-wrap items-center justify-between gap-3 border-t border-border px-6 py-5">
         <p className="font-mono text-xs text-text-muted">
-          © 2026 Kembali — Malaysia &amp; SEA
+          © 2026 Kembali · Malaysia &amp; SEA
         </p>
         <p className="font-mono text-xs text-text-muted">
           PDPA: marketing is opt-in · export or delete your data anytime

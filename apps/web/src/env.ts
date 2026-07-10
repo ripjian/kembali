@@ -1,7 +1,7 @@
 import { createEnv } from "@kembali/config/env";
 import { z } from "zod";
 
-/** Server-side env, validated at boot (zod at every boundary — CLAUDE.md).
+/** Server-side env, validated at boot (zod at every boundary - CLAUDE.md).
  * Import only from server code; client code sees NEXT_PUBLIC_* inlined. */
 export const env = createEnv({
   NODE_ENV: z
@@ -11,7 +11,7 @@ export const env = createEnv({
   NEXT_PUBLIC_SENTRY_DSN: z.union([z.url(), z.literal("")]).optional(),
   /** Postgres. Optional in dev (embedded PGlite fallback), required in prod. */
   DATABASE_URL: z.union([z.url(), z.literal("")]).optional(),
-  /** HMAC secret for customer QR tokens — required in prod (lib/config.ts). */
+  /** HMAC secret for customer QR tokens - required in prod (lib/config.ts). */
   QR_TOKEN_SECRET: z.string().min(16).optional(),
 });
 

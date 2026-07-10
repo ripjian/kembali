@@ -1,6 +1,6 @@
 /**
  * Outlet attribution (Decision Log 2026-07-11): every stamp/point/redemption
- * event carries an outlet_id, and the "serving outlet" pick is tenant-safe —
+ * event carries an outlet_id, and the "serving outlet" pick is tenant-safe -
  * a cookie/outlet id from another tenant can never attribute your events
  * (RLS makes it unreachable, so the pick falls back to your own outlet).
  */

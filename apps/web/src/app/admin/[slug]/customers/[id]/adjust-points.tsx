@@ -4,7 +4,7 @@ import { inputClass, Modal } from "@/components/admin/form-bits";
 import { adjustCustomerPoints } from "@/lib/admin-actions";
 
 /* Add/deduct points with a required reason. Every adjustment is a ledger
- * event the customer sees in their own history — say why in plain words. */
+ * event the customer sees in their own history - say why in plain words. */
 
 export function AdjustPointsButton({
   tenantId,

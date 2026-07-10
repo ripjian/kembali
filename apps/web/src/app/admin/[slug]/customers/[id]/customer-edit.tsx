@@ -3,7 +3,7 @@
 import { inputClass, Modal } from "@/components/admin/form-bits";
 import { updateCustomer } from "@/lib/admin-actions";
 
-/* Edit customer details in a modal — same pattern as Adjust points, so the
+/* Edit customer details in a modal - same pattern as Adjust points, so the
  * two actions on the profile feel consistent. Shown only with the
  * editCustomers permission; the server action re-checks it regardless.
  * `defaultOpen` supports the ?edit=1 deep-link from the customers list. */

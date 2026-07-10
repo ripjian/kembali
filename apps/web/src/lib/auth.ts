@@ -15,7 +15,7 @@ import { DEMO_TENANT_ID, getDb } from "./db";
 
 /* Session plumbing (SECURITY.md rule 6): random 256-bit tokens in
  * httpOnly/secure/lax cookies; only sha256 hashes are stored. Global auth
- * tables are readable by the app role without a tenant GUC — they hold no
+ * tables are readable by the app role without a tenant GUC - they hold no
  * tenant business data. */
 
 const CUSTOMER_COOKIE = "kb_session";

@@ -10,7 +10,7 @@ export type TestDb = PgliteDatabase<typeof schema>;
 
 const migrationsFolder = fileURLToPath(new URL("../../drizzle", import.meta.url));
 
-/** Fresh in-process Postgres with all migrations applied — no external DB
+/** Fresh in-process Postgres with all migrations applied - no external DB
  * needed, so the RLS suite runs identically on laptops and CI. */
 export async function createTestDb(): Promise<{ db: TestDb; client: PGlite }> {
   const client = new PGlite();

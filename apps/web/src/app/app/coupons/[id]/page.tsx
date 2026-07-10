@@ -51,7 +51,7 @@ export default async function CouponPage({
   });
   if (!data) notFound();
 
-  // A reserved coupon past its window reads as expired — the confirm API
+  // A reserved coupon past its window reads as expired - the confirm API
   // applies the same rule, so the screen never promises what staff can't scan.
   const state =
     data.state === "reserved" && data.expiresAt < new Date() ? "expired" : data.state;
@@ -92,7 +92,7 @@ export default async function CouponPage({
           <div className="mt-5 rounded-xl border border-leaf/50 bg-surface p-5" data-coupon-state="redeemed">
             <p className="text-2xl">🎉</p>
             <p className="mt-2 text-sm font-semibold text-text">
-              Redeemed — enjoy your {data.title.toLowerCase()}!
+              Redeemed. Enjoy your {data.title.toLowerCase()}.
             </p>
             {data.redeemedAt && (
               <p className="mt-1 text-xs text-text-muted">

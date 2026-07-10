@@ -49,7 +49,7 @@ export function ShopPreview() {
 
   return (
     <div className="panel-ring mx-auto grid w-full max-w-4xl gap-8 rounded-2xl border border-border bg-surface p-6 sm:p-8 lg:grid-cols-2 lg:items-center">
-      {/* Fields — three inputs, then the CTA */}
+      {/* Fields - three inputs, then the CTA */}
       <div className="flex flex-col gap-5">
         <label className="flex flex-col gap-1.5">
           <span className="text-xs font-medium text-text-secondary">
@@ -125,7 +125,7 @@ export function ShopPreview() {
         </p>
       </div>
 
-      {/* Live mock card — tenant brand color drives the header and stamps
+      {/* Live mock card - tenant brand color drives the header and stamps
           (white-label preview; BRAND.md allows tenant colors to override). */}
       <div className="flex justify-center">
         <div className="w-full max-w-xs overflow-hidden rounded-2xl border border-border bg-surface shadow-sm">

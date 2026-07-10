@@ -249,15 +249,15 @@ export function ManageMerchantButton({ name, slug }: { name: string; slug: strin
         onClick={() => ref.current?.showModal()}
         className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-text hover:bg-surface-alt"
       >
-        Manage Merchant
+        Manage merchant
       </button>
       <dialog
         ref={ref}
         className="admin-modal m-auto w-[min(92vw,400px)] rounded-2xl border border-border bg-surface p-5 text-text backdrop:bg-black/40"
       >
-        <h2 className="text-sm font-semibold text-text">Open {name}&apos;s panel?</h2>
+        <h2 className="text-sm font-semibold text-text">Open {name}&apos;s panel</h2>
         <p className="mt-2 text-sm text-text-secondary">
-          You&apos;ll see their admin view at /admin/{slug} — exactly what
+          You&apos;ll see their admin view at /admin/{slug}. It matches what
           their team sees, with your system-admin powers.
         </p>
         <div className="mt-4 flex gap-2">
@@ -266,7 +266,7 @@ export function ManageMerchantButton({ name, slug }: { name: string; slug: strin
             onClick={() => router.push(`/admin/${slug}`)}
             className="rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-on-primary hover:bg-primary-hover"
           >
-            Yes, open their panel
+            Open their panel
           </button>
           <button
             type="button"

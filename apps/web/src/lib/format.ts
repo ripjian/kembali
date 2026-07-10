@@ -1,4 +1,4 @@
-/** RM 12.50 — MYR display for sen amounts. */
+/** RM 12.50 - MYR display for sen amounts. */
 export function formatRM(amountCents: number): string {
   return `RM ${(amountCents / 100).toFixed(2)}`;
 }

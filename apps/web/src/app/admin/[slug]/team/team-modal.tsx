@@ -7,7 +7,7 @@ import { createStaff, deleteStaff, updateStaff } from "@/lib/admin-actions";
 
 /* One modal for adding a team member and editing an existing one. Staff
  * sign in with their email (there's no separate username). Passwords are
- * scrypt-hashed server-side and never shown back — edit mode offers "set a
+ * scrypt-hashed server-side and never shown back - edit mode offers "set a
  * new password", not the old one. Edit mode also allows removal, with a
  * confirm step; self and last-owner deletes are blocked server-side. */
 
@@ -97,7 +97,7 @@ export function EditTeamMemberButton({
 }: {
   tenantId: string;
   member: Member;
-  /** false for yourself — the server blocks it too. */
+  /** false for yourself - the server blocks it too. */
   canDelete: boolean;
 }) {
   const [confirming, setConfirming] = useState(false);

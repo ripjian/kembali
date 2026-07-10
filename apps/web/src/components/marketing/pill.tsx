@@ -45,7 +45,7 @@ export function ActionLink({
   );
 }
 
-/** Feature pill — the system's signature floating element: a small colored
+/** Feature pill - the system's signature floating element: a small colored
  * dot (exactly one accent per pill) + quiet label, 9999px radius.
  * `style` is exposed for animation custom properties (e.g. `--i` delays). */
 export function Tag({

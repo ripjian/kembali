@@ -48,14 +48,14 @@ export function QrPanel() {
         // plain <img>: the QR is a local data URL, nothing to optimize
         <img
           src={dataUrl}
-          alt="Your stamp code — show this at the counter"
+          alt="Your stamp code, show this at the counter"
           className="size-52 rounded-2xl border border-border bg-white p-2"
         />
       ) : (
         <div className="size-52 animate-pulse rounded-2xl border border-border bg-surface-alt" />
       )}
       <p className="text-xs text-text-muted">
-        {error ?? "Refreshes automatically — screenshots won't work."}
+        {error ?? "Refreshes automatically. Screenshots won't work."}
       </p>
       {token && (
         <details className="w-full text-center">

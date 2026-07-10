@@ -10,7 +10,7 @@ import { z } from "zod";
 import { getCustomerSession } from "@/lib/auth";
 import { getDb } from "@/lib/db";
 
-/* Customer-side redemption actions. Points are NOT deducted here — the
+/* Customer-side redemption actions. Points are NOT deducted here - the
  * coupon reserves the reward; the balance moves when staff confirm the
  * scan (see /api/admin/redemption/confirm). An abandoned coupon simply
  * expires, so nothing needs refunding. */

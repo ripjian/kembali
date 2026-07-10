@@ -8,7 +8,7 @@ import { getDb } from "@/lib/db";
 import { formatDateTime, formatRM } from "@/lib/format";
 import { getPanelContext } from "@/lib/panel";
 
-/* Reports overview — activity, sales, repeat behaviour, points & rewards.
+/* Reports overview - activity, sales, repeat behaviour, points & rewards.
  * Each list preview is capped to the latest 25; "See full report" opens a
  * dedicated page with pagination, date range and CSV download. */
 

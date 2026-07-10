@@ -5,15 +5,15 @@ import { ActionLink } from "@/components/marketing/pill";
 import { Reveal } from "@/components/marketing/reveal";
 
 export const metadata: Metadata = {
-  title: "Pricing — Kembali",
+  title: "Pricing · Kembali",
   description:
-    "Simple pricing, per outlet, per month. Start as a founding merchant at RM99 with a 30-day free pilot. No card needed — we invoice you after the trial.",
+    "Simple pricing, per outlet, per month. Start as a founding merchant at RM99 with a 30-day free pilot. No card needed. We invoice you after the trial.",
 };
 
 /* Pricing page (PRICING.md §8). Light-locked marketing surface, DESIGN-dub
  * style. Points and rewards are live, so they sit in the included lists;
  * only the genuinely unshipped features are greyed "Coming soon". No
- * self-serve payment anywhere — contact-to-invoice, no card. */
+ * self-serve payment anywhere - contact-to-invoice, no card. */
 
 function Check() {
   return (
@@ -78,7 +78,7 @@ const PLANS: Plan[] = [
     badge: "Available now",
     featured: true,
     blurb:
-      "For the first 20 shops. Everything Kembali makes, as it ships — no plan change, ever.",
+      "For the first 20 shops. Everything Kembali makes, as it ships, with no plan change, ever.",
     cta: {
       label: "Become a founding merchant",
       href: "/#reach-out",
@@ -92,7 +92,7 @@ const PLANS: Plan[] = [
       "Reports and free data export",
     ],
     footNote:
-      "30-day free pilot, then RM99 locked for 12 months. New features — wallet cards, WhatsApp, referrals — arrive at no extra cost.",
+      "30-day free pilot, then RM99 locked for 12 months. New features arrive at no extra cost: wallet cards, WhatsApp, referrals.",
   },
   {
     id: "starter",
@@ -139,7 +139,7 @@ const PLANS: Plan[] = [
 const FAQ = [
   {
     q: "Do my customers download an app?",
-    a: "No. Their card opens right in the phone browser from a QR at your counter — nothing to install, nothing to forget.",
+    a: "No. Their card opens right in the phone browser from a QR at your counter. Nothing to install, nothing to forget.",
   },
   {
     q: "Do I need new hardware?",
@@ -147,7 +147,7 @@ const FAQ = [
   },
   {
     q: "What happens to my data if I leave?",
-    a: "It stays yours. Export every customer and visit to a CSV file anytime — free, on every plan, forever.",
+    a: "It stays yours. Export every customer and visit to a CSV file anytime. Free, on every plan, forever.",
   },
   {
     q: "How do I pay?",
@@ -230,7 +230,7 @@ export default function PricingPage() {
         </Reveal>
         <Reveal delay={160}>
           <p className="max-w-xl text-base leading-relaxed text-text-secondary sm:text-lg">
-            Start free for 30 days. No card to sign up — we invoice you after
+            Start free for 30 days. No card to sign up. We invoice you after
             the pilot. Every plan keeps free data export, forever.
           </p>
         </Reveal>
@@ -247,7 +247,7 @@ export default function PricingPage() {
       <section className="mt-6 grid gap-4 sm:grid-cols-2">
         <Reveal>
           <div className="flex h-full flex-col gap-1.5 rounded-2xl border border-border bg-surface-alt p-6">
-            <p className="text-sm font-medium text-text">Paying yearly?</p>
+            <p className="text-sm font-medium text-text">Yearly billing</p>
             <p className="text-sm leading-relaxed text-text-secondary">
               Pay for ten months and get twelve. Same price per outlet, two
               months on us.
@@ -256,10 +256,10 @@ export default function PricingPage() {
         </Reveal>
         <Reveal delay={80}>
           <div className="flex h-full flex-col gap-1.5 rounded-2xl border border-border bg-surface-alt p-6">
-            <p className="text-sm font-medium text-text">More than one shop?</p>
+            <p className="text-sm font-medium text-text">Multiple outlets</p>
             <p className="text-sm leading-relaxed text-text-secondary">
-              Five outlets or more get 20% off. Running a bigger chain? Talk to
-              us and we&apos;ll sort out a plan that fits.
+              Five outlets or more get 20% off. For a bigger chain, talk to us
+              and we&apos;ll sort out a plan that fits.
             </p>
           </div>
         </Reveal>
@@ -288,7 +288,7 @@ export default function PricingPage() {
       <section className="mt-16 flex flex-col items-center gap-5 rounded-2xl border border-border bg-surface-alt px-8 py-14 text-center">
         <Reveal>
           <h2 className="max-w-2xl text-2xl font-medium leading-tight tracking-[-0.02em] text-text sm:text-4xl">
-            Ready to start with your first 20 customers?
+            Start with your first 20 customers.
           </h2>
         </Reveal>
         <Reveal delay={100}>

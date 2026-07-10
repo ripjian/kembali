@@ -2,7 +2,7 @@
  * Cross-tenant isolation proof (CLAUDE.md definition of done).
  *
  * Connects as the `kembali_app` role (what the apps use in production) and
- * verifies RLS makes another tenant's data unreachable — reads, writes, and
+ * verifies RLS makes another tenant's data unreachable - reads, writes, and
  * even knowing a row's primary key. Also proves stamp_events is append-only
  * for everyone, including the table owner.
  */
@@ -15,7 +15,7 @@ import { seed, SEED_IDS } from "../seed-data";
 import { createTestDb, type TestDb } from "./helpers";
 
 /** Drizzle wraps DB errors in DrizzleQueryError ("Failed query: …") with the
- * Postgres error in `.cause` — match the pattern anywhere in the chain. */
+ * Postgres error in `.cause` - match the pattern anywhere in the chain. */
 async function expectRejectsWith(promise: Promise<unknown>, pattern: RegExp) {
   let thrown: unknown;
   try {
@@ -173,7 +173,7 @@ describe("RLS tenant isolation (as kembali_app)", () => {
 describe("GUC edge cases", () => {
   it("returns zero rows (not an error) after a tenant transaction reverts", async () => {
     // Postgres quirk: after a transaction-local set_config reverts, the GUC
-    // reads as '' (not NULL). Policies must nullif() the cast — regression
+    // reads as '' (not NULL). Policies must nullif() the cast - regression
     // for the '""::uuid' crash hit by platform-session queries.
     await withTenant(db, TENANT_A, (tx) => tx.select().from(schema.customers));
     const rows = await db.select().from(schema.staffUsers);
@@ -183,7 +183,7 @@ describe("GUC edge cases", () => {
 
 describe("stamp_events append-only ledger", () => {
   // As the app role, UPDATE/DELETE die on the missing grant (permission
-  // denied) before the trigger can even fire — two independent layers.
+  // denied) before the trigger can even fire - two independent layers.
   it("rejects UPDATE as the app role", async () => {
     await expectRejectsWith(
       withTenant(db, TENANT_A, (tx) =>

@@ -102,7 +102,7 @@ export default async function ScanPage({
                   </span>
                 </span>
                 <span className="tabular-nums text-text" data-stat>
-                  {row.amountCents != null ? formatRM(row.amountCents) : "—"}
+                  {row.amountCents != null ? formatRM(row.amountCents) : "-"}
                 </span>
               </li>
             ))}

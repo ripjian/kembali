@@ -1,4 +1,4 @@
-/* Stamping rules v1 (SECURITY.md rule 5: velocity rules). Pure functions —
+/* Stamping rules v1 (SECURITY.md rule 5: velocity rules). Pure functions -
  * the caller fetches the card's recent events and passes timestamps in. */
 
 export const MIN_SECONDS_BETWEEN_STAMPS = 60;
@@ -29,7 +29,7 @@ export function checkStampVelocity(
 }
 
 /** A reward is earned each time the count crosses a multiple of the
- * program requirement (cards loop — see computeCardProgress). */
+ * program requirement (cards loop - see computeCardProgress). */
 export function earnsReward(newStampsCount: number, stampsRequired: number): boolean {
   return newStampsCount > 0 && newStampsCount % stampsRequired === 0;
 }

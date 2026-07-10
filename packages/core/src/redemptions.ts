@@ -4,14 +4,14 @@ import { randomBytes } from "node:crypto";
  *
  * Lifecycle: reserved (coupon shown to the customer) → redeemed (staff
  * confirm) | expired (never scanned in time) | cancelled (customer backed
- * out). Points are deducted at CONFIRM, not at reserve — an abandoned
+ * out). Points are deducted at CONFIRM, not at reserve - an abandoned
  * coupon costs nothing and needs no refund ledger entry. The balance is
  * re-checked atomically inside the confirm transaction. */
 
 /** Reserved coupons are meant to be scanned at the counter right away. */
 export const REDEMPTION_TTL_MINUTES = 15;
 
-/** No 0/O, 1/I/L — cashiers may have to read the fallback code out loud. */
+/** No 0/O, 1/I/L - cashiers may have to read the fallback code out loud. */
 const CODE_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
 
 /** Unguessable single-use coupon code, e.g. KMB-7GXA-Q2ZM. Uniqueness is

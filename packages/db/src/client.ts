@@ -8,7 +8,7 @@ import * as schema from "./schema";
 
 export type Db = PostgresJsDatabase<typeof schema>;
 
-/** Driver-agnostic database type — postgres-js in prod, PGlite in dev/tests. */
+/** Driver-agnostic database type - postgres-js in prod, PGlite in dev/tests. */
 export type KembaliDb = PgDatabase<PgQueryResultHKT, typeof schema>;
 
 /** Create a postgres-js backed Drizzle client. The connection should log in
@@ -32,7 +32,7 @@ interface DbLike<TTx extends TxLike> {
 
 /**
  * Run `fn` inside a transaction scoped to one tenant. Sets the
- * `app.tenant_id` GUC (transaction-local) that every RLS policy checks —
+ * `app.tenant_id` GUC (transaction-local) that every RLS policy checks -
  * this is the ONLY sanctioned way to touch tenant data (CLAUDE.md).
  * Works with any Drizzle Postgres driver (postgres-js in prod, PGlite in
  * tests).
@@ -53,7 +53,7 @@ export async function withTenant<TTx extends TxLike, T>(
 
 /**
  * Run `fn` with the platform-admin RLS bypass (tenants + staff_users
- * policies only). Call ONLY after verifying a `platform` session —
+ * policies only). Call ONLY after verifying a `platform` session -
  * privileged actions inside must be audit-logged (SECURITY.md rule 9).
  */
 export async function withPlatform<TTx extends TxLike, T>(

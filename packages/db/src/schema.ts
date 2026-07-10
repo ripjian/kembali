@@ -1,5 +1,5 @@
 /**
- * Kembali schema v1 — ROADMAP §4.
+ * Kembali schema v1 - ROADMAP §4.
  *
  * Rules enforced here (CLAUDE.md conventions):
  *  - Every tenant table carries `tenant_id` + a Postgres RLS policy scoping
@@ -27,7 +27,7 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 
-/** Runtime role the apps connect through — never the table owner, so RLS
+/** Runtime role the apps connect through - never the table owner, so RLS
  * always applies. Production login users are members of this role. */
 export const appRole = pgRole("kembali_app");
 
@@ -80,9 +80,9 @@ export const tenants = pgTable(
     slug: text("slug").notNull().unique(),
     plan: text("plan").notNull().default("trial"),
     billingStatus: text("billing_status").notNull().default("trialing"),
-    /** logo URL, brand colors, custom domain — white-label (ROADMAP §1) */
+    /** logo URL, brand colors, custom domain - white-label (ROADMAP §1) */
     branding: jsonb("branding").notNull().default({}),
-    /** Square brand logo — data URL in v1, object storage later. */
+    /** Square brand logo - data URL in v1, object storage later. */
     logoUrl: text("logo_url"),
     addressLine: text("address_line"),
     city: text("city"),
@@ -114,7 +114,7 @@ export const tenants = pgTable(
       using: sql`id = nullif(current_setting('app.tenant_id', true), '')::uuid`,
       withCheck: sql`id = nullif(current_setting('app.tenant_id', true), '')::uuid`,
     }),
-    // Platform admins manage all tenants — the app sets this GUC only
+    // Platform admins manage all tenants - the app sets this GUC only
     // after verifying a platform session (client.ts withPlatform).
     pgPolicy("tenants_platform_all", {
       for: "all",
@@ -131,7 +131,7 @@ export const outlets = pgTable(
     id: id(),
     tenantId: tenantId(),
     name: text("name").notNull(),
-    /** Address lives on the outlet — the attribution + billing unit
+    /** Address lives on the outlet - the attribution + billing unit
      * (Decision Log 2026-07-11). tenants.address_* is deprecated; migration
      * 0011 copies it into each tenant's first outlet. */
     addressLine: text("address_line"),
@@ -166,7 +166,7 @@ export const staffUsers = pgTable(
     email: text("email").notNull(),
     name: text("name").notNull(),
     role: staffRole("role").notNull().default("cashier"),
-    /** scrypt hash (packages/core auth) — null until an invite is accepted */
+    /** scrypt hash (packages/core auth) - null until an invite is accepted */
     passwordHash: text("password_hash"),
     /** Cashiers are scoped to assigned outlets (ROADMAP §5). */
     outletIds: uuid("outlet_ids").array().notNull().default([]),
@@ -211,7 +211,7 @@ export const sessions = pgTable(
   "sessions",
   {
     id: id(),
-    /** sha256 of the cookie token — the raw token never touches the DB */
+    /** sha256 of the cookie token - the raw token never touches the DB */
     tokenHash: text("token_hash").notNull().unique(),
     kind: sessionKind("kind").notNull(),
     subjectId: uuid("subject_id").notNull(),
@@ -244,13 +244,13 @@ export const customers = pgTable(
     /** PDPA: explicit opt-in per channel, e.g. {"whatsapp": true} (ROADMAP §5) */
     marketingOptIns: jsonb("marketing_opt_ins").notNull().default({}),
     /** Projection of point_events, maintained ONLY by the DB trigger in
-     * migration 0009 — direct UPDATEs to this column are rejected. */
+     * migration 0009 - direct UPDATEs to this column are rejected. */
     pointsBalance: integer("points_balance").notNull().default(0),
     createdAt: createdAt(),
   },
   (t) => [
     tenantPolicy("customers"),
-    // phone/email unique per tenant (ROADMAP §4) — partial so nulls are fine
+    // phone/email unique per tenant (ROADMAP §4) - partial so nulls are fine
     uniqueIndex("customers_tenant_phone_uq")
       .on(t.tenantId, t.phone)
       .where(sql`phone is not null`),
@@ -286,7 +286,7 @@ export const cards = pgTable(
     programId: uuid("program_id")
       .notNull()
       .references(() => programs.id),
-    /** Projection of stamp_events — never the source of truth. */
+    /** Projection of stamp_events - never the source of truth. */
     stampsCount: integer("stamps_count").notNull().default(0),
     status: cardStatus("status").notNull().default("active"),
     createdAt: createdAt(),
@@ -358,7 +358,7 @@ export const rewardItems = pgTable(
     tenantId: tenantId(),
     title: text("title").notNull(),
     description: text("description"),
-    /** Square image — data URL in v1, object storage later (same as logos). */
+    /** Square image - data URL in v1, object storage later (same as logos). */
     imageUrl: text("image_url"),
     pointsCost: integer("points_cost").notNull(),
     active: boolean("active").notNull().default(true),
@@ -382,7 +382,7 @@ export const redemptions = pgTable(
      * unique index is what makes concurrent confirms safe. */
     code: text("code").notNull().unique(),
     state: redemptionState("state").notNull().default("reserved"),
-    /** Price snapshot at reserve time — catalog edits don't reprice coupons. */
+    /** Price snapshot at reserve time - catalog edits don't reprice coupons. */
     pointsCost: integer("points_cost").notNull(),
     expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
     redeemedAt: timestamp("redeemed_at", { withTimezone: true }),
@@ -407,7 +407,7 @@ export const pointEvents = pgTable(
     /** Positive = earned/added, negative = spent/deducted. */
     delta: integer("delta").notNull(),
     source: pointEventSource("source").notNull(),
-    /** Required for adjustments — customer-visible in their history. */
+    /** Required for adjustments - customer-visible in their history. */
     reason: text("reason"),
     staffId: uuid("staff_id").references(() => staffUsers.id),
     /** Outlet this movement is attributed to (Decision Log 2026-07-11);
@@ -463,7 +463,7 @@ export const walletPasses = pgTable(
     platform: walletPlatform("platform").notNull(),
     serial: text("serial").notNull(),
     /** Apple PassKit web-service per-pass authenticationToken (ROADMAP §5).
-     * Generated per pass at issue time — a data-plane credential, not a
+     * Generated per pass at issue time - a data-plane credential, not a
      * repo secret. */
     authToken: text("auth_token").notNull(),
     lastPushedAt: timestamp("last_pushed_at", { withTimezone: true }),

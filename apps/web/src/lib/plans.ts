@@ -1,4 +1,4 @@
-/** Plan types v1 — no in-product billing (manual invoicing, PRICING.md).
+/** Plan types v1 - no in-product billing (manual invoicing, PRICING.md).
  * `founding` is the RM99 founding-merchant program; `trial` is the default
  * for a freshly created store before a plan is chosen. */
 export const PLAN_TYPES = ["founding", "trial", "starter", "growth"] as const;

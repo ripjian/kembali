@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import QRCode from "qrcode";
 
 /* Static QR of the single-use coupon code (unlike the stamp QR it doesn't
- * rotate — the DB makes it single-use). While the coupon is reserved we
+ * rotate - the DB makes it single-use). While the coupon is reserved we
  * poll so the screen flips to "redeemed" the moment staff confirm. */
 
 export function CouponQr({ code, live }: { code: string; live: boolean }) {
@@ -34,7 +34,7 @@ export function CouponQr({ code, live }: { code: string; live: boolean }) {
         // local data URL, nothing to optimize
         <img
           src={dataUrl}
-          alt="Your coupon code — show this at the counter"
+          alt="Your coupon code, show this at the counter"
           className="size-52 rounded-2xl border border-border bg-white p-2"
         />
       ) : (

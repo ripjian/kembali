@@ -10,7 +10,7 @@ const jakarta = Plus_Jakarta_Sans({
 
 export const metadata: Metadata = {
   title: "Admin",
-  description: "Merchant dashboard — programs, outlets, customers, campaigns.",
+  description: "Merchant dashboard for programs, outlets, customers and campaigns.",
 };
 
 export default async function AdminLayout({

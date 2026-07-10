@@ -18,7 +18,7 @@ export function parseModules(raw: unknown): TenantModules {
 }
 
 /** The module set a plan starts with (PRICING.md). Every current plan
- * includes all shipped modules — wallet/tags/WhatsApp aren't toggles yet —
+ * includes all shipped modules - wallet/tags/WhatsApp aren't toggles yet -
  * so this is all-on today; it's the hook that differentiates plans as those
  * features arrive. The platform admin can still adjust each box afterwards. */
 export function modulesForPlan(_plan: string): TenantModules {

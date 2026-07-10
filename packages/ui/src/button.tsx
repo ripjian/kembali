@@ -1,7 +1,7 @@
 import type { ButtonHTMLAttributes } from "react";
 
 /* Pandan = actions (BRAND.md §2 usage rules). There is intentionally no
- * coral button variant — coral is for earned things, never actions. */
+ * coral button variant - coral is for earned things, never actions. */
 
 type ButtonVariant = "primary" | "outline";
 

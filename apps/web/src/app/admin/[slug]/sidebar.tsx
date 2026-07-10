@@ -53,7 +53,7 @@ function ThemeToggle({ theme }: { theme: AdminTheme }) {
   );
 }
 
-/** The full sidebar content — logo, nav, appearance and sign out. Shared by
+/** The full sidebar content - logo, nav, appearance and sign out. Shared by
  * the desktop rail and the mobile drawer. */
 export function AdminSidebar({
   base,
@@ -70,7 +70,7 @@ export function AdminSidebar({
     <div className="flex h-full flex-col gap-4">
       <div className="flex items-center gap-2.5 px-2 pt-1">
         {tenantLogoUrl ? (
-          // merchant-uploaded square logo (data URL — no optimizer)
+          // merchant-uploaded square logo (data URL - no optimizer)
           <img
             src={tenantLogoUrl}
             alt=""

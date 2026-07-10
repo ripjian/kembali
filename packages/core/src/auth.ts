@@ -9,7 +9,7 @@ import {
 
 import { z } from "zod";
 
-/* Auth primitives (SECURITY.md rules 5–6). Pure node:crypto — no native
+/* Auth primitives (SECURITY.md rules 5–6). Pure node:crypto - no native
  * dependencies. Server-only. */
 
 /* ---- passwords (scrypt) --------------------------------------------- */
@@ -42,7 +42,7 @@ export function hashSessionToken(token: string): string {
   return createHash("sha256").update(token).digest("hex");
 }
 
-/* ---- customer QR tokens (signed, short TTL — SECURITY.md rule 5) ------ */
+/* ---- customer QR tokens (signed, short TTL - SECURITY.md rule 5) ------ */
 
 const qrPayloadSchema = z.object({
   cardId: z.uuid(),
@@ -118,7 +118,7 @@ export function hashOtpCode(phone: string, code: string): string {
 /**
  * Development bypass code (founder-requested): accepted ONLY when the
  * caller passes `devBypassEnabled: true`, which the app derives from
- * non-production env (SECURITY.md — must never be enabled in production).
+ * non-production env (SECURITY.md - must never be enabled in production).
  */
 export const OTP_DEV_BYPASS_CODE = "888888";
 

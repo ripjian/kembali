@@ -1,6 +1,6 @@
 import type { SVGProps } from "react";
 
-/* Brand marks — geometry mirrors brand/logo-a-return-loop.svg and
+/* Brand marks - geometry mirrors brand/logo-a-return-loop.svg and
  * brand/logo-d-wordmark.svg (BRAND.md §1). `mono` renders the approved
  * monochrome fallback: all deep-pandan, or all-sand via `mono="sand"`. */
 
@@ -21,7 +21,7 @@ function logoColors(mono?: MonoVariant): { ink: string; dot: string } {
   return { ink: INK, dot: CORAL };
 }
 
-/** Primary mark A — return loop with coral stamp dot. */
+/** Primary mark A - return loop with coral stamp dot. */
 export function LogoMark({ mono, size = 40, ...props }: LogoProps) {
   const { ink, dot } = logoColors(mono);
   return (
@@ -47,7 +47,7 @@ export function LogoMark({ mono, size = 40, ...props }: LogoProps) {
   );
 }
 
-/** Wordmark D — final "i" in coral (the last stamp). Sans cut. */
+/** Wordmark D - final "i" in coral (the last stamp). Sans cut. */
 export function LogoWordmark({ mono, size = 28, ...props }: LogoProps) {
   const { ink, dot } = logoColors(mono);
   return (

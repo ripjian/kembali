@@ -16,7 +16,7 @@ describe("pointsForAmount", () => {
     expect(pointsForAmount(1000, 0.5)).toBe(5); // RM10 @ 0.5 pt/RM
   });
 
-  it("always rounds down — never give away an unconfigured point", () => {
+  it("always rounds down - never give away an unconfigured point", () => {
     expect(pointsForAmount(199, 1)).toBe(1);
     expect(pointsForAmount(99, 1)).toBe(0);
     expect(pointsForAmount(150, 0.5)).toBe(0);

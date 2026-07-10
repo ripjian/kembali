@@ -11,7 +11,7 @@ export function qrTokenSecret(): string {
   return "kembali-dev-qr-secret-not-for-production";
 }
 
-/** OTP dev bypass (888888) — hard-disabled in production builds
+/** OTP dev bypass (888888) - hard-disabled in production builds
  * (SECURITY.md). Real SMS/WhatsApp delivery is a Phase 1 remaining item. */
 export const OTP_BYPASS_ENABLED = !IS_PRODUCTION;
 

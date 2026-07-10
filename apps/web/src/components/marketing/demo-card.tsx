@@ -4,7 +4,7 @@ import { useState } from "react";
 
 const TOTAL = 10;
 
-/** Interactive demo stamp card — lets a visitor feel the product in two
+/** Interactive demo stamp card - lets a visitor feel the product in two
  * taps. Coral = earned (BRAND.md); the stamp pop follows the same motion
  * rules as the real card will (scale from 0.6, strong ease-out, <300ms). */
 export function DemoCard() {
@@ -38,7 +38,7 @@ export function DemoCard() {
       <p className="mt-5 min-h-10 text-sm leading-relaxed text-text-secondary" aria-live="polite">
         {done ? (
           <span className="font-medium text-accent-deep">
-            Reward earned — a free coffee. This is the moment your regulars
+            Reward earned: a free coffee. This is the moment your regulars
             look forward to.
           </span>
         ) : (

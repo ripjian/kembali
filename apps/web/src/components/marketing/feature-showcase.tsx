@@ -214,7 +214,7 @@ function QrBlock({ className = "" }: { className?: string }) {
   );
 }
 
-/** Scene 1 — the card home, front and centre. */
+/** Scene 1 - the card home, front and centre. */
 function CardHomeScene({ active }: { active: boolean }) {
   return (
     <SceneShell active={active}>
@@ -245,7 +245,7 @@ function CardHomeScene({ active }: { active: boolean }) {
   );
 }
 
-/** Scene 2 — the Show-QR modal over the dimmed card. */
+/** Scene 2 - the Show-QR modal over the dimmed card. */
 function ShowQrScene({ active }: { active: boolean }) {
   return (
     <SceneShell active={active}>
@@ -275,7 +275,7 @@ function ShowQrScene({ active }: { active: boolean }) {
   );
 }
 
-/** Scene 3 — the rewards list ("Treat yourself"). */
+/** Scene 3 - the rewards list ("Treat yourself"). */
 function RewardsScene({ active }: { active: boolean }) {
   return (
     <SceneShell active={active}>
@@ -320,7 +320,7 @@ function RewardsScene({ active }: { active: boolean }) {
   );
 }
 
-/** Scene 4 — the redeem coupon, single-use and short-lived. */
+/** Scene 4 - the redeem coupon, single-use and short-lived. */
 function RedeemScene({ active }: { active: boolean }) {
   return (
     <SceneShell active={active} center>
@@ -342,7 +342,7 @@ function RedeemScene({ active }: { active: boolean }) {
   );
 }
 
-/** Scene 5 — from the app's Add to Wallet tap into the pass sliding in. */
+/** Scene 5 - from the app's Add to Wallet tap into the pass sliding in. */
 function WalletScene({ active }: { active: boolean }) {
   return (
     <SceneShell active={active} center>

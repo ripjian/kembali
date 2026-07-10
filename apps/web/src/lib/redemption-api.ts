@@ -6,7 +6,7 @@ import type { AdminContext } from "./auth";
 
 /* Shared authorization for the cashier redemption endpoints: the request
  * names the tenant (the scan page knows its store); staff must belong to
- * it AND hold the redeemRewards permission — checked server-side, nav
+ * it AND hold the redeemRewards permission - checked server-side, nav
  * hiding is cosmetic (SECURITY.md checklist). */
 
 export async function authorizeRedeem(

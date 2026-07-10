@@ -1,6 +1,6 @@
 /**
  * Demo seed: one tenant (Corner Coffee), one outlet, one 9-stamp program,
- * three customers with cards in different states. Idempotent — fixed UUIDs
+ * three customers with cards in different states. Idempotent - fixed UUIDs
  * + ON CONFLICT DO NOTHING, safe to re-run.
  *
  * Runs as the migration/owner role (RLS does not apply to seeding); the
@@ -15,7 +15,7 @@ type SeedDb = PgDatabase<PgQueryResultHKT, typeof schema>;
 
 const T = "11111111-1111-4111-8111-111111111111";
 
-/** DEV/DEMO credentials — for local testing only, never a production
+/** DEV/DEMO credentials - for local testing only, never a production
  * deployment. Rotate/remove before real customer data exists. */
 export const SEED_LOGINS = {
   platformAdmin: { email: "admin@kembali.app", password: "KembaliAdmin1!" },
@@ -290,7 +290,7 @@ export async function seed(db: SeedDb, now: Date = new Date()): Promise<SeedSumm
     {
       id: SEED_IDS.rewardItems.retiredMug,
       title: "Ceramic mug (retired)",
-      description: "Old design — kept for redemption history.",
+      description: "Old design - kept for redemption history.",
       pointsCost: 200,
       active: false,
     },
@@ -332,7 +332,7 @@ export async function seed(db: SeedDb, now: Date = new Date()): Promise<SeedSumm
     })
     .onConflictDoNothing();
 
-  // Second demo merchant on the Starter plan — lets the founder see report
+  // Second demo merchant on the Starter plan - lets the founder see report
   // downloads locked (Corner Coffee = Founding = unlocked). Minimal: tenant,
   // outlet, program, owner login. No customers, so the shared-seed counts
   // above are unchanged.

@@ -5,13 +5,13 @@
 @source "../../../../packages/ui/src";
 
 /*
- * Marketing theme — frosted-SaaS direction from brand/DESIGN-dub.md:
+ * Marketing theme - frosted-SaaS direction from brand/DESIGN-dub.md:
  * near-white canvas, 1px ash hairlines instead of elevation, Inter-driven
  * type (weight-500 display, never bold), compact density, pill/12/16/8px
  * radius vocabulary, restrained glassmorphism on floating elements only.
  * Neutrals come from the reference; the chroma stays Kembali (BRAND.md):
  *   deep-sapphire action → pandan  (--primary, the ONE committed color)
- *   feature-pill accents → coral (earned) + leaf (progress) — never swap.
+ *   feature-pill accents → coral (earned) + leaf (progress) - never swap.
  *
  * Marketing is deliberately LIGHT-ONLY. Scoped to the (marketing) layout's
  * wrapper so /app and /admin keep their system light/dark behavior.
@@ -40,7 +40,7 @@
   --font-mono:
     var(--font-jetbrains), ui-monospace, SFMono-Regular, Menlo, monospace;
 
-  /* Strong curves per the emil-design-eng skill — built-ins are too weak */
+  /* Strong curves per the emil-design-eng skill - built-ins are too weak */
   --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out-strong: cubic-bezier(0.77, 0, 0.175, 1);
 }
@@ -53,7 +53,7 @@
   box-shadow: 0 0 0 4px rgb(0 0 0 / 0.06);
 }
 
-/* Frosted glass — floating elements only, never large surfaces.
+/* Frosted glass - floating elements only, never large surfaces.
    Pair with Tailwind's `backdrop-blur-md` in markup: the blur must come
    from the utility (the build pipeline strips a hand-written
    backdrop-filter from this rule). */
@@ -70,7 +70,7 @@
   mask-image: linear-gradient(to bottom, black 55%, transparent 100%);
 }
 
-/* Receipt cards (how-it-works) — the café's own artifact: perforated top,
+/* Receipt cards (how-it-works) - the café's own artifact: perforated top,
    torn zigzag bottom, dotted leaders between item and value. */
 .receipt-perforation {
   background-image: radial-gradient(circle, var(--border) 2.2px, transparent 2.4px);
@@ -92,7 +92,7 @@
   transform: translateY(-4px);
 }
 
-/* Transit-line roadmap — the "now" station pings like a live train */
+/* Transit-line roadmap - the "now" station pings like a live train */
 @keyframes station-ping {
   0% {
     transform: scale(1);
@@ -108,7 +108,7 @@
   animation: station-ping 2.4s var(--ease-out-strong) infinite;
 }
 
-/* Hero glass cards — gentle, continuous drift (transform-only). Two curves
+/* Hero glass cards - gentle, continuous drift (transform-only). Two curves
    in opposite phase so the pair floats independently. Paused off-screen via
    the [data-inview="false"] rule below. */
 @keyframes rm-drift {
@@ -212,13 +212,13 @@
   animation: step-in 180ms ease both;
 }
 
-/* Row action menu — quick transform/opacity pop. */
+/* Row action menu - quick transform/opacity pop. */
 .admin-menu {
   animation: step-in 140ms var(--ease-out-strong) both;
   transform-origin: top right;
 }
 
-/* Mobile nav drawer — slide in from the left. */
+/* Mobile nav drawer - slide in from the left. */
 @keyframes admin-drawer-in {
   from {
     transform: translateX(-100%);
@@ -386,7 +386,7 @@
   }
 }
 
-/* Phase 1 — stamps landing on a card, one by one (never from scale(0)).
+/* Phase 1 - stamps landing on a card, one by one (never from scale(0)).
    10 stamps (5 × 2 rows) → longer loop so the full card fills. */
 @keyframes rm-stamp {
   0% {
@@ -415,7 +415,7 @@
   animation-delay: calc(var(--i) * 600ms);
 }
 
-/* How-it-works flow pills — each step lights up in order, holds, resets.
+/* How-it-works flow pills - each step lights up in order, holds, resets.
    Explains the sequence without a single word of extra copy. */
 @keyframes rm-flow {
   0% {
@@ -442,7 +442,7 @@
   animation-delay: calc(var(--i) * 800ms);
 }
 
-/* Foundations — platform layers stacking from the bottom up. */
+/* Foundations - platform layers stacking from the bottom up. */
 @keyframes rm-slab {
   0% {
     opacity: 0;
@@ -467,7 +467,7 @@
   animation-delay: calc(var(--i) * 700ms);
 }
 
-/* Phase 2 — WhatsApp-style bubbles arriving */
+/* Phase 2 - WhatsApp-style bubbles arriving */
 @keyframes rm-bubble {
   0% {
     opacity: 0;
@@ -491,7 +491,7 @@
   animation-delay: calc(var(--i) * 900ms);
 }
 
-/* Phase 3 — chart bars growing (origin bottom, transform only) */
+/* Phase 3 - chart bars growing (origin bottom, transform only) */
 @keyframes rm-bar {
   0% {
     transform: scaleY(0.15);
@@ -513,7 +513,7 @@
   animation-delay: calc(var(--i) * 250ms);
 }
 
-/* Phase 4 — platform nodes pulsing along the pipeline */
+/* Phase 4 - platform nodes pulsing along the pipeline */
 @keyframes rm-node {
   0%,
   100% {
@@ -530,7 +530,7 @@
   animation-delay: calc(var(--i) * 500ms);
 }
 
-/* Backlog — wallet pass sliding into its slot, patiently */
+/* Backlog - wallet pass sliding into its slot, patiently */
 @keyframes rm-wallet {
   0% {
     opacity: 0;

@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 
-/* A café receipt — the subject's own artifact (frontend-design skill:
+/* A café receipt - the subject's own artifact (frontend-design skill:
  * build from the subject's world). Perforated header, dotted leaders,
  * torn zigzag bottom. Rows light up in order via the rm-flow loop. */
 

@@ -271,7 +271,7 @@ export async function updateTenant(formData: FormData) {
     await tx
       .update(schema.tenants)
       .set({
-        // slug intentionally stable — it is the merchant's panel path.
+        // slug intentionally stable - it is the merchant's panel path.
         // Address is per-outlet now; not edited here.
         name: p.name,
         plan: p.plan,
@@ -310,7 +310,7 @@ export async function setAdminTheme(formData: FormData) {
       maxAge: 365 * 24 * 60 * 60,
     });
   }
-  // No redirect — the current route re-renders with the new cookie.
+  // No redirect - the current route re-renders with the new cookie.
 }
 
 /* ---- cashier: serving outlet of the day --------------------------------- */
@@ -355,7 +355,7 @@ export async function saveRolePermissions(formData: FormData) {
       matrix[role][key] = formData.get(`perm.${role}.${key}`) === "on";
     }
   }
-  // Owners keep team management for themselves — never lock everyone out.
+  // Owners keep team management for themselves - never lock everyone out.
   matrix.owner.manageTeam = true;
 
   const db = await getDb();
@@ -438,7 +438,7 @@ export async function updateStaff(formData: FormData) {
     email: formData.get("email"),
     role: formData.get("role"),
   });
-  // Optional "set new password" — blank means keep the current one.
+  // Optional "set new password" - blank means keep the current one.
   const rawPassword = String(formData.get("password") ?? "");
   if (!parsed.success || (rawPassword !== "" && rawPassword.length < 8)) {
     redirect(`/admin/${slug}/team?error=invalid`);
@@ -522,7 +522,7 @@ export async function deleteStaff(formData: FormData) {
       if ((owners?.n ?? 0) <= 1) return "lastowner";
     }
     // Ledgers reference the staff id and are append-only, so a member with
-    // history can't be erased without breaking the record — block it and
+    // history can't be erased without breaking the record - block it and
     // suggest changing their role instead.
     const [stampRef] = await tx
       .select({ n: sql`count(*)::int`.mapWith(Number) })

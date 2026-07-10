@@ -196,7 +196,7 @@ export default async function MerchantsPage({
           <p role="alert" className="rounded-xl border border-error/40 bg-surface px-4 py-3 text-sm text-error">
             {sp.error === "exists"
               ? "A merchant with that name already exists. Pick a different name."
-              : "Check the form — name, outlet, program, owner email and an 8+ character password are required."}
+              : "Check the form. Name, outlet, program, owner email and an 8+ character password are required."}
           </p>
         )}
 
@@ -290,7 +290,7 @@ export default async function MerchantsPage({
                     {PLAN_LABELS[(t.plan as PlanType)] ?? t.plan}
                   </td>
                   <td className="px-4 py-3 text-text-secondary">
-                    {t.location || "—"}
+                    {t.location || "-"}
                   </td>
                   <td className="px-4 py-3 text-text-secondary">{formatDate(t.createdAt)}</td>
                   <td className="px-4 py-3">

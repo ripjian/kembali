@@ -65,14 +65,14 @@ export default async function NewCustomerPage({
         </div>
         <div>
           <label className="text-sm font-medium text-text" htmlFor="birthday">
-            Birthday (optional — for birthday rewards later)
+            Birthday (optional, for birthday rewards later)
           </label>
           <input id="birthday" name="birthday" type="date" className={`mt-1.5 ${inputClass}`} />
         </div>
 
         <fieldset className="rounded-xl border border-border bg-surface p-4">
           <legend className="px-1 text-sm font-medium text-text">
-            Marketing consent (PDPA — ask the customer)
+            Marketing consent (PDPA, ask the customer)
           </legend>
           <label className="mt-1 flex items-center gap-2 text-sm text-text-secondary">
             <input type="checkbox" name="optInWhatsapp" className="size-4 accent-[var(--primary)]" />

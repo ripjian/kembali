@@ -4,10 +4,10 @@ import { Inter, JetBrains_Mono } from "next/font/google";
 import { SiteFooter } from "@/components/marketing/site-footer";
 import { SiteNav } from "@/components/marketing/site-nav";
 
-// Frosted-SaaS type system (brand/DESIGN-dub.md): Inter is the workhorse —
+// Frosted-SaaS type system (brand/DESIGN-dub.md): Inter is the workhorse -
 // weight 500 with tight tracking plays the display role (Satoshi
 // substitute per the reference), 400 body at 16px. JetBrains Mono only for
-// technical micro-labels (the Geist Mono role). Scoped to marketing —
+// technical micro-labels (the Geist Mono role). Scoped to marketing -
 // /app and /admin keep Plus Jakarta Sans.
 const inter = Inter({
   subsets: ["latin"],
@@ -21,9 +21,9 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Kembali — loyalty cards your customers never lose",
+  title: "Kembali: loyalty cards your customers never lose",
   description:
-    "Digital stamp cards for cafés, F&B, salons and gyms in Malaysia & SEA. Customers join from a QR in under 30 seconds — no app, no hardware. Loyalty your customers will love.",
+    "Digital stamp cards for cafés, F&B, salons and gyms in Malaysia & SEA. Customers join from a QR in under 30 seconds. No app, no hardware. Loyalty your customers will love.",
 };
 
 export default function MarketingLayout({
@@ -32,7 +32,7 @@ export default function MarketingLayout({
   return (
     <div
       // data-theme pins the light Dub-style tokens for this subtree only
-      // (globals.css) — marketing is light-locked, the app/admin surfaces
+      // (globals.css) - marketing is light-locked, the app/admin surfaces
       // keep dark-mode support.
       data-theme="marketing"
       className={`${inter.variable} ${jetbrains.variable} min-h-dvh bg-bg font-body text-text`}

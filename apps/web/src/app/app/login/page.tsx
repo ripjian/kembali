@@ -63,7 +63,7 @@ export default function CustomerLoginPage() {
           <h1 className="text-xl font-semibold text-text">Your loyalty card</h1>
           <p className="mt-1 text-sm text-text-secondary">
             {step === "phone"
-              ? "Enter your phone number to open your card — or create one."
+              ? "Enter your phone number to open your card, or create one."
               : "We sent a 6-digit code to your phone."}
           </p>
         </div>

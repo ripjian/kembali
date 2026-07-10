@@ -84,7 +84,7 @@ function useCamera(onCode: (value: string) => Promise<void>) {
               busyRef.current = false;
             }
           } catch {
-            /* detection errors are transient — keep scanning */
+            /* detection errors are transient - keep scanning */
           }
         }
         raf = requestAnimationFrame(() => void tick());
@@ -203,7 +203,7 @@ export function ScanClient({
     );
   }
   if (!canRedeem) {
-    // Only one job available — skip the chooser.
+    // Only one job available - skip the chooser.
     return (
       <>
         {outletBar}
@@ -250,7 +250,7 @@ function OutletPrompt({ tenantId, outlets }: { tenantId: string; outlets: Outlet
       <input type="hidden" name="tenantId" value={tenantId} />
       <div>
         <h2 className="text-base font-semibold text-text">
-          Which outlet are you serving at today?
+          Choose today&apos;s outlet
         </h2>
         <p className="mt-1 text-sm text-text-secondary">
           We&apos;ll tag today&apos;s stamps and rewards to it. You can switch
@@ -375,7 +375,7 @@ function MemberScan({ onBack, showBack }: { onBack: () => void; showBack: boolea
   return (
     <div className="flex flex-col gap-4">
       {showBack && <BackLink onBack={onBack} />}
-      {/* amount first — cashiers key it in while the customer opens their code */}
+      {/* amount first - cashiers key it in while the customer opens their code */}
       <div className="rounded-xl border border-border bg-surface p-4">
         <label className="text-sm font-medium text-text" htmlFor="amount">
           Transaction amount (RM, optional)
@@ -434,11 +434,11 @@ function MemberScan({ onBack, showBack }: { onBack: () => void; showBack: boolea
           data-stamp-result
         >
           <p className="text-sm font-semibold text-text">
-            Stamped — {result.customerName}
+            Stamped for {result.customerName}
           </p>
           <p className="mt-1 text-sm text-text-secondary">
             {result.rewardEarned
-              ? "Reward earned! Their free item is ready to redeem."
+              ? "Reward earned. Their free item is ready to redeem."
               : `${result.stampsRemaining} more ${
                   result.stampsRemaining === 1 ? "stamp" : "stamps"
                 } to their reward.`}
@@ -566,7 +566,7 @@ function RewardScan({ tenantId, onBack }: { tenantId: string; onBack: () => void
               disabled={busy}
               className="mt-3 inline-flex h-11 w-full items-center justify-center rounded-xl bg-primary text-sm font-semibold text-on-primary hover:bg-primary-hover disabled:opacity-60"
             >
-              {busy ? "Confirming…" : "Confirm — hand over the reward"}
+              {busy ? "Confirming…" : "Confirm and hand over"}
             </button>
           ) : (
             <p role="alert" className="mt-3 rounded-lg bg-surface-alt px-3 py-2 text-sm text-text-secondary">
@@ -589,7 +589,7 @@ function RewardScan({ tenantId, onBack }: { tenantId: string; onBack: () => void
           data-redeem-result
         >
           <p className="text-sm font-semibold text-text">
-            Redeemed — hand {confirmed.customerName} their{" "}
+            Redeemed. Hand {confirmed.customerName} their{" "}
             {confirmed.title.toLowerCase()}.
           </p>
           <p className="mt-1 text-sm text-text-secondary">

@@ -10,13 +10,13 @@ const FEATURES = [
   {
     dot: "coral" as const,
     title: "Points and rewards",
-    body: "Every ringgit spent earns points, and customers redeem them for rewards you choose — with a single-use code at your counter. Every point is logged to the cent.",
+    body: "Every ringgit spent earns points. Customers redeem them for rewards you choose, with a single-use code at your counter. Every point is logged to the cent.",
     tag: "At launch",
   },
   {
     dot: "leaf" as const,
     title: "Simple reports, not homework",
-    body: "Today's stamps, signups and redemptions, plus who keeps coming back. The numbers you check over morning coffee — deeper analytics comes later.",
+    body: "Today's stamps, signups and redemptions, plus who keeps coming back. Simple numbers to check over morning coffee. Deeper analytics comes later.",
     tag: "At launch",
   },
   {
@@ -36,11 +36,11 @@ const FEATURES = [
 export default function Home() {
   return (
     <main>
-      {/* Hero — thesis up top, product peeking past the fold below */}
+      {/* Hero - thesis up top, product peeking past the fold below */}
       <section className="relative overflow-hidden border-b border-border">
         <div aria-hidden className="dot-grid absolute inset-0" />
         <div className="relative mx-auto flex w-full max-w-[1200px] flex-col items-center px-6 pt-16 text-center sm:pt-20">
-          {/* floating feature pills — one accent each */}
+          {/* floating feature pills - one accent each */}
           <div className="flex flex-wrap items-center justify-center gap-2">
             <Tag dot="coral">Stamp cards</Tag>
             <Tag dot="pandan">Points &amp; rewards</Tag>
@@ -52,7 +52,7 @@ export default function Home() {
           </h1>
           <p className="mt-6 max-w-xl text-base leading-relaxed text-text-secondary sm:text-lg">
             Kembali puts your stamp card on your customers&apos; phones. They
-            join in 30 seconds from a QR at your counter — and every visit
+            join in 30 seconds from a QR at your counter, and every visit
             brings them closer to their next reward.
           </p>
 
@@ -67,7 +67,7 @@ export default function Home() {
             ↓
           </p>
 
-          {/* Dashboard mockup, deliberately clipped by the fold — the rest
+          {/* Dashboard mockup, deliberately clipped by the fold - the rest
               is one scroll away */}
           <div className="relative mt-8 h-56 w-full max-w-4xl overflow-hidden sm:h-72">
             <div className="panel-ring absolute inset-x-0 top-0 flex h-[420px] overflow-hidden rounded-t-2xl border border-border bg-surface text-left">
@@ -104,7 +104,7 @@ export default function Home() {
                   ))}
                 </div>
                 <div className="mt-3 flex flex-col">
-                  {["Aisyah — stamp 7 of 10", "Ming Wei — reward redeemed", "Priya — joined your program"].map(
+                  {["Aisyah, stamp 7 of 10", "Ming Wei, reward redeemed", "Priya joined your program"].map(
                     (row, i) => (
                       <div
                         key={row}
@@ -121,7 +121,7 @@ export default function Home() {
               </div>
             </div>
 
-            {/* glass activity cards floating over the panel — drift gently,
+            {/* glass activity cards floating over the panel - drift gently,
                 pause off-screen (see HeroFloats) */}
             <HeroFloats />
           </div>
@@ -151,7 +151,7 @@ export default function Home() {
             </h2>
           </Reveal>
 
-          {/* Two receipts — the café's own paper, itemized */}
+          {/* Two receipts - the café's own paper, itemized */}
           <div className="mt-10 grid items-start gap-8 lg:grid-cols-2">
             <div className="flex flex-col items-center gap-10">
               <Reveal delay={80} className="flex w-full justify-center">
@@ -231,7 +231,7 @@ export default function Home() {
                 </h3>
                 <p className="text-sm leading-relaxed text-on-primary/80 sm:text-base">
                   Your logo and your colors on every card. Customers see your
-                  brand — Kembali stays quietly in the background.
+                  brand. Kembali stays quietly in the background.
                 </p>
               </div>
             </Reveal>

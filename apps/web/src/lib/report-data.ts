@@ -6,7 +6,7 @@ import { and, desc, eq, gte, inArray, lte, sql } from "drizzle-orm";
 /* Shared report queries used by BOTH the full-report pages and the CSV
  * export route, so the two never drift. Every function opens its own
  * tenant-scoped context (RLS applies). Date ranges bound the data;
- * per-source fetches are capped so a runaway range can't exhaust memory —
+ * per-source fetches are capped so a runaway range can't exhaust memory -
  * the cap is surfaced (never silently truncated). */
 
 export const MAX_REPORT_ROWS = 5000;
@@ -77,8 +77,8 @@ export function fetchCustomersReport(
       .limit(MAX_REPORT_ROWS);
     return rows.map((r) => ({
       id: r.id,
-      name: r.name ?? "—",
-      phone: r.phone ?? "—",
+      name: r.name ?? "-",
+      phone: r.phone ?? "-",
       joined: r.joined,
       visits: r.visits,
       spendCents: r.spendCents,
@@ -104,7 +104,7 @@ export interface OutletOption {
   name: string;
 }
 
-/** Outlets for a tenant — used for the report/history outlet filter. */
+/** Outlets for a tenant - used for the report/history outlet filter. */
 export function fetchOutlets(db: KembaliDb, tenantId: string): Promise<OutletOption[]> {
   return withTenant(db, tenantId, (tx) =>
     tx
@@ -261,7 +261,7 @@ export function fetchRewardsReport(
       customer: r.name ?? r.phone ?? "Customer",
       pointsCost: r.pointsCost,
       state: r.state,
-      staff: r.staff ?? "—",
+      staff: r.staff ?? "-",
     }));
   });
 }

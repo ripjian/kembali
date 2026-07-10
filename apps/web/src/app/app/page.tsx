@@ -197,7 +197,7 @@ export default async function CardPage() {
           href={`/app/coupons/${openCoupon.id}`}
           className="rounded-xl border border-accent/40 bg-surface p-3 text-sm font-medium text-accent-deep"
         >
-          Your coupon for {openCoupon.title.toLowerCase()} is ready — show it
+          Your coupon for {openCoupon.title.toLowerCase()} is ready. Show it
           at the counter →
         </Link>
       )}
@@ -313,7 +313,7 @@ export default async function CardPage() {
           </div>
           {openRewards.length === 0 ? (
             <p className="px-1 text-xs text-text-muted">
-              No rewards waiting yet — you&apos;re {progress.stampsRemaining}{" "}
+              No rewards waiting yet. You&apos;re {progress.stampsRemaining}{" "}
               stamps away.
             </p>
           ) : (
@@ -324,7 +324,7 @@ export default async function CardPage() {
               >
                 <div>
                   <p className="text-sm font-medium text-accent-deep">
-                    {rewardTitle} — ready to redeem
+                    {rewardTitle}, ready to redeem
                   </p>
                   {reward.expiresAt && (
                     <p className="mt-0.5 text-xs text-text-muted">
@@ -387,7 +387,7 @@ export default async function CardPage() {
 
       <div className="pb-4 text-center">
         <Button className="w-full" aria-hidden disabled>
-          Add to wallet — coming soon
+          Add to wallet (coming soon)
         </Button>
       </div>
     </main>

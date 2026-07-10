@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 
 /* Shared admin form pieces: native-<dialog> modal and the validated
  * square-image → data-URL input (used for merchant logos and reward
- * photos — PNG/JPG/WebP, square, ≤512 KB, re-checked server-side).
+ * photos - PNG/JPG/WebP, square, ≤512 KB, re-checked server-side).
  * Entry animation is transform/opacity, <300ms, reduced-motion-aware
  * (the `.admin-modal` rule in globals.css) per emil-design-eng. */
 
@@ -21,7 +21,7 @@ export function Modal({
   title: string;
   buttonLabel: string;
   buttonClass: string;
-  /** Open on mount — used for the ?edit=1 deep-link from the row menu. */
+  /** Open on mount - used for the ?edit=1 deep-link from the row menu. */
   defaultOpen?: boolean;
   children: ReactNode;
 }) {

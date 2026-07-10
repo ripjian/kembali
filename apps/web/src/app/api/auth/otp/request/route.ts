@@ -59,7 +59,7 @@ export async function POST(req: Request) {
   }
 
   // Phase 1 remaining: real SMS/WhatsApp delivery. Dev: print the code
-  // (code only — never the phone number; SECURITY.md rule 10).
+  // (code only - never the phone number; SECURITY.md rule 10).
   if (!IS_PRODUCTION) {
     console.log(`[dev] OTP code: ${code} (bypass ${OTP_DEV_BYPASS_CODE} also works)`);
   }

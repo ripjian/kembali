@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 
 /* The two glass activity cards floating over the hero dashboard. They drift
  * gently and continuously (transform-only), and pause when the hero scrolls
- * out of view — decorative loops shouldn't run off-screen (emil-design-eng).
+ * out of view - decorative loops shouldn't run off-screen (emil-design-eng).
  * Positioning stays absolute against the mockup container; this wrapper is
  * static so it doesn't become the offset parent. */
 export function HeroFloats() {

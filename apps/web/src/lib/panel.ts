@@ -16,7 +16,7 @@ import { parseModules, type TenantModules } from "./modules";
 
 /* Path-based tenancy: every merchant panel lives at /admin/[slug]/…
  * Staff are locked to their own store's slug; platform admins may open any
- * store (each merchant path is theirs alone — the system admin area at
+ * store (each merchant path is theirs alone - the system admin area at
  * /admin/merchants is never shared with merchant users). */
 
 export interface PanelTenant {

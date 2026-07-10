@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 
-/* Decorative, looping illustrations for the public roadmap — pure CSS
+/* Decorative, looping illustrations for the public roadmap - pure CSS
  * animations (globals.css `rm-*`), transform/opacity only, paused until
  * their section scrolls into view and disabled under reduced motion.
  * Coral = earned, leaf = progress, pandan = actions (BRAND.md).
@@ -13,7 +13,7 @@ function iVar(i: number): CSSProperties {
 const frame =
   "relative flex h-64 items-center justify-center overflow-hidden rounded-2xl border border-border bg-surface-alt";
 
-/** Shipped — the platform layers, stacking from the bottom up. */
+/** Shipped - the platform layers, stacking from the bottom up. */
 export function FoundationsIllustration() {
   const layers = [
     { label: "Your brand & card", width: "w-36", i: 2 },
@@ -40,7 +40,7 @@ export function FoundationsIllustration() {
   );
 }
 
-/** Phase 1 — stamps landing on a card, one by one (5 × 2 rows). */
+/** Phase 1 - stamps landing on a card, one by one (5 × 2 rows). */
 export function StampsIllustration() {
   return (
     <div className={frame} aria-hidden>
@@ -58,7 +58,7 @@ export function StampsIllustration() {
   );
 }
 
-/** Points & rewards (live) — points climb toward a reward that unlocks. */
+/** Points and rewards (live): points climb toward a reward you can redeem. */
 export function PointsIllustration() {
   return (
     <div className={frame} aria-hidden>
@@ -85,7 +85,7 @@ export function PointsIllustration() {
   );
 }
 
-/** Phase 2 — the card sliding into the phone's own wallet. */
+/** Phase 2 - the card sliding into the phone's own wallet. */
 export function WalletIllustration() {
   return (
     <div className={frame} aria-hidden>
@@ -114,7 +114,7 @@ export function WalletIllustration() {
   );
 }
 
-/** Phase 3 — WhatsApp-first nudges arriving. */
+/** Phase 3 - WhatsApp-first nudges arriving. */
 export function MessagesIllustration() {
   return (
     <div className={frame} aria-hidden>
@@ -126,14 +126,14 @@ export function MessagesIllustration() {
           2 stamps to your free coffee 👀
         </div>
         <div style={iVar(2)} className="rm-bubble max-w-52 self-end rounded-2xl rounded-br-md bg-primary px-4 py-2.5 text-on-primary">
-          Happy birthday — treat&apos;s on us 🎂
+          Happy birthday, a treat&apos;s on us 🎂
         </div>
       </div>
     </div>
   );
 }
 
-/** Phase 4 — a link travels from one customer to a friend; both win. */
+/** Phase 4 - a link travels from one customer to a friend; both win. */
 export function ReferralIllustration() {
   return (
     <div className={frame} aria-hidden>
@@ -169,7 +169,7 @@ export function ReferralIllustration() {
   );
 }
 
-/** Phase 5 — the platform opens up: API, webhooks, POS. */
+/** Phase 5 - the platform opens up: API, webhooks, POS. */
 export function PlatformIllustration() {
   const nodes = ["POS", "Kembali API", "Webhooks"];
   return (

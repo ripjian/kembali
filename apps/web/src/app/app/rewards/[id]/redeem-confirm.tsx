@@ -29,7 +29,7 @@ export function RedeemConfirm({
           {pointsCost - balance} more points to go
         </p>
         <p className="mt-1 text-xs text-text-muted">
-          Keep visiting — every ringgit counts.
+          Keep visiting. Every ringgit counts.
         </p>
       </div>
     );
@@ -60,7 +60,7 @@ export function RedeemConfirm({
           <form action={reserveRedemption}>
             <input type="hidden" name="rewardItemId" value={rewardItemId} />
             <button className="inline-flex h-11 w-full items-center justify-center rounded-xl bg-primary text-sm font-semibold text-on-primary hover:bg-primary-hover">
-              Yes — show my coupon
+              Yes, show my coupon
             </button>
           </form>
           <button

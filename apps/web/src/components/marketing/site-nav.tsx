@@ -25,7 +25,7 @@ export function SiteNav() {
         </Link>
       </div>
 
-      {/* Frosted sticky nav — the one glass surface that follows you,
+      {/* Frosted sticky nav - the one glass surface that follows you,
           keeping the CTA in reach while you explore */}
       <header className="glass backdrop-blur-md sticky top-0 z-40 border-x-0 border-t-0 border-b border-border">
         <div className="mx-auto flex h-16 w-full max-w-[1200px] items-center justify-between gap-6 px-6">

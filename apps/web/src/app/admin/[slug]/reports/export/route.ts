@@ -12,7 +12,7 @@ import {
 } from "@/lib/report-data";
 
 /* CSV export for analytics reports. Gated to Founding + Growth plans
- * (planAllowsReportDownload) — Starter/Trial get 403. This is ANALYTICS
+ * (planAllowsReportDownload); Starter/Trial get 403. This is ANALYTICS
  * only; the PDPA customer-data export is a separate, always-free feature. */
 
 const RM = (cents: number) => (cents / 100).toFixed(2);

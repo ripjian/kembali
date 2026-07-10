@@ -35,7 +35,7 @@ describe("seed script", () => {
     expect(planAllowsReportDownload(plans["bloom-bakery"]!)).toBe(false);
   });
 
-  it("is idempotent — re-running does not duplicate rows or balances", async () => {
+  it("is idempotent - re-running does not duplicate rows or balances", async () => {
     await seed(db);
     const customers = await db.select().from(schema.customers);
     const events = await db.select().from(schema.stampEvents);

@@ -8,7 +8,7 @@ import { createDb, createDevDb, SEED_IDS, type KembaliDb } from "@kembali/db";
 /**
  * Database singleton. Production: real Postgres via DATABASE_URL (the
  * connection user must be a member of `kembali_app`). Development without
- * DATABASE_URL: embedded PGlite, migrated + seeded on first boot —
+ * DATABASE_URL: embedded PGlite, migrated + seeded on first boot -
  * zero-setup local testing (this machine has no Docker/Postgres).
  */
 const g = globalThis as typeof globalThis & { __kembaliDb?: Promise<KembaliDb> };

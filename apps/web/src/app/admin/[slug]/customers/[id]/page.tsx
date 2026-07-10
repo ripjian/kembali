@@ -120,7 +120,7 @@ export default async function CustomerDetailPage({
     ...events.map((event) => ({
       key: `visit-${event.id}`,
       createdAt: event.createdAt,
-      label: event.source === "qr" ? "Visit — scanned" : "Visit — manual",
+      label: event.source === "qr" ? "Scanned visit" : "Manual visit",
       amountCents: event.amountCents,
       points: pointsByStampEvent.get(event.id) ?? 0,
       outlet: event.outlet,
@@ -133,8 +133,8 @@ export default async function CustomerDetailPage({
         createdAt: event.createdAt,
         label:
           event.source === "adjustment"
-            ? `Points adjustment — ${event.reason ?? "no reason given"}`
-            : `Reward redeemed${event.reason ? ` — ${event.reason}` : ""}`,
+            ? `Points adjustment: ${event.reason ?? "no reason given"}`
+            : `Reward redeemed${event.reason ? `: ${event.reason}` : ""}`,
         amountCents: null,
         points: event.delta,
         outlet: event.outlet,
@@ -186,7 +186,7 @@ export default async function CustomerDetailPage({
 
       {adjusted && (
         <p role="status" className="rounded-xl border border-leaf/50 bg-surface px-4 py-3 text-sm text-text">
-          Points adjusted — it&apos;s in the customer&apos;s history.
+          Points adjusted. It&apos;s in the customer&apos;s history.
         </p>
       )}
       {error === "adjust" && (
@@ -215,7 +215,7 @@ export default async function CustomerDetailPage({
         </div>
         <div className="rounded-xl border border-border bg-surface p-4">
           <p className="text-2xl font-semibold tabular-nums text-text" data-stat>
-            {progress ? `${progress.stampsTowardNext}/${program?.stampsRequired}` : "—"}
+            {progress ? `${progress.stampsTowardNext}/${program?.stampsRequired}` : "-"}
           </p>
           <p className="mt-1 text-xs text-text-muted">Current card</p>
         </div>
@@ -264,15 +264,15 @@ export default async function CustomerDetailPage({
         <dl className="mt-3 grid gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
           <div className="flex justify-between gap-4 sm:block">
             <dt className="text-text-muted">Phone</dt>
-            <dd className="text-text">{customer.phone ?? "—"}</dd>
+            <dd className="text-text">{customer.phone ?? "-"}</dd>
           </div>
           <div className="flex justify-between gap-4 sm:block">
             <dt className="text-text-muted">Email</dt>
-            <dd className="text-text">{customer.email ?? "—"}</dd>
+            <dd className="text-text">{customer.email ?? "-"}</dd>
           </div>
           <div className="flex justify-between gap-4 sm:block">
             <dt className="text-text-muted">Birthday</dt>
-            <dd className="text-text">{customer.birthday ?? "—"}</dd>
+            <dd className="text-text">{customer.birthday ?? "-"}</dd>
           </div>
           <div className="flex justify-between gap-4 sm:block">
             <dt className="text-text-muted">Marketing consent</dt>
@@ -355,7 +355,7 @@ export default async function CustomerDetailPage({
                 </span>
                 <span className="flex shrink-0 items-center gap-3">
                   <span className="tabular-nums text-text" data-stat>
-                    {row.amountCents != null ? formatRM(row.amountCents) : "—"}
+                    {row.amountCents != null ? formatRM(row.amountCents) : "-"}
                   </span>
                   {ctx.tenant.modules.points && (
                     <span
@@ -368,7 +368,7 @@ export default async function CustomerDetailPage({
                       }`}
                       data-stat
                     >
-                      {row.points > 0 ? `+${row.points}` : row.points !== 0 ? row.points : "—"}{" "}
+                      {row.points > 0 ? `+${row.points}` : row.points !== 0 ? row.points : "-"}{" "}
                       pts
                     </span>
                   )}

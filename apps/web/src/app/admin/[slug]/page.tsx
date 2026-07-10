@@ -69,7 +69,7 @@ export default async function AdminOverviewPage({
     <main className="flex flex-col gap-6">
       {/* Founder-approved exception to the English-only rule (2026-07-11):
           this one greeting on the merchant overview may use Malay. Nothing
-          else may — see brand/BRAND.md §5 and ROADMAP §13. */}
+          else may. See brand/BRAND.md §5 and ROADMAP §13. */}
       <p className="text-lg font-medium text-text" data-greeting>
         Selamat kembali ke {ctx.tenant.name} 👋
       </p>
@@ -143,7 +143,7 @@ export default async function AdminOverviewPage({
                   </p>
                 </div>
                 <span className="tabular-nums text-text" data-stat>
-                  {row.amountCents != null ? formatRM(row.amountCents) : "—"}
+                  {row.amountCents != null ? formatRM(row.amountCents) : "-"}
                 </span>
               </li>
             ))}

@@ -14,9 +14,9 @@ import {
 } from "@/components/marketing/roadmap-illustrations";
 
 export const metadata: Metadata = {
-  title: "Roadmap — Kembali",
+  title: "Roadmap · Kembali",
   description:
-    "What we're building and when — the public, high-level Kembali roadmap.",
+    "What we're building and when. The public, high-level Kembali roadmap.",
 };
 
 type Status = "shipped" | "now" | "next" | "later";
@@ -66,7 +66,7 @@ const PHASES: Phase[] = [
   {
     status: "now",
     title: "Points and rewards",
-    body: "Every visit earns points, and customers spend them on rewards you choose — redeemed with a single-use code at your counter.",
+    body: "Every visit earns points, and customers spend them on rewards you choose, redeemed with a single-use code at your counter.",
     points: [
       "Points from each visit, at a rate you set",
       "A rewards catalog you control",
@@ -78,7 +78,7 @@ const PHASES: Phase[] = [
   {
     status: "next",
     title: "Wallet cards & VIP tags",
-    body: "Cards that live in the phone's own wallet and update the moment a stamp lands — plus VIP and staff tags that earn points faster.",
+    body: "Cards that live in the phone's own wallet and update the moment a stamp lands. VIP and staff tags earn points faster.",
     points: [
       "Apple Wallet pass with live updates",
       "Google Wallet loyalty cards",
@@ -100,7 +100,7 @@ const PHASES: Phase[] = [
   {
     status: "later",
     title: "Referral rewards",
-    body: "Your regulars bring their friends. Everyone shares a personal link — when a friend joins and visits, both sides get a treat.",
+    body: "Your regulars bring their friends. Everyone shares a personal link. When a friend joins and visits, both sides get a treat.",
     points: [
       "Personal referral links & QR codes",
       "Rewards for the sender and the friend",
@@ -111,7 +111,7 @@ const PHASES: Phase[] = [
   {
     status: "later",
     title: "Connect your POS & deeper reports",
-    body: "Kembali opens up: an API and webhooks for POS integrations, plus the deeper numbers for growing chains — across every branch.",
+    body: "Kembali opens up: an API and webhooks for POS integrations, plus the deeper numbers for growing chains, across every branch.",
     points: [
       "Public API & webhooks, POS integrations",
       "Repeat-visit rate, member share, redemptions",
@@ -141,7 +141,7 @@ export default function RoadmapPage() {
         </Reveal>
       </section>
 
-      {/* The line — every phase is a station on Kembali's return journey.
+      {/* The line - every phase is a station on Kembali's return journey.
           Solid track behind us, dashed track ahead, the current station
           pings like a live train. */}
       <ol className="relative">
@@ -218,7 +218,7 @@ export default function RoadmapPage() {
             </li>
           );
         })}
-        {/* terminus — the loop back */}
+        {/* terminus - the loop back */}
         <li className="relative mt-2 pl-10 sm:pl-14">
           <span
             aria-hidden
@@ -227,7 +227,7 @@ export default function RoadmapPage() {
             ↺
           </span>
           <p className="pt-1 text-sm text-text-muted">
-            And then the loop continues — pilot merchants pick the next stop.
+            And then the loop continues. Pilot merchants pick the next stop.
           </p>
         </li>
       </ol>
@@ -235,12 +235,12 @@ export default function RoadmapPage() {
       <section className="mt-16 flex flex-col items-center gap-5 rounded-2xl border border-border bg-surface-alt px-8 py-14 text-center">
         <Reveal>
           <h2 className="max-w-2xl text-2xl font-medium leading-tight tracking-[-0.02em] text-text sm:text-4xl">
-            Want a say in what ships first?
+            Shape what ships first.
           </h2>
         </Reveal>
         <Reveal delay={100}>
           <p className="max-w-xl text-base leading-relaxed text-text-secondary">
-            Pilot merchants use Kembali free while we build — and their
+            Pilot merchants use Kembali free while we build, and their
             feedback decides what comes next.
           </p>
         </Reveal>

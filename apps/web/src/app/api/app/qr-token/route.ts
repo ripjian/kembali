@@ -8,7 +8,7 @@ import { getCustomerSession } from "@/lib/auth";
 import { qrTokenSecret } from "@/lib/config";
 import { getDb } from "@/lib/db";
 
-/** Short-lived signed stamp token for the logged-in customer's card —
+/** Short-lived signed stamp token for the logged-in customer's card -
  * refetched by the card page every ~60s (SECURITY.md rule 5). */
 export async function GET() {
   const session = await getCustomerSession();
@@ -24,7 +24,10 @@ export async function GET() {
     return row ?? null;
   });
   if (!card) {
-    return NextResponse.json({ error: "No card yet — join first." }, { status: 404 });
+    return NextResponse.json(
+      { error: "You don't have a card yet. Ask staff to set you up at the counter." },
+      { status: 404 },
+    );
   }
   const token = signQrToken(
     { cardId: card.id, tenantId: session.tenantId },

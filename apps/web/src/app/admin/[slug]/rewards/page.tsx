@@ -138,7 +138,7 @@ export default async function RewardsPage({
                     />
                   ) : (
                     <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-surface-alt text-xs text-text-muted">
-                      —
+                      -
                     </span>
                   )}
                   <div className="min-w-0">

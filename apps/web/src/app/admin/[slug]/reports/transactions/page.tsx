@@ -138,7 +138,7 @@ export default async function TransactionsReportPage({
 
       {truncated && (
         <p className="rounded-xl border border-border bg-surface-alt px-4 py-2 text-xs text-text-muted">
-          Showing the first {all.length} records for this range — narrow the
+          Showing the first {all.length} records for this range. Narrow the
           dates to see the rest.
         </p>
       )}
@@ -169,10 +169,10 @@ export default async function TransactionsReportPage({
                 <td className="px-4 py-3 text-text-secondary">{KIND_LABEL[r.kind]}</td>
                 <td className="px-4 py-3 font-medium text-text">{r.customer}</td>
                 {multiOutlet && (
-                  <td className="px-4 py-3 text-text-secondary">{r.outlet ?? "—"}</td>
+                  <td className="px-4 py-3 text-text-secondary">{r.outlet ?? "-"}</td>
                 )}
                 <td className="px-4 py-3 tabular-nums text-text" data-stat>
-                  {r.amountCents != null ? formatRM(r.amountCents) : "—"}
+                  {r.amountCents != null ? formatRM(r.amountCents) : "-"}
                 </td>
                 <td
                   className={`px-4 py-3 tabular-nums ${
@@ -187,7 +187,7 @@ export default async function TransactionsReportPage({
                   {r.points == null
                     ? r.kind === "stamp"
                       ? "+1 stamp"
-                      : "—"
+                      : "-"
                     : r.points > 0
                       ? `+${r.points}`
                       : r.points}

@@ -10,7 +10,7 @@ import { getDb } from "@/lib/db";
 import { authorizeRedeem } from "@/lib/redemption-api";
 
 /* Coupon lookup: staff scan/type a code and see which reward and which
- * member BEFORE confirming — no points move here. */
+ * member BEFORE confirming - no points move here. */
 
 const bodySchema = z.object({
   tenantId: z.uuid(),

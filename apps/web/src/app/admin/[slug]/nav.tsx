@@ -20,7 +20,7 @@ export function AdminNav({
     reports: boolean;
     team: boolean;
   };
-  /** Called when a link is tapped — lets the mobile drawer close itself. */
+  /** Called when a link is tapped - lets the mobile drawer close itself. */
   onNavigate?: () => void;
 }) {
   const pathname = usePathname();

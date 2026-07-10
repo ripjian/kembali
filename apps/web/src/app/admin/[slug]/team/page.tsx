@@ -23,7 +23,7 @@ const ERRORS: Record<string, string> = {
   invalid: "Check the name, email and an 8+ character password, then try again.",
   exists: "Someone on your team already uses that email.",
   self: "You can't remove your own account.",
-  lastowner: "This is the only owner — add another owner first.",
+  lastowner: "This is the only owner. Add another owner first.",
   hasactivity:
     "This person already has activity on record, so their account can't be removed. Change their role to limit access instead.",
 };

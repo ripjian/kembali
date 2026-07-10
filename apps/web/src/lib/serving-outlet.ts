@@ -11,7 +11,7 @@ import { and, asc, eq } from "drizzle-orm";
  * (Decision Log 2026-07-11). */
 
 const SERVING_COOKIE = "kb_serving";
-/** A shift's worth — the embedded date is what actually enforces "today". */
+/** A shift's worth - the embedded date is what actually enforces "today". */
 const MAX_AGE_SECONDS = 20 * 60 * 60;
 
 function todayStr(): string {
@@ -42,7 +42,7 @@ export async function readServingOutletId(tenantId: string): Promise<string | nu
 
 /** Pick the outlet to attribute an event to, inside a tenant-scoped tx:
  * `preferredId` if it belongs to this tenant (RLS enforces that), else the
- * tenant's first outlet. Pure DB — no cookie — so it's unit-testable. */
+ * tenant's first outlet. Pure DB - no cookie - so it's unit-testable. */
 export async function pickOutletId(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- structural drizzle tx; only select() is used
   tx: any,

@@ -13,7 +13,7 @@ import { CustomersTable, type CustomerRow } from "./customers-table";
 /* Customers list with server-side search, sort and filter (shareable URL
  * params, like the platform merchant directory). Rows are clickable and
  * carry a View/Edit menu (customers-table.tsx). Tag filtering ships with
- * member tags (Phase 3) — not built yet, so it isn't offered here. */
+ * member tags (Phase 3) - not built yet, so it isn't offered here. */
 
 const SORTS = ["joined", "name", "points", "visit"] as const;
 type Sort = (typeof SORTS)[number];
@@ -114,8 +114,8 @@ export default async function CustomersPage({
 
   const tableRows: CustomerRow[] = rows.map((c) => ({
     id: c.id,
-    name: c.name ?? "—",
-    phone: c.phone ?? "—",
+    name: c.name ?? "-",
+    phone: c.phone ?? "-",
     joined: formatDate(c.createdAt),
     lastVisit: c.lastVisit ? formatDate(new Date(c.lastVisit)) : "No visits yet",
     stamps: c.stamps,
@@ -183,7 +183,7 @@ export default async function CustomersPage({
         empty={
           f.q || f.optin || f.activity
             ? "No customers match those filters."
-            : "No customers yet — add your first one."
+            : "No customers yet. Add your first one."
         }
       />
     </main>

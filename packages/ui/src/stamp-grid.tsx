@@ -1,4 +1,4 @@
-/* Stamp grid — coral = earned stamps (the "earn" color), border/muted =
+/* Stamp grid - coral = earned stamps (the "earn" color), border/muted =
  * empty slots. Leaf is reserved for progress bars, not stamps. */
 
 export interface StampGridProps {

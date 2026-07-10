@@ -10,9 +10,9 @@ import { schema, withTenant } from "@kembali/db";
 import { and, eq, gt, isNull } from "drizzle-orm";
 import { z } from "zod";
 
-import { IS_PRODUCTION, OTP_BYPASS_ENABLED } from "@/lib/config";
 import { getDb } from "@/lib/db";
 import { resolveJoinTenantId } from "@/lib/join";
+import { getOtpSender, OTP_DEV_NOTICE } from "@/lib/otp-sender";
 import { normalizePhone, phoneInputSchema } from "@/lib/phone";
 
 const bodySchema = z.object({
@@ -67,11 +67,15 @@ export async function POST(req: Request) {
     );
   }
 
-  // Phase 1 remaining: real SMS/WhatsApp delivery. Dev: print the code
-  // (code only - never the phone number; SECURITY.md rule 10).
-  if (!IS_PRODUCTION) {
-    console.log(`[dev] OTP code: ${code} (bypass ${OTP_DEV_BYPASS_CODE} also works)`);
+  // Deliver via the configured provider. NullSender (no provider yet) sends
+  // nothing; a real WhatsApp/SMS sender slots in here with no route changes.
+  await getOtpSender().send(phone, code);
+
+  // With no provider connected (dev only), print the code so it can still be
+  // used (code only - never the phone number; SECURITY.md rule 10).
+  if (OTP_DEV_NOTICE) {
+    console.log(`[dev] OTP code: ${code} (no provider connected; ${OTP_DEV_BYPASS_CODE} also works)`);
   }
 
-  return NextResponse.json({ sent: true, devBypass: OTP_BYPASS_ENABLED });
+  return NextResponse.json({ sent: true, devNotice: OTP_DEV_NOTICE });
 }

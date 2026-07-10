@@ -15,5 +15,10 @@ export function qrTokenSecret(): string {
  * (SECURITY.md). Real SMS/WhatsApp delivery is a Phase 1 remaining item. */
 export const OTP_BYPASS_ENABLED = !IS_PRODUCTION;
 
+/** Selected OTP delivery provider. Read directly from process.env (not
+ * env.ts) so importing this in a route never pulls in the boot-time env
+ * assertions. env.ts validates + fails the boot when this is "none" in prod. */
+export const OTP_PROVIDER = process.env["OTP_PROVIDER"] ?? "none";
+
 export const CUSTOMER_SESSION_TTL_DAYS = 30;
 export const ADMIN_SESSION_TTL_HOURS = 12;

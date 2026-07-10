@@ -23,7 +23,7 @@ export function LoginForm({
   const [step, setStep] = useState<"phone" | "code">("phone");
   const [phone, setPhone] = useState("");
   const [code, setCode] = useState("");
-  const [devBypass, setDevBypass] = useState(false);
+  const [devNotice, setDevNotice] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -42,7 +42,7 @@ export function LoginForm({
       setError(data.error ?? "Couldn't send the code. Try again.");
       return;
     }
-    setDevBypass(Boolean(data.devBypass));
+    setDevNotice(Boolean(data.devNotice));
     setStep("code");
   }
 
@@ -61,7 +61,9 @@ export function LoginForm({
       setError(data.error ?? "That code didn't match. Try again.");
       return;
     }
-    router.push("/app");
+    // New or nameless customers finish the one-screen registration first;
+    // returning customers go straight to their card.
+    router.push(data.needsProfile ? "/app/register" : "/app");
     router.refresh();
   }
 
@@ -118,9 +120,12 @@ export function LoginForm({
             onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
             className="h-12 rounded-xl border border-border bg-surface px-4 text-center text-xl tracking-[0.4em] text-text outline-none focus:border-primary"
           />
-          {devBypass && (
-            <p className="text-xs text-text-muted">
-              Development build: the code is in the server log, or use 888888.
+          {devNotice && (
+            <p
+              role="status"
+              className="rounded-xl border border-warning/40 bg-warning/10 px-3 py-2 text-xs font-medium text-warning"
+            >
+              No SMS provider is connected yet. Use code 888888.
             </p>
           )}
           <button

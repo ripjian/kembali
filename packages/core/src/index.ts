@@ -17,6 +17,13 @@ export {
 } from "./theme";
 export { customerJoinPath, customerJoinUrl } from "./join";
 export {
+  OTP_PROVIDERS,
+  isDeliverableOtpProvider,
+  assertOtpDeliverable,
+  showsDevOtpNotice,
+} from "./otp";
+export { needsRegistration } from "./registration";
+export {
   hashPassword,
   verifyPassword,
   createSessionToken,

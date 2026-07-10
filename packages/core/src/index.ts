@@ -1,5 +1,21 @@
 export { computeCardProgress, type CardProgress } from "./card-progress";
 export {
+  parseHex,
+  normalizeHex,
+  relativeLuminance,
+  contrastRatio,
+  onColor,
+  ensureReadable,
+  type Rgb,
+} from "./contrast";
+export {
+  deriveTenantTheme,
+  contrastCheck,
+  AA_TEXT,
+  AA_UI,
+  type TenantTheme,
+} from "./theme";
+export {
   hashPassword,
   verifyPassword,
   createSessionToken,

@@ -24,6 +24,7 @@ export {
   type StampCheck,
 } from "./stamping";
 export { pointsForAmount, sumPointDeltas } from "./points";
+export { planAllowsReportDownload, REPORT_DOWNLOAD_PLANS } from "./plans";
 export {
   generateRedemptionCode,
   isRedemptionCode,

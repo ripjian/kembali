@@ -1,3 +1,4 @@
+import { planAllowsReportDownload } from "@kembali/core";
 import { sql } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
@@ -19,10 +20,19 @@ afterAll(async () => {
 describe("seed script", () => {
   it("runs clean on an empty database", async () => {
     const summary = await seed(db);
-    expect(summary.tenants).toBe(1);
+    expect(summary.tenants).toBe(2);
     expect(summary.customers).toBe(3);
     expect(summary.cards).toBe(3);
     expect(summary.stampEvents).toBe(14);
+  });
+
+  it("seeds a Founding and a Starter merchant for report-download gating", async () => {
+    const tenants = await db.select().from(schema.tenants);
+    const plans = Object.fromEntries(tenants.map((t) => [t.slug, t.plan]));
+    expect(plans["corner-coffee"]).toBe("founding");
+    expect(plans["bloom-bakery"]).toBe("starter");
+    expect(planAllowsReportDownload(plans["corner-coffee"]!)).toBe(true);
+    expect(planAllowsReportDownload(plans["bloom-bakery"]!)).toBe(false);
   });
 
   it("is idempotent — re-running does not duplicate rows or balances", async () => {

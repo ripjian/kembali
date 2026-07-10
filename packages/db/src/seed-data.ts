@@ -19,8 +19,11 @@ const T = "11111111-1111-4111-8111-111111111111";
  * deployment. Rotate/remove before real customer data exists. */
 export const SEED_LOGINS = {
   platformAdmin: { email: "admin@kembali.app", password: "KembaliAdmin1!" },
+  // Corner Coffee is on the Founding plan → report downloads enabled.
   merchantOwner: { email: "nadia@cornercoffee.example", password: "CornerCoffee1!" },
   merchantCashier: { email: "farid@cornercoffee.example", password: "CornerStaff1!" },
+  // Bloom Bakery is on the Starter plan → report downloads locked.
+  starterOwner: { email: "lily@bloombakery.example", password: "BloomBakery1!" },
   customerPhone: "+60123456701",
 } as const;
 
@@ -49,6 +52,11 @@ export const SEED_IDS = {
     retiredMug: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaa04",
   },
   pointAdjustment: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbb01",
+  // Second demo merchant on the Starter plan (report downloads locked).
+  starterTenant: "dddddddd-dddd-4ddd-8ddd-dddddddddd01",
+  starterOutlet: "dddddddd-dddd-4ddd-8ddd-dddddddddd02",
+  starterStaffOwner: "dddddddd-dddd-4ddd-8ddd-dddddddddd03",
+  starterProgram: "dddddddd-dddd-4ddd-8ddd-dddddddddd04",
 } as const;
 
 function eventId(n: number): string {
@@ -83,7 +91,7 @@ export async function seed(db: SeedDb, now: Date = new Date()): Promise<SeedSumm
       id: T,
       name: "Corner Coffee",
       slug: "corner-coffee",
-      plan: "trial",
+      plan: "founding",
       billingStatus: "trialing",
       addressLine: "12 Jalan SS15/4",
       city: "Subang Jaya",
@@ -303,11 +311,59 @@ export async function seed(db: SeedDb, now: Date = new Date()): Promise<SeedSumm
     })
     .onConflictDoNothing();
 
+  // Second demo merchant on the Starter plan — lets the founder see report
+  // downloads locked (Corner Coffee = Founding = unlocked). Minimal: tenant,
+  // outlet, program, owner login. No customers, so the shared-seed counts
+  // above are unchanged.
+  const B = SEED_IDS.starterTenant;
+  await db
+    .insert(schema.tenants)
+    .values({
+      id: B,
+      name: "Bloom Bakery",
+      slug: "bloom-bakery",
+      plan: "starter",
+      billingStatus: "trialing",
+      addressLine: "8 Jalan Telawi",
+      city: "Bangsar",
+      state: "Kuala Lumpur",
+      country: "Malaysia",
+      branding: { primaryColor: "#0F3D32", accentColor: "#E0684B" },
+    })
+    .onConflictDoNothing();
+  await db
+    .insert(schema.outlets)
+    .values({ id: SEED_IDS.starterOutlet, tenantId: B, name: "Bloom Bakery — Bangsar" })
+    .onConflictDoNothing();
+  await db
+    .insert(schema.staffUsers)
+    .values({
+      id: SEED_IDS.starterStaffOwner,
+      tenantId: B,
+      email: SEED_LOGINS.starterOwner.email,
+      name: "Lily Chong",
+      role: "owner",
+      passwordHash: hashPassword(SEED_LOGINS.starterOwner.password),
+      outletIds: [SEED_IDS.starterOutlet],
+    })
+    .onConflictDoNothing();
+  await db
+    .insert(schema.programs)
+    .values({
+      id: SEED_IDS.starterProgram,
+      tenantId: B,
+      name: "Bakery Card",
+      stampsRequired: 8,
+      rewardDefinitions: [{ type: "reward", title: "Free loaf" }],
+      expiryRules: { rewardValidDays: 30 },
+    })
+    .onConflictDoNothing();
+
   return {
-    tenants: 1,
-    outlets: 1,
-    staff: 2,
-    programs: 1,
+    tenants: 2,
+    outlets: 2,
+    staff: 3,
+    programs: 2,
     customers: 3,
     cards: 3,
     stampEvents: events.length,

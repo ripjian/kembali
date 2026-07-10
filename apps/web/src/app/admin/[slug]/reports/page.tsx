@@ -8,8 +8,46 @@ import { getDb } from "@/lib/db";
 import { formatDateTime, formatRM } from "@/lib/format";
 import { getPanelContext } from "@/lib/panel";
 
-/* Basic reports v1 (ROADMAP Phase 1) — activity, sales captured, repeat
- * behaviour, rewards, top regulars. Deeper analytics is Phase 5. */
+/* Reports overview — activity, sales, repeat behaviour, points & rewards.
+ * Each list preview is capped to the latest 25; "See full report" opens a
+ * dedicated page with pagination, date range and CSV download. */
+
+/** Section title bar with an optional "recent 25" hint and a link to the
+ * matching full report. */
+function SectionHead({
+  title,
+  href,
+  capped = false,
+}: {
+  title: string;
+  href?: string;
+  capped?: boolean;
+}) {
+  return (
+    <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3">
+      <h2 className="flex items-center gap-1.5 text-sm font-semibold text-text">
+        {title}
+        {capped && (
+          <span
+            title="Showing the most recent 25 records"
+            aria-label="Showing the most recent 25 records"
+            className="grid size-4 cursor-help place-items-center rounded-full border border-border text-[10px] font-medium text-text-muted"
+          >
+            i
+          </span>
+        )}
+      </h2>
+      {href && (
+        <Link
+          href={href}
+          className="shrink-0 text-xs font-medium text-primary hover:underline"
+        >
+          See full report →
+        </Link>
+      )}
+    </div>
+  );
+}
 
 export default async function ReportsPage({
   params,
@@ -92,7 +130,7 @@ export default async function ReportsPage({
       .where(gte(schema.stampEvents.createdAt, since))
       .groupBy(schema.customers.id)
       .orderBy(desc(sql`count(*)`))
-      .limit(5);
+      .limit(25);
 
     // Points & redemptions (Phase 2)
     const [pointsAgg] = await tx
@@ -116,7 +154,7 @@ export default async function ReportsPage({
       .where(gte(schema.pointEvents.createdAt, since))
       .groupBy(schema.customers.id)
       .orderBy(desc(sql`sum(${schema.pointEvents.delta}) filter (where ${schema.pointEvents.delta} > 0)`))
-      .limit(5);
+      .limit(25);
 
     const adjustments = await tx
       .select({
@@ -135,7 +173,7 @@ export default async function ReportsPage({
         sql`${schema.pointEvents.source} = 'adjustment' and ${schema.pointEvents.createdAt} >= ${since}`,
       )
       .orderBy(desc(schema.pointEvents.createdAt))
-      .limit(10);
+      .limit(25);
 
     const redemptionsByReward = await tx
       .select({
@@ -178,7 +216,7 @@ export default async function ReportsPage({
         sql`${schema.redemptions.state} = 'redeemed' and ${schema.redemptions.redeemedAt} >= ${since}`,
       )
       .orderBy(desc(schema.redemptions.redeemedAt))
-      .limit(10);
+      .limit(25);
 
     return {
       totals,
@@ -256,12 +294,20 @@ export default async function ReportsPage({
         ))}
       </section>
 
-      <section className="rounded-xl border border-border bg-surface p-4">
-        <h2 className="text-sm font-semibold text-text">Stamps per day</h2>
+      <section className="rounded-xl border border-border bg-surface">
+        <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3">
+          <h2 className="text-sm font-semibold text-text">Stamps per day</h2>
+          <Link
+            href={`${ctx.base}/reports/transactions?txn=stamp`}
+            className="shrink-0 text-xs font-medium text-primary hover:underline"
+          >
+            See full report →
+          </Link>
+        </div>
         {data.byDay.length === 0 ? (
-          <p className="mt-3 text-sm text-text-muted">No activity in this period yet.</p>
+          <p className="p-4 text-sm text-text-muted">No activity in this period yet.</p>
         ) : (
-          <ul className="mt-3 flex flex-col gap-1.5">
+          <ul className="flex flex-col gap-1.5 p-4">
             {data.byDay.map((d) => (
               <li key={d.day} className="flex items-center gap-3 text-xs">
                 <span className="w-20 shrink-0 font-mono text-text-muted">{d.day.slice(5)}</span>
@@ -283,9 +329,11 @@ export default async function ReportsPage({
       </section>
 
       <section className="rounded-xl border border-border bg-surface">
-        <h2 className="border-b border-border px-4 py-3 text-sm font-semibold text-text">
-          Your top regulars
-        </h2>
+        <SectionHead
+          title="Your top regulars"
+          href={`${ctx.base}/reports/customers`}
+          capped
+        />
         {data.topCustomers.length === 0 ? (
           <p className="px-4 py-5 text-sm text-text-muted">No visits in this period yet.</p>
         ) : (
@@ -324,9 +372,11 @@ export default async function ReportsPage({
 
       {ctx.tenant.modules.points && (
         <section className="rounded-xl border border-border bg-surface">
-          <h2 className="border-b border-border px-4 py-3 text-sm font-semibold text-text">
-            Points by customer
-          </h2>
+          <SectionHead
+            title="Points by customer"
+            href={`${ctx.base}/reports/customers`}
+            capped
+          />
           {data.pointsByCustomer.length === 0 ? (
             <p className="px-4 py-5 text-sm text-text-muted">
               No points activity in this period yet.
@@ -369,9 +419,11 @@ export default async function ReportsPage({
 
       {ctx.tenant.modules.points && (
         <section className="rounded-xl border border-border bg-surface">
-          <h2 className="border-b border-border px-4 py-3 text-sm font-semibold text-text">
-            Points adjustments
-          </h2>
+          <SectionHead
+            title="Points adjustments"
+            href={`${ctx.base}/reports/transactions?txn=adjustment`}
+            capped
+          />
           {data.adjustments.length === 0 ? (
             <p className="px-4 py-5 text-sm text-text-muted">
               No manual adjustments in this period.
@@ -407,9 +459,11 @@ export default async function ReportsPage({
 
       {ctx.tenant.modules.rewards && (
         <section className="rounded-xl border border-border bg-surface">
-          <h2 className="border-b border-border px-4 py-3 text-sm font-semibold text-text">
-            Redemptions by reward
-          </h2>
+          <SectionHead
+            title="Redemptions by reward"
+            href={`${ctx.base}/reports/rewards`}
+            capped
+          />
           {data.redemptionsByReward.length === 0 ? (
             <p className="px-4 py-5 text-sm text-text-muted">
               No rewards redeemed in this period yet.

@@ -23,6 +23,7 @@ export interface PanelTenant {
   id: string;
   name: string;
   slug: string;
+  plan: string;
   logoUrl: string | null;
   modules: TenantModules;
   permissions: RolePermissionMatrix;
@@ -41,6 +42,7 @@ function toPanelTenant(row: {
   id: string;
   name: string;
   slug: string;
+  plan: string;
   logoUrl: string | null;
   modules: unknown;
   rolePermissions: unknown;
@@ -49,6 +51,7 @@ function toPanelTenant(row: {
     id: row.id,
     name: row.name,
     slug: row.slug,
+    plan: row.plan,
     logoUrl: row.logoUrl,
     modules: parseModules(row.modules),
     permissions: resolveRolePermissions(row.rolePermissions),

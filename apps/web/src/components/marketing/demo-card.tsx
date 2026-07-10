@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-const TOTAL = 9;
+const TOTAL = 10;
 
 /** Interactive demo stamp card — lets a visitor feel the product in two
  * taps. Coral = earned (BRAND.md); the stamp pop follows the same motion
@@ -20,14 +20,16 @@ export function DemoCard() {
         </p>
       </div>
 
-      <div className="mt-5 grid grid-cols-3 gap-3" aria-hidden>
+      {/* Exactly 2 rows of 5, each stamp filling its cell so the grid stays
+          evenly spaced at every width. */}
+      <div className="mt-5 grid grid-cols-5 gap-2.5 sm:gap-3" aria-hidden>
         {Array.from({ length: TOTAL }, (_, i) => (
           <span
             key={i}
             className={
               i < stamps
-                ? "step-in size-11 rounded-full bg-accent"
-                : "size-11 rounded-full border-2 border-dashed border-border"
+                ? "step-in aspect-square w-full rounded-full bg-accent"
+                : "aspect-square w-full rounded-full border-2 border-dashed border-border"
             }
           />
         ))}

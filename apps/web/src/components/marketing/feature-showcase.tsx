@@ -4,36 +4,47 @@ import { useEffect, useRef, useState } from "react";
 
 import { Reveal } from "./reveal";
 
-/* Steep-style scroll showcase: feature chapters on the left, a sticky
- * phone mockup on the right whose screen switches between low-fi scenes
- * as each chapter crosses the middle of the viewport. On small screens
- * the phone renders inline inside each chapter instead (no stickiness).
- * All scene motion is CSS (`rm-*` / `.scene` in globals.css). */
+/* Steep-style scroll showcase: feature chapters on the left, a sticky phone
+ * mockup on the right whose screen switches between scenes as each chapter
+ * crosses the middle of the viewport. On small screens the phone renders
+ * inline inside each chapter instead (no stickiness).
+ *
+ * The scenes are faithful, light-mode recreations of the real /app customer
+ * screens: the card home, the Show-QR modal, the rewards list and the redeem
+ * coupon. The wallet scene keeps its own animation but now opens from the
+ * app's "Add to Apple Wallet" button before the pass slides in. All scene
+ * motion is CSS (`rm-*` / `.scene` in globals.css). */
 
 const CHAPTERS = [
   {
     id: "card",
     tag: "At launch",
-    title: "A card on their phone",
-    body: "Customers open their card right in the browser — stamps, rewards and their personal QR code. No app store, no download, nothing to forget.",
+    title: "Their card, always on their phone",
+    body: "Customers open their card in the browser and see stamps, points and their own code. No app store, no download, nothing to lose.",
   },
   {
-    id: "stamping",
+    id: "showqr",
     tag: "At launch",
-    title: "Stamping in seconds",
-    body: "Staff scan the customer's QR with any phone camera. The stamp lands instantly — and codes expire, so screenshots don't work.",
+    title: "One code at the counter",
+    body: "They tap Show QR and your staff scan it. The code refreshes every 90 seconds, so a screenshot won't work twice.",
   },
   {
     id: "rewards",
     tag: "At launch",
-    title: "Points that become rewards",
-    body: "Every visit earns points. Customers spend them on rewards you choose, and redeem with a single-use code at your counter.",
+    title: "Points add up to real rewards",
+    body: "Every ringgit spent earns points. Customers spend them on rewards you pick, from a free coffee to a pastry.",
+  },
+  {
+    id: "redeem",
+    tag: "At launch",
+    title: "Redeem in a couple of taps",
+    body: "They confirm they're at your counter and get a single-use code. Points leave their balance only when your staff mark it done.",
   },
   {
     id: "wallet",
     tag: "Up next",
     title: "Straight into their wallet",
-    body: "One tap adds the card to Apple Wallet or Google Wallet. It updates the moment a stamp lands — and sits next to their boarding passes.",
+    body: "One tap adds the card to Apple Wallet or Google Wallet. It updates the moment a stamp lands and sits next to their boarding passes.",
   },
 ];
 
@@ -44,7 +55,7 @@ export function FeatureShowcase() {
   useEffect(() => {
     if (typeof IntersectionObserver === "undefined") return;
     // A narrow band around the viewport's vertical center decides the
-    // active chapter — the standard scroll-narrative pattern.
+    // active chapter, the standard scroll-narrative pattern.
     const io = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
@@ -110,12 +121,13 @@ function PhoneMock({ scene }: { scene: number }) {
       className="panel-ring relative h-[560px] w-[272px] overflow-hidden rounded-[44px] border-[6px] border-text bg-bg"
     >
       {/* dynamic island */}
-      <div className="absolute left-1/2 top-3 z-10 h-5 w-20 -translate-x-1/2 rounded-full bg-text" />
-      <div className="relative h-full w-full overflow-hidden bg-surface">
-        <WebCardScene active={scene === 0} />
-        <StampingScene active={scene === 1} />
+      <div className="absolute left-1/2 top-3 z-20 h-5 w-20 -translate-x-1/2 rounded-full bg-text" />
+      <div className="relative h-full w-full overflow-hidden bg-bg">
+        <CardHomeScene active={scene === 0} />
+        <ShowQrScene active={scene === 1} />
         <RewardsScene active={scene === 2} />
-        <WalletScene active={scene === 3} />
+        <RedeemScene active={scene === 3} />
+        <WalletScene active={scene === 4} />
       </div>
     </div>
   );
@@ -123,44 +135,53 @@ function PhoneMock({ scene }: { scene: number }) {
 
 function SceneShell({
   active,
+  center,
   children,
 }: {
   active: boolean;
+  center?: boolean;
   children: React.ReactNode;
 }) {
   return (
     <div
       data-active={active ? "true" : "false"}
-      className="scene absolute inset-0 flex flex-col justify-center gap-5 px-6"
+      className={`scene absolute inset-0 flex flex-col gap-4 overflow-hidden px-5 ${
+        center ? "justify-center py-6" : "pt-11 pb-6"
+      }`}
     >
       {children}
     </div>
   );
 }
 
-function MiniHeader({ label }: { label: string }) {
+/** The real app header: logo mark, store name, customer name, sign out. */
+function AppHeader() {
   return (
-    <div className="flex items-center gap-2.5">
-      <span className="flex size-8 items-center justify-center rounded-full bg-primary">
-        <span className="size-2.5 rounded-full bg-accent" />
-      </span>
-      <div>
-        <p className="text-xs font-semibold text-text">Corner Coffee</p>
-        <p className="text-[10px] text-text-muted">{label}</p>
+    <div className="flex items-center justify-between">
+      <div className="flex items-center gap-2.5">
+        <span className="flex size-8 items-center justify-center rounded-lg bg-primary">
+          <span className="size-2.5 rounded-full bg-accent" />
+        </span>
+        <div>
+          <p className="text-sm font-semibold text-text">Corner Coffee</p>
+          <p className="text-[10px] text-text-muted">Aisyah</p>
+        </div>
       </div>
+      <span className="text-[10px] font-medium text-text-muted">Sign out</span>
     </div>
   );
 }
 
-function Dots({ filled, total, pop }: { filled: number; total: number; pop?: boolean }) {
+/** A 2×5 stamp grid; the next open slot pops as a fresh stamp lands. */
+function StampRows({ filled, pop }: { filled: number; pop?: boolean }) {
   return (
-    <div className="grid grid-cols-5 gap-2.5">
-      {Array.from({ length: total }, (_, i) => {
+    <div className="grid grid-cols-5 gap-2">
+      {Array.from({ length: 10 }, (_, i) => {
         if (pop && i === filled) {
           return (
             <span key={i} className="relative flex items-center justify-center">
               <span className="rm-ring absolute inset-0 rounded-full border-2 border-accent" />
-              <span className="rm-pop size-8 rounded-full bg-accent" />
+              <span className="rm-pop aspect-square w-full rounded-full bg-accent" />
             </span>
           );
         }
@@ -169,8 +190,8 @@ function Dots({ filled, total, pop }: { filled: number; total: number; pop?: boo
             key={i}
             className={
               i < filled
-                ? "size-8 rounded-full bg-accent"
-                : "size-8 rounded-full border-2 border-dashed border-border"
+                ? "aspect-square w-full rounded-full bg-accent"
+                : "aspect-square w-full rounded-full border-2 border-dashed border-border"
             }
           />
         );
@@ -179,122 +200,193 @@ function Dots({ filled, total, pop }: { filled: number; total: number; pop?: boo
   );
 }
 
-/** Scene 1 — the web card in the browser. */
-function WebCardScene({ active }: { active: boolean }) {
+/** A low-fi QR block that reads as a scannable code. */
+function QrBlock({ className = "" }: { className?: string }) {
+  return (
+    <div className={`grid grid-cols-4 gap-1 rounded-xl border border-border bg-white p-2 ${className}`}>
+      {[0, 1, 3, 4, 6, 7, 9, 10, 12, 15].map((n) => (
+        <span key={n} className="aspect-square rounded-[2px] bg-text" />
+      ))}
+      {[2, 5, 8, 11, 13, 14].map((n) => (
+        <span key={`e${n}`} className="aspect-square rounded-[2px] bg-surface-alt" />
+      ))}
+    </div>
+  );
+}
+
+/** Scene 1 — the card home, front and centre. */
+function CardHomeScene({ active }: { active: boolean }) {
   return (
     <SceneShell active={active}>
-      <MiniHeader label="Coffee Card" />
-      <div className="rounded-xl border border-border bg-bg p-4">
-        <Dots filled={4} total={10} />
+      <AppHeader />
+      <div className="rounded-2xl border border-border bg-surface p-4 shadow-sm">
+        <div className="flex items-baseline justify-between">
+          <p className="text-xs font-semibold text-text">Coffee Card</p>
+          <p className="font-mono text-[10px] text-text-muted tabular-nums">4/10</p>
+        </div>
+        <div className="mt-3">
+          <StampRows filled={4} pop />
+        </div>
         <div className="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-surface-alt">
           <div className="rm-fill h-full w-full rounded-full bg-leaf" />
         </div>
         <p className="mt-2.5 text-[10px] text-text-secondary">
           6 more stamps to a free coffee
         </p>
+        <span className="mt-4 flex h-9 items-center justify-center rounded-xl bg-primary text-[11px] font-semibold text-on-primary">
+          Show QR to collect stamps
+        </span>
+        <p className="mt-2.5 text-center text-[10px] text-text-muted">
+          Points balance{" "}
+          <span className="font-semibold text-text tabular-nums">120</span>
+        </p>
       </div>
-      {/* QR placeholder */}
-      <div className="mx-auto grid size-24 grid-cols-3 gap-1 rounded-xl border border-border bg-bg p-2.5">
-        {[0, 2, 3, 5, 6, 7].map((n) => (
-          <span key={n} className={`rounded-[3px] bg-text ${n % 2 ? "opacity-70" : ""}`} />
-        ))}
-        {[1, 4, 8].map((n) => (
-          <span key={`e${n}`} className="rounded-[3px] border border-border" />
-        ))}
-      </div>
-      <span className="mx-auto rounded-lg bg-primary px-4 py-2 text-[10px] font-medium text-on-primary">
-        Show my QR code
-      </span>
     </SceneShell>
   );
 }
 
-/** Scene 4 — the same card, inside Apple/Google Wallet. */
-function WalletScene({ active }: { active: boolean }) {
+/** Scene 2 — the Show-QR modal over the dimmed card. */
+function ShowQrScene({ active }: { active: boolean }) {
   return (
     <SceneShell active={active}>
-      <p className="text-center text-[10px] font-medium text-text-muted">Wallet</p>
-      {/* other passes peeking behind */}
+      {/* the card, dimmed behind the modal */}
+      <div className="pointer-events-none opacity-40">
+        <AppHeader />
+        <div className="mt-4 rounded-2xl border border-border bg-surface p-4">
+          <StampRows filled={4} />
+        </div>
+      </div>
+      {/* scrim + modal */}
+      <div className="absolute inset-0 flex items-center justify-center bg-black/40 px-5">
+        <div className="w-full rounded-2xl border border-border bg-surface p-4 text-center">
+          <p className="text-[11px] font-semibold text-text">
+            Show this at the counter
+          </p>
+          <QrBlock className="mx-auto mt-3 size-32" />
+          <p className="mt-2.5 text-[9px] text-text-muted">
+            Refreshes automatically. Screenshots won&apos;t work.
+          </p>
+          <span className="mt-3 flex h-8 items-center justify-center rounded-xl border border-border text-[10px] font-medium text-text">
+            Done
+          </span>
+        </div>
+      </div>
+    </SceneShell>
+  );
+}
+
+/** Scene 3 — the rewards list ("Treat yourself"). */
+function RewardsScene({ active }: { active: boolean }) {
+  return (
+    <SceneShell active={active}>
+      <AppHeader />
+      <div className="rounded-2xl border border-border bg-surface p-4 shadow-sm">
+        <p className="text-xs font-semibold text-text">Treat yourself</p>
+        <p className="mt-1 text-[10px] text-text-muted">
+          Spend your points on something nice.
+        </p>
+        <div className="mt-3 flex flex-col gap-2">
+          <div className="flex items-center gap-2 rounded-xl border border-border p-2.5">
+            <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-surface-alt text-sm">
+              🎁
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block truncate text-[11px] font-medium text-text">
+                Free coffee
+              </span>
+              <span className="block text-[9px] text-success">Ready to redeem</span>
+            </span>
+            <span className="shrink-0 rounded-full bg-surface-alt px-2 py-0.5 text-[9px] font-semibold text-text tabular-nums">
+              100 pts
+            </span>
+          </div>
+          <div className="flex items-center gap-2 rounded-xl border border-border p-2.5">
+            <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-surface-alt text-sm">
+              🥐
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block truncate text-[11px] font-medium text-text">
+                Pastry of the day
+              </span>
+              <span className="block text-[9px] text-text-muted">20 pts to go</span>
+            </span>
+            <span className="shrink-0 rounded-full bg-surface-alt px-2 py-0.5 text-[9px] font-semibold text-text tabular-nums">
+              140 pts
+            </span>
+          </div>
+        </div>
+      </div>
+    </SceneShell>
+  );
+}
+
+/** Scene 4 — the redeem coupon, single-use and short-lived. */
+function RedeemScene({ active }: { active: boolean }) {
+  return (
+    <SceneShell active={active} center>
+      <div className="rounded-2xl border border-border bg-surface p-5 text-center shadow-sm">
+        <p className="text-sm font-semibold text-text">Free coffee</p>
+        <p className="mt-0.5 font-mono text-[10px] text-text-muted tabular-nums">
+          100 points
+        </p>
+        <p className="mt-3 text-[10px] text-text-secondary">
+          Show this to the staff. It works once.
+        </p>
+        <QrBlock className="mx-auto mt-4 size-36" />
+        <p className="mt-3 rounded-lg bg-surface-alt py-1.5 font-mono text-[11px] font-medium tracking-widest text-text">
+          KMB-7Q4X-2P9C
+        </p>
+        <p className="mt-2 text-[9px] text-text-muted">Expires in 14:32</p>
+      </div>
+    </SceneShell>
+  );
+}
+
+/** Scene 5 — from the app's Add to Wallet tap into the pass sliding in. */
+function WalletScene({ active }: { active: boolean }) {
+  return (
+    <SceneShell active={active} center>
+      {/* the app's add-to-wallet moment */}
+      <div className="rounded-2xl border border-border bg-surface p-4">
+        <div className="flex items-center gap-2.5">
+          <span className="flex size-7 items-center justify-center rounded-lg bg-primary">
+            <span className="size-2 rounded-full bg-accent" />
+          </span>
+          <p className="text-[11px] font-semibold text-text">Coffee Card</p>
+        </div>
+        <span className="mt-3 flex h-8 items-center justify-center rounded-lg bg-text text-[10px] font-medium text-bg">
+            Add to Apple Wallet
+        </span>
+      </div>
+
+      <p className="text-center text-[10px] text-text-muted">Added to Wallet</p>
+
+      {/* the wallet stack, branded pass sliding into its slot */}
       <div className="flex flex-col gap-2">
-        <div className="h-9 rounded-t-xl border border-border bg-surface-alt" />
-        <div className="-mt-4 h-9 rounded-t-xl border border-border bg-bg" />
-        {/* the Kembali-powered pass sliding in */}
-        <div className="rm-wallet -mt-3 rounded-xl bg-primary p-4">
+        <div className="h-8 rounded-t-xl border border-border bg-surface-alt" />
+        <div className="-mt-4 h-8 rounded-t-xl border border-border bg-surface" />
+        <div className="rm-wallet -mt-3 rounded-xl bg-primary p-3.5">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-medium text-on-primary">Corner Coffee</span>
+            <span className="text-[10px] font-medium text-on-primary">
+              Corner Coffee
+            </span>
             <span className="size-2.5 rounded-full bg-accent" />
           </div>
-          <div className="mt-3 flex gap-1.5">
+          <div className="mt-2.5 flex gap-1.5">
             {Array.from({ length: 10 }, (_, i) => (
               <span
                 key={i}
                 className={
                   i < 4
-                    ? "size-3 rounded-full bg-accent"
-                    : "size-3 rounded-full border border-on-primary/40"
+                    ? "size-2.5 rounded-full bg-accent"
+                    : "size-2.5 rounded-full border border-on-primary/40"
                 }
               />
             ))}
           </div>
-          <p className="mt-3 text-[9px] text-on-primary/70">
+          <p className="mt-2.5 text-[9px] text-on-primary/70">
             Updates the moment a stamp lands
           </p>
-        </div>
-      </div>
-      <span className="mx-auto rounded-lg bg-text px-4 py-2 text-[10px] font-medium text-bg">
-        Add to wallet
-      </span>
-    </SceneShell>
-  );
-}
-
-/** Scene 2 — a new stamp landing after a scan. */
-function StampingScene({ active }: { active: boolean }) {
-  return (
-    <SceneShell active={active}>
-      <MiniHeader label="Stamping" />
-      <div className="rounded-xl border border-border bg-bg p-4">
-        <Dots filled={7} total={10} pop />
-        <p className="mt-3 text-[10px] text-text-secondary">
-          Scanned — stamp added in 3 seconds
-        </p>
-      </div>
-      {/* frosted confirmation toast */}
-      <div className="rm-toast glass backdrop-blur-md mx-auto flex items-center gap-2 rounded-full px-4 py-2">
-        <span className="size-2 rounded-full bg-leaf" />
-        <span className="text-[10px] font-medium text-text">+1 stamp collected</span>
-      </div>
-    </SceneShell>
-  );
-}
-
-/** Scene 3 — points climbing, a reward ready to redeem. */
-function RewardsScene({ active }: { active: boolean }) {
-  return (
-    <SceneShell active={active}>
-      <MiniHeader label="Rewards" />
-      <div className="rounded-xl border border-border bg-bg p-4">
-        <div className="flex items-center justify-between">
-          <span className="text-[10px] text-text-secondary">Your points</span>
-          <span className="font-mono text-xs text-text tabular-nums">120</span>
-        </div>
-        <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-surface-alt">
-          <div className="rm-fill h-full w-full rounded-full bg-leaf" />
-        </div>
-      </div>
-      <div className="flex flex-col gap-2">
-        <div className="flex items-center justify-between rounded-lg border border-border bg-bg px-3 py-2">
-          <span className="flex items-center gap-1.5">
-            <span className="size-2 rounded-full bg-accent" />
-            <span className="text-[10px] font-medium text-text">Free coffee</span>
-          </span>
-          <span className="rm-pop rounded-md bg-primary px-2 py-0.5 text-[9px] font-medium text-on-primary">
-            Redeem
-          </span>
-        </div>
-        <div className="flex items-center justify-between rounded-lg border border-border bg-bg px-3 py-2">
-          <span className="text-[10px] text-text-secondary">Pastry of the day</span>
-          <span className="font-mono text-[9px] text-text-muted">80 pts</span>
         </div>
       </div>
     </SceneShell>

@@ -208,7 +208,9 @@ audit_log                       actor, action, entity, tenant_id
 - ✅ **Basic reports (shipped):** stamps/sales/new customers/repeat-rate/redemption-rate over 7/30 days, stamps-per-day, top regulars. Complex analytics stays Phase 6.
 - ✅ **Security:** rotating signed QR tokens (90s TTL), velocity rules v1, scrypt passwords, hashed session tokens, RLS, audit log.
 - **Billing (re-decided 2026-07-09):** **no payment processing in-product.** Subscriptions collected by manual invoice (bank transfer/DuitNow). Stripe deferred until self-serve public launch at the earliest. Transaction key-in during stamping is record-keeping only (POS/payments = maybe, much later).
-- ⬜ **Remaining:** real OTP delivery (SMS/WhatsApp provider), merchant onboarding wizard polish, printable QR kit.
+- ✅ **QR kit (shipped 2026-07-11):** merchant-admin page with A4/A5 poster PDFs (vector QR) + PNG, in the shop's theme colours, encoding a tenant-scoped join URL (`/app/join/[slug]`); one kit per outlet when outlets differ.
+- ✅ **Tenant theming (shipped 2026-07-11, light):** platform admin sets per-tenant brand colours with a live preview + AA badges; customer surfaces derive AA-safe colours via `@kembali/core`. Deeper white-label (custom domain) stays Phase 3+.
+- ⬜ **Remaining:** real OTP delivery (SMS/WhatsApp provider), merchant onboarding wizard.
 - **Exit criteria:** 1 pilot merchant live; stamp→card-update round trip <5s in the web PWA; zero cross-tenant leakage (tested).
 
 ### Phase 2 — Points & rewards *(inserted 2026-07-09, founder)* ← *core shipped 2026-07-10*
@@ -276,8 +278,8 @@ What is new on each surface, per phase. **➕ = proposed addition (2026-07-09), 
 - ➕ Customer lookup by phone when the QR won't scan (screen glare, cracked phone).
 - ➕ "Reward ready" banner on scan result so the cashier can offer redemption unprompted.
 **Merchant admin (`/admin/[slug]`)**
-- Shipped: dashboard, customer list/detail/create (PDPA opt-ins), team + role matrix, reward redemption, basic reports (7/30d).
-- Planned: onboarding wizard, printable QR kit. (Stripe billing screen dropped 2026-07-09 — manual invoicing.)
+- Shipped: dashboard, customer list/detail/create (PDPA opt-ins), team + role matrix, reward redemption, basic reports (7/30d), QR kit (A4/A5 PDF + PNG).
+- Planned: onboarding wizard. (Stripe billing screen dropped 2026-07-09 — manual invoicing.)
 - ➕ Live card preview while editing the program (see what customers see).
 - ➕ Customer tags + private notes ("regular, oat milk").
 - ➕ Customer CSV export (PDPA access requests need it anyway).
@@ -452,6 +454,9 @@ Super-admin (internal): /tenants, /usage, /billing-health, /feature-flags
 | 2026-07-11 | **Admin nav rework + Auto/Light/Dark toggle** (persisted cookie, `data-theme` override). Reports submenu (Overview/Customers/Transactions/Rewards); below `lg` the nav collapses to a left hamburger + drawer; desktop rail is sticky full-height so Sign out stays visible | Founder review — back-office ergonomics on tablet/phone; theme persists across sessions |
 | 2026-07-11 | **English-only copy exception (founder-approved, scoped):** the merchant overview greeting may read "Selamat kembali ke {store}". ONLY sanctioned Malay in the product; `/admin/[slug]` overview only — nothing else (customer, marketing, buttons, other admin) | Founder call — a warm brand-name play for shop owners; recorded in brand/BRAND.md §5 |
 | 2026-07-11 | **Marketing round 2 + site-wide copy rework.** Landing: drifting hero activity chips; product showcase rebuilt from faithful recreations of the real /app screens (card home, Show-QR, rewards, redeem coupon) with the wallet scene opening from the app's Add to Apple Wallet button; the "try it yourself" card is 2 rows of 5; the reach-out section became a live card preview (shop name + reward + brand color update a mock card in real time). Copy: full ux-writing pass across marketing, /app and /admin. **New hard bans:** no em dashes anywhere in `apps/web/src` (restructure, not hyphenate prose), and no AI-tell vocabulary/patterns (seamless, unlock, elevate, headline rhetorical questions, exclamation marks, rule-of-three, etc.) | Founder review — the public copy and product voice must read human and specific; the Malay greeting exception above is the only sanctioned non-English string. Bans recorded in brand/BRAND.md §5 |
+| 2026-07-11 | **Reach-out flow re-ordered:** 3-question quiz first (business type → outlets → main goal) → tailored pitch result → **card simulator appears after the result**, pre-seeded from quiz answers | Founder call: qualify first, then let them play; simulator moves from standalone reach-out replacement to the quiz payoff |
+| 2026-07-11 | **QR kit v1 (completes the Phase 1 leftover):** separate merchant-admin menu item; downloadable print-ready kit (PDF + PNG, vector-sourced) containing the shop's join QR, the join link in text, shop name + logo. QR encodes the tenant-scoped join URL: merchant A's QR always lands on merchant A's join/login | Founder spec; per-tenant routing confirmed as the intended logic |
+| 2026-07-11 | **Tenant theming, platform-admin only:** brand colors per merchant set in the system admin's edit-merchant screen (never merchant-side). On-colors (text/lines on primary) are **auto-derived via WCAG relative luminance** so every pairing meets **AA**; picker shows live contrast ratios; text-on-surface variants darkened/lightened until they pass. Implemented as dependency-free pure functions in `@kembali/core`, unit-tested | Founder wants any chosen color to stay readable; math guarantees black-or-white on any primary ≥ 4.5:1, so AA is enforceable, not advisory |
 
 ## 14. References
 

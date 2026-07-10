@@ -37,8 +37,11 @@ system admin).
 | Rewards / points module toggles | platform admin · `/admin/merchants` create/edit | platform admin | Enable/disable per-tenant modules (stamps, scan, reports, points, rewards) | platform only | All | 1 | Live |
 | Merchant directory | platform admin · `/admin/merchants` | platform admin | Search/filter/sort/paginate; sectioned create (General → Plan & modules → Program → Outlets → Owner) with repeatable outlets incl. postcode; edit plan/modules/logo. Location reads the first outlet | platform only | n/a | 1 | Live |
 | Admin appearance & nav | merchant + platform admin · admin sidebar/drawer | merchant + platform admin | Auto/Light/Dark toggle (persisted); Reports submenu; sticky full-height rail; left hamburger drawer below `lg` | — | All | 1 | Live |
+| Tenant theming (white-label) | platform admin · `/admin/merchants` edit; customer · `/app/*` | platform admin (set), customer (see) | Platform admin sets `brand_primary`/`brand_accent` per tenant with a live card preview + AA contrast badges. Customer surfaces resolve buttons/links/progress/stamps through `--tenant-*` CSS vars, derived AA-safe by `@kembali/core` (light + dark). Null = Kembali default. Merchants cannot edit colours | platform only (set) | All | 1 (light), 3 (deep) | Live |
+| QR kit | merchant admin · `/admin/[slug]/qr-kit` (+ `/download`) | merchant admin, cashier | Print-ready join kit: A4/A5 poster PDFs (vector QR) + high-res PNG, in the shop's theme colours, with shop name, logo, join link and instructions. One kit per outlet when outlets differ | — (any staff of the store) | All | 1 | Live |
+| Customer join (tenant-scoped) | customer · `/app/join/[slug]` | customer | A merchant's QR opens their branded join page; the slug decides which tenant a customer joins, independent of any session. OTP request/verify create the customer under the scanned tenant | — | All | 1 | Live |
 | Audit log | system · written by privileged actions | platform + merchant admin | Append-only record of privileged actions (staff, points, redemptions, tenant changes) | — (write); viewer UI planned | All | 1 | Live (viewer UI planned) |
-| Marketing site | public · `/`, `/roadmap`, `/pricing` | prospect | Landing (with reach-out qualifier), public roadmap, pricing | — | n/a | 0.5–2 | Live |
+| Marketing site | public · `/`, `/roadmap`, `/pricing` | prospect | Landing (reach-out quiz → tailored pitch → live card simulator), public roadmap, pricing | — | n/a | 0.5–2 | Live |
 
 ## Planned modules (not built — do not build ahead of phase)
 

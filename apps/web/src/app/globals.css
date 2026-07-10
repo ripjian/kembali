@@ -161,6 +161,31 @@
   animation: step-in 220ms var(--ease-out-strong) both;
 }
 
+/* Admin modal entrance (native <dialog>): transform/opacity only, snappy
+ * (<300ms), strong ease-out for the entry (emil-design-eng). */
+@keyframes admin-modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.admin-modal[open] {
+  animation: admin-modal-in 180ms var(--ease-out-strong) both;
+}
+.admin-modal[open]::backdrop {
+  animation: step-in 180ms ease both;
+}
+
+/* Row action menu — quick transform/opacity pop. */
+.admin-menu {
+  animation: step-in 140ms var(--ease-out-strong) both;
+  transform-origin: top right;
+}
+
 /* ---------- roadmap illustrations (decorative loops) ------------------ */
 /* Loops pause until their section is in view (animation-play-state). */
 
@@ -492,6 +517,11 @@
     transition: opacity 200ms ease;
   }
   .step-in {
+    animation-duration: 1ms;
+  }
+  .admin-modal[open],
+  .admin-modal[open]::backdrop,
+  .admin-menu {
     animation-duration: 1ms;
   }
   .press:active {

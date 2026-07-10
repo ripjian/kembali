@@ -1,10 +1,12 @@
 "use client";
 
-import { useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 
 /* Shared admin form pieces: native-<dialog> modal and the validated
  * square-image → data-URL input (used for merchant logos and reward
- * photos — PNG/JPG/WebP, square, ≤512 KB, re-checked server-side). */
+ * photos — PNG/JPG/WebP, square, ≤512 KB, re-checked server-side).
+ * Entry animation is transform/opacity, <300ms, reduced-motion-aware
+ * (the `.admin-modal` rule in globals.css) per emil-design-eng. */
 
 export const inputClass =
   "h-10 w-full rounded-lg border border-border bg-surface px-3 text-sm text-text outline-none focus:border-primary";
@@ -13,14 +15,22 @@ export function Modal({
   title,
   buttonLabel,
   buttonClass,
+  defaultOpen = false,
   children,
 }: {
   title: string;
   buttonLabel: string;
   buttonClass: string;
+  /** Open on mount — used for the ?edit=1 deep-link from the row menu. */
+  defaultOpen?: boolean;
   children: ReactNode;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
+
+  useEffect(() => {
+    if (defaultOpen) ref.current?.showModal();
+  }, [defaultOpen]);
+
   return (
     <>
       <button type="button" className={buttonClass} onClick={() => ref.current?.showModal()}>
@@ -28,7 +38,7 @@ export function Modal({
       </button>
       <dialog
         ref={ref}
-        className="m-auto w-[min(92vw,540px)] rounded-2xl border border-border bg-surface p-0 text-text backdrop:bg-black/40"
+        className="admin-modal m-auto w-[min(92vw,540px)] rounded-2xl border border-border bg-surface p-0 text-text backdrop:bg-black/40"
       >
         <div className="flex items-center justify-between border-b border-border px-5 py-3">
           <h2 className="text-sm font-semibold text-text">{title}</h2>

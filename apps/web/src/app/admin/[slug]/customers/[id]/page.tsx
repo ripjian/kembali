@@ -12,20 +12,20 @@ import { formatDate, formatDateTime, formatRM } from "@/lib/format";
 import { getPanelContext } from "@/lib/panel";
 
 import { AdjustPointsButton } from "./adjust-points";
-import { CustomerEdit } from "./customer-edit";
+import { CustomerEditButton } from "./customer-edit";
 
 export default async function CustomerDetailPage({
   params,
   searchParams,
 }: {
   params: Promise<{ slug: string; id: string }>;
-  searchParams: Promise<{ saved?: string; adjusted?: string; error?: string }>;
+  searchParams: Promise<{ saved?: string; adjusted?: string; error?: string; edit?: string }>;
 }) {
   const { slug, id } = await params;
   const ctx = await getPanelContext(slug);
   if (!ctx.can("manageCustomers")) redirect(ctx.base);
   if (!z.uuid().safeParse(id).success) notFound();
-  const { saved, adjusted, error } = await searchParams;
+  const { saved, adjusted, error, edit } = await searchParams;
 
   const db = await getDb();
   const data = await withTenant(db, ctx.tenant.id, async (tx) => {
@@ -215,8 +215,9 @@ export default async function CustomerDetailPage({
             />
           )}
           {ctx.can("editCustomers") && (
-            <CustomerEdit
+            <CustomerEditButton
               tenantId={ctx.tenant.id}
+              defaultOpen={edit === "1"}
               customer={{
                 id: customer.id,
                 name: customer.name,

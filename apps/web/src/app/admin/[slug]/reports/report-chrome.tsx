@@ -39,11 +39,14 @@ export function DateRangeForm({
   action,
   range,
   hidden,
+  children,
 }: {
   action: string;
   range: DateRange;
   /** extra params to preserve (e.g. the transaction type filter) */
   hidden?: Record<string, string>;
+  /** extra submittable controls (e.g. an outlet filter) rendered before Apply */
+  children?: React.ReactNode;
 }) {
   const inputClass =
     "h-10 rounded-lg border border-border bg-surface px-3 text-sm text-text outline-none focus:border-primary";
@@ -61,6 +64,7 @@ export function DateRangeForm({
         To
         <input type="date" name="to" defaultValue={toDateInput(range.to)} className={`mt-1 block ${inputClass}`} />
       </label>
+      {children}
       <button className="h-10 rounded-lg border border-border bg-surface px-4 text-sm font-medium text-text hover:bg-surface-alt">
         Apply
       </button>

@@ -48,8 +48,15 @@ export default async function CustomerDetailPage({
       : undefined;
     const events = card
       ? await tx
-          .select()
+          .select({
+            id: schema.stampEvents.id,
+            createdAt: schema.stampEvents.createdAt,
+            source: schema.stampEvents.source,
+            amountCents: schema.stampEvents.amountCents,
+            outlet: schema.outlets.name,
+          })
           .from(schema.stampEvents)
+          .leftJoin(schema.outlets, eq(schema.stampEvents.outletId, schema.outlets.id))
           .where(eq(schema.stampEvents.cardId, card.id))
           .orderBy(desc(schema.stampEvents.createdAt))
           .limit(30)
@@ -71,15 +78,36 @@ export default async function CustomerDetailPage({
           .where(eq(schema.stampEvents.cardId, card.id))
       : [{ visits: 0, spend: 0 }];
     const pointEvents = await tx
-      .select()
+      .select({
+        id: schema.pointEvents.id,
+        delta: schema.pointEvents.delta,
+        source: schema.pointEvents.source,
+        reason: schema.pointEvents.reason,
+        stampEventId: schema.pointEvents.stampEventId,
+        createdAt: schema.pointEvents.createdAt,
+        outlet: schema.outlets.name,
+      })
       .from(schema.pointEvents)
+      .leftJoin(schema.outlets, eq(schema.pointEvents.outletId, schema.outlets.id))
       .where(eq(schema.pointEvents.customerId, customer.id))
       .orderBy(desc(schema.pointEvents.createdAt))
       .limit(60);
-    return { customer, card, program, events, rewards, lifetime, pointEvents };
+    const [outletCount] = await tx
+      .select({ n: sql<number>`count(*)::int` })
+      .from(schema.outlets);
+    return {
+      customer,
+      card,
+      program,
+      events,
+      rewards,
+      lifetime,
+      pointEvents,
+      multiOutlet: (outletCount?.n ?? 0) > 1,
+    };
   });
   if (!data) notFound();
-  const { customer, card, program, events, rewards, lifetime, pointEvents } = data;
+  const { customer, card, program, events, rewards, lifetime, pointEvents, multiOutlet } = data;
 
   // Points earned per visit (keyed by stamp event) + standalone ledger rows
   // (adjustments, redemptions) merged into one customer-visible timeline.
@@ -95,6 +123,7 @@ export default async function CustomerDetailPage({
       label: event.source === "qr" ? "Visit — scanned" : "Visit — manual",
       amountCents: event.amountCents,
       points: pointsByStampEvent.get(event.id) ?? 0,
+      outlet: event.outlet,
       stamp: true,
     })),
     ...pointEvents
@@ -108,6 +137,7 @@ export default async function CustomerDetailPage({
             : `Reward redeemed${event.reason ? ` — ${event.reason}` : ""}`,
         amountCents: null,
         points: event.delta,
+        outlet: event.outlet,
         stamp: false,
       })),
   ]
@@ -318,7 +348,10 @@ export default async function CustomerDetailPage({
               >
                 <span className="min-w-0 text-text-secondary">
                   {formatDateTime(row.createdAt)}
-                  <span className="ml-2 text-xs text-text-muted">{row.label}</span>
+                  <span className="ml-2 text-xs text-text-muted">
+                    {row.label}
+                    {multiOutlet && row.outlet ? ` · ${row.outlet}` : ""}
+                  </span>
                 </span>
                 <span className="flex shrink-0 items-center gap-3">
                   <span className="tabular-nums text-text" data-stat>

@@ -47,14 +47,16 @@ export async function GET(
 
   if (type === "transactions") {
     const txn = (url.searchParams.get("txn") ?? "all") as TxnTypeFilter;
-    const { rows } = await fetchTransactionsReport(db, ctx.tenant.id, range, txn);
+    const outlet = url.searchParams.get("outlet") || null;
+    const { rows } = await fetchTransactionsReport(db, ctx.tenant.id, range, txn, outlet);
     filename = "transactions";
     csv = toCsv(
-      ["Date", "Type", "Customer", "Amount (RM)", "Points"],
+      ["Date", "Type", "Customer", "Outlet", "Amount (RM)", "Points"],
       rows.map((r) => [
         iso(r.at),
         r.kind,
         r.customer,
+        r.outlet ?? "",
         r.amountCents != null ? RM(r.amountCents) : "",
         r.points != null ? r.points : "",
       ]),

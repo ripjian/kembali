@@ -96,6 +96,22 @@ export interface TransactionReportRow {
   customer: string;
   amountCents: number | null;
   points: number | null;
+  outlet: string | null;
+}
+
+export interface OutletOption {
+  id: string;
+  name: string;
+}
+
+/** Outlets for a tenant — used for the report/history outlet filter. */
+export function fetchOutlets(db: KembaliDb, tenantId: string): Promise<OutletOption[]> {
+  return withTenant(db, tenantId, (tx) =>
+    tx
+      .select({ id: schema.outlets.id, name: schema.outlets.name })
+      .from(schema.outlets)
+      .orderBy(schema.outlets.createdAt),
+  );
 }
 
 const POINT_SOURCE: Record<"transaction" | "adjustment" | "redemption", TxnKind> = {
@@ -109,6 +125,7 @@ export async function fetchTransactionsReport(
   tenantId: string,
   range: DateRange,
   type: TxnTypeFilter,
+  outletId?: string | null,
 ): Promise<{ rows: TransactionReportRow[]; truncated: boolean }> {
   return withTenant(db, tenantId, async (tx) => {
     const out: TransactionReportRow[] = [];
@@ -121,14 +138,17 @@ export async function fetchTransactionsReport(
           amountCents: schema.stampEvents.amountCents,
           name: schema.customers.name,
           phone: schema.customers.phone,
+          outlet: schema.outlets.name,
         })
         .from(schema.stampEvents)
         .innerJoin(schema.cards, eq(schema.stampEvents.cardId, schema.cards.id))
         .innerJoin(schema.customers, eq(schema.cards.customerId, schema.customers.id))
+        .leftJoin(schema.outlets, eq(schema.stampEvents.outletId, schema.outlets.id))
         .where(
           and(
             gte(schema.stampEvents.createdAt, range.from),
             lte(schema.stampEvents.createdAt, range.to),
+            outletId ? eq(schema.stampEvents.outletId, outletId) : undefined,
           ),
         )
         .orderBy(desc(schema.stampEvents.createdAt))
@@ -141,6 +161,7 @@ export async function fetchTransactionsReport(
           customer: s.name ?? s.phone ?? "Customer",
           amountCents: s.amountCents,
           points: null,
+          outlet: s.outlet,
         });
       }
     }
@@ -164,14 +185,17 @@ export async function fetchTransactionsReport(
           source: schema.pointEvents.source,
           name: schema.customers.name,
           phone: schema.customers.phone,
+          outlet: schema.outlets.name,
         })
         .from(schema.pointEvents)
         .innerJoin(schema.customers, eq(schema.pointEvents.customerId, schema.customers.id))
+        .leftJoin(schema.outlets, eq(schema.pointEvents.outletId, schema.outlets.id))
         .where(
           and(
             gte(schema.pointEvents.createdAt, range.from),
             lte(schema.pointEvents.createdAt, range.to),
             inArray(schema.pointEvents.source, [...pointSources]),
+            outletId ? eq(schema.pointEvents.outletId, outletId) : undefined,
           ),
         )
         .orderBy(desc(schema.pointEvents.createdAt))
@@ -184,6 +208,7 @@ export async function fetchTransactionsReport(
           customer: p.name ?? p.phone ?? "Customer",
           amountCents: null,
           points: p.delta,
+          outlet: p.outlet,
         });
       }
     }

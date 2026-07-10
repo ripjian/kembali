@@ -202,7 +202,7 @@ audit_log                       actor, action, entity, tenant_id
 > **Re-set again by founder 2026-07-09:** points + rewards inserted as **Phase 2**; wallet passes → Phase 3 (with member tags), WhatsApp → 4, referrals → 5, API/POS → 6. No payment processing in-product — subscriptions invoiced manually; Stripe deferred.
 
 ### Phase 1 — MVP: Core loyalty + basic reports ← *current, first working build 2026-07-08*
-- ✅ **Customer PWA:** OTP login/register (dev bypass code, non-production only), branded stamp card, rotating QR, rewards + promo section, recent spends.
+- ✅ **Customer PWA:** phone OTP + one-screen registration (name/email/birthday/PDPA opt-in) after verify, branded stamp card, rotating QR, rewards + promo section, recent spends.
 - ✅ **Cashier flow:** staff login → camera QR scan (BarcodeDetector; paste fallback) → amount → stamp; velocity rules; daily view at the counter.
 - ✅ **Merchant admin:** customer list/detail/create (PDPA opt-ins), team roles, reward redemption. Platform admin: add merchants (tenant+outlet+program+owner login), module toggles, password resets — all audit-logged.
 - ✅ **Basic reports (shipped):** stamps/sales/new customers/repeat-rate/redemption-rate over 7/30 days, stamps-per-day, top regulars. Complex analytics stays Phase 6.
@@ -210,7 +210,7 @@ audit_log                       actor, action, entity, tenant_id
 - **Billing (re-decided 2026-07-09):** **no payment processing in-product.** Subscriptions collected by manual invoice (bank transfer/DuitNow). Stripe deferred until self-serve public launch at the earliest. Transaction key-in during stamping is record-keeping only (POS/payments = maybe, much later).
 - ✅ **QR kit (shipped 2026-07-11):** merchant-admin page with A4/A5 poster PDFs (vector QR) + PNG, in the shop's theme colours, encoding a tenant-scoped join URL (`/app/join/[slug]`); one kit per outlet when outlets differ.
 - ✅ **Tenant theming (shipped 2026-07-11, light):** platform admin sets per-tenant brand colours with a live preview + AA badges; customer surfaces derive AA-safe colours via `@kembali/core`. Deeper white-label (custom domain) stays Phase 3+.
-- ⬜ **Remaining:** real OTP delivery (SMS/WhatsApp provider), merchant onboarding wizard.
+- ⬜ **Remaining:** real OTP delivery (SMS/WhatsApp provider). OTP now ships behind an `OtpSender` interface with a `NullSender` (no provider yet) and a non-production dev notice; adding a real provider is a class + a switch case, and a prod build with `OTP_PROVIDER=none` fails at boot. Also remaining: merchant onboarding wizard.
 - **Exit criteria:** 1 pilot merchant live; stamp→card-update round trip <5s in the web PWA; zero cross-tenant leakage (tested).
 
 ### Phase 2 — Points & rewards *(inserted 2026-07-09, founder)* ← *core shipped 2026-07-10*
@@ -353,7 +353,8 @@ Super-admin (internal): /tenants, /usage, /billing-health, /feature-flags
 
 ```
 /                             # merchant-branded landing → "Join & get your card"
-/join                         # phone → OTP → (name, birthday optional) → card issued
+/app/join/[slug]              # tenant-scoped join: phone → OTP (dev notice when no provider)
+/app/register                 # after verify, if nameless: full name + email/birthday/opt-in → card
 /card (home after login)      # 1) stamp card + "Show QR" CTA → modal (QR, fallback code, dismiss)
                               # 2) rewards section below: all redeemable rewards
                               #   (Add to Apple/Google Wallet buttons ship in Phase 3)
@@ -457,6 +458,8 @@ Super-admin (internal): /tenants, /usage, /billing-health, /feature-flags
 | 2026-07-11 | **Reach-out flow re-ordered:** 3-question quiz first (business type → outlets → main goal) → tailored pitch result → **card simulator appears after the result**, pre-seeded from quiz answers | Founder call: qualify first, then let them play; simulator moves from standalone reach-out replacement to the quiz payoff |
 | 2026-07-11 | **QR kit v1 (completes the Phase 1 leftover):** separate merchant-admin menu item; downloadable print-ready kit (PDF + PNG, vector-sourced) containing the shop's join QR, the join link in text, shop name + logo. QR encodes the tenant-scoped join URL: merchant A's QR always lands on merchant A's join/login | Founder spec; per-tenant routing confirmed as the intended logic |
 | 2026-07-11 | **Tenant theming, platform-admin only:** brand colors per merchant set in the system admin's edit-merchant screen (never merchant-side). On-colors (text/lines on primary) are **auto-derived via WCAG relative luminance** so every pairing meets **AA**; picker shows live contrast ratios; text-on-surface variants darkened/lightened until they pass. Implemented as dependency-free pure functions in `@kembali/core`, unit-tested | Founder wants any chosen color to stay readable; math guarantees black-or-white on any primary ≥ 4.5:1, so AA is enforceable, not advisory |
+| 2026-07-11 | **Customer registration fields:** after OTP verify a nameless customer completes one screen: **full name required**, **phone verified + read-only**, **email optional** (validated), **birthday skippable** (date only; a birthday-treat line), **marketing opt-in unchecked** by default. Returning named customers skip it. Server action is session-scoped, zod-validated, `withTenant`, audit-logged | Founder review of the join gap: a phone-only account with no name/consent is not a real registration; PDPA means opt-in is off by default |
+| 2026-07-11 | **OTP ships provider-less behind an `OtpSender` interface** (`NullSender`, `OTP_PROVIDER=none`); a non-production-only on-screen notice tells testers to use `888888`, and a production build with no real provider fails at boot. Choosing/wiring a real WhatsApp/SMS provider is a **separate founder decision, planned next** | Founder wants the seam in place now without picking a vendor; the guard makes silent no-delivery auth impossible in production |
 
 ## 14. References
 

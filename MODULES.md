@@ -18,7 +18,7 @@ system admin).
 
 | Module | Surface · route | For | What it does | Permission key(s) | Plans | Phase | Status |
 |---|---|---|---|---|---|---|---|
-| Auth / OTP | customer · `/app/login`, `/api/auth/otp/*` | customer | Phone OTP login/register; dev bypass `888888` (non-prod only) | — | All | 1 | Live |
+| Auth / OTP | customer · `/app/login`, `/app/join/[slug]`, `/api/auth/otp/*` | customer | Phone OTP. Codes go through an `OtpSender` (NullSender today; `OTP_PROVIDER=none`, no real delivery yet). Non-prod shows a "no provider, use `888888`" notice; a prod build with `OTP_PROVIDER=none` fails at boot. Dev bypass `888888` non-prod only | — | All | 1 | Live |
 | Stamp card | customer · `/app` | customer | Branded card, stamp progress, earned rewards, recent visits | — | All | 1 | Live |
 | Show QR | customer · `/app` modal, `/api/app/qr-token` | customer | Rotating signed QR (90s TTL) + fallback code to collect stamps | — | All | 1 | Live |
 | Scan-to-stamp | cashier · `/admin/[slug]/scan` (Scan member), `/api/admin/stamp` | cashier, merchant admin | Scan a member's QR, key in amount, add a stamp (+ points); attributed to the serving outlet | `scan` | All | 1 | Live |
@@ -40,6 +40,7 @@ system admin).
 | Tenant theming (white-label) | platform admin · `/admin/merchants` edit; customer · `/app/*` | platform admin (set), customer (see) | Platform admin sets `brand_primary`/`brand_accent` per tenant with a live card preview + AA contrast badges. Customer surfaces resolve buttons/links/progress/stamps through `--tenant-*` CSS vars, derived AA-safe by `@kembali/core` (light + dark). Null = Kembali default. Merchants cannot edit colours | platform only (set) | All | 1 (light), 3 (deep) | Live |
 | QR kit | merchant admin · `/admin/[slug]/qr-kit` (+ `/download`) | merchant admin, cashier | Print-ready join kit: A4/A5 poster PDFs (vector QR) + high-res PNG, in the shop's theme colours, with shop name, logo, join link and instructions. One kit per outlet when outlets differ | — (any staff of the store) | All | 1 | Live |
 | Customer join (tenant-scoped) | customer · `/app/join/[slug]` | customer | A merchant's QR opens their branded join page; the slug decides which tenant a customer joins, independent of any session. OTP request/verify create the customer under the scanned tenant | — | All | 1 | Live |
+| Customer registration | customer · `/app/register` | customer | After OTP verify, a nameless customer completes a one-screen profile (full name required, phone verified/read-only, email optional, birthday skippable, marketing opt-in unchecked per PDPA), themed in the tenant's colours. Returning named customers skip it. `completeCustomerProfile` action: zod, `withTenant`, audit-logged | — | All | 1 | Live |
 | Audit log | system · written by privileged actions | platform + merchant admin | Append-only record of privileged actions (staff, points, redemptions, tenant changes) | — (write); viewer UI planned | All | 1 | Live (viewer UI planned) |
 | Marketing site | public · `/`, `/roadmap`, `/pricing` | prospect | Landing (reach-out quiz → tailored pitch → live card simulator), public roadmap, pricing | — | n/a | 0.5–2 | Live |
 

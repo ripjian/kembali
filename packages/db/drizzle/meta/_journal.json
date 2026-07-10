@@ -85,6 +85,13 @@
       "when": 1783668524615,
       "tag": "0011_migrate_address_to_outlet",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1783669767369,
+      "tag": "0012_outlets_platform_policy",
+      "breakpoints": true
     }
   ]
 }

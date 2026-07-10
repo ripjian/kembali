@@ -102,13 +102,11 @@ const logoSchema = z
   .max(700_000, "Logo must be under 512 KB")
   .or(z.literal(""));
 
+// Address now lives on outlets (Decision Log 2026-07-11); tenants.address_*
+// is deprecated and no longer written from here.
 const merchantProfileSchema = z.object({
   name: z.string().trim().min(2).max(80),
   plan: z.enum(PLAN_TYPES),
-  addressLine: z.string().trim().max(200),
-  city: z.string().trim().max(80),
-  state: z.string().trim().max(80),
-  country: z.string().trim().min(2).max(80),
   logoDataUrl: logoSchema,
   modules: modulesSchema,
 });
@@ -117,10 +115,6 @@ function readMerchantProfile(formData: FormData) {
   return merchantProfileSchema.safeParse({
     name: formData.get("name"),
     plan: formData.get("plan"),
-    addressLine: formData.get("addressLine") ?? "",
-    city: formData.get("city") ?? "",
-    state: formData.get("state") ?? "",
-    country: formData.get("country") || "Malaysia",
     logoDataUrl: formData.get("logoDataUrl") ?? "",
     modules: {
       stamps: formData.get("mod_stamps") === "on",
@@ -132,6 +126,36 @@ function readMerchantProfile(formData: FormData) {
   });
 }
 
+const outletInputSchema = z.object({
+  name: z.string().trim().min(2).max(120),
+  addressLine: z.string().trim().max(200),
+  postcode: z.string().trim().max(20),
+  city: z.string().trim().max(80),
+  state: z.string().trim().max(80),
+  country: z.string().trim().max(80),
+});
+
+/** Zip the repeated outlet fields into records; drop blank blocks. */
+function readOutlets(formData: FormData) {
+  const names = formData.getAll("outletName").map(String);
+  const addresses = formData.getAll("outletAddress").map(String);
+  const postcodes = formData.getAll("outletPostcode").map(String);
+  const cities = formData.getAll("outletCity").map(String);
+  const states = formData.getAll("outletState").map(String);
+  const countries = formData.getAll("outletCountry").map(String);
+  const outlets = names
+    .map((name, i) => ({
+      name: name.trim(),
+      addressLine: (addresses[i] ?? "").trim(),
+      postcode: (postcodes[i] ?? "").trim(),
+      city: (cities[i] ?? "").trim(),
+      state: (states[i] ?? "").trim(),
+      country: (countries[i] ?? "").trim() || "Malaysia",
+    }))
+    .filter((o) => o.name.length > 0);
+  return z.array(outletInputSchema).min(1).max(50).safeParse(outlets);
+}
+
 /* ---- platform: merchants ------------------------------------------------ */
 
 async function requirePlatform() {
@@ -141,26 +165,29 @@ async function requirePlatform() {
 }
 
 const newMerchantExtraSchema = z.object({
-  outletName: z.string().trim().min(2).max(120),
   ownerName: z.string().trim().min(2).max(120),
   ownerEmail: z.email(),
   ownerPassword: z.string().min(8),
   stampsRequired: z.coerce.number().int().min(2).max(30),
   rewardTitle: z.string().trim().min(2).max(120),
+  pointsPerRm: z.coerce.number().min(0).max(1000),
 });
 
 export async function createTenant(formData: FormData) {
   const admin = await requirePlatform();
   const profile = readMerchantProfile(formData);
+  const outlets = readOutlets(formData);
   const extra = newMerchantExtraSchema.safeParse({
-    outletName: formData.get("outletName"),
     ownerName: formData.get("ownerName"),
     ownerEmail: formData.get("ownerEmail"),
     ownerPassword: formData.get("ownerPassword"),
     stampsRequired: formData.get("stampsRequired") ?? 10,
     rewardTitle: formData.get("rewardTitle"),
+    pointsPerRm: formData.get("pointsPerRm") ?? 1,
   });
-  if (!profile.success || !extra.success) redirect("/admin/merchants?error=invalid");
+  if (!profile.success || !extra.success || !outlets.success) {
+    redirect("/admin/merchants?error=invalid");
+  }
   const p = profile.data;
   const slug = p.name
     .toLowerCase()
@@ -179,12 +206,9 @@ export async function createTenant(formData: FormData) {
         name: p.name,
         slug,
         plan: p.plan,
-        addressLine: p.addressLine || null,
-        city: p.city || null,
-        state: p.state || null,
-        country: p.country,
         logoUrl: p.logoDataUrl || null,
         modules: p.modules,
+        pointsPerRm: extra.data.pointsPerRm,
       })
       .onConflictDoNothing()
       .returning();
@@ -203,16 +227,24 @@ export async function createTenant(formData: FormData) {
       action: "tenant.created",
       entity: "tenant",
       entityId: tenant.id,
-      meta: { slug, plan: p.plan },
+      meta: { slug, plan: p.plan, outlets: outlets.data.length },
     });
     return tenant.id;
   });
   if (!tenantId) redirect("/admin/merchants?error=exists");
 
   await withTenant(db, tenantId, async (tx) => {
-    await tx
-      .insert(schema.outlets)
-      .values({ tenantId, name: extra.data.outletName });
+    await tx.insert(schema.outlets).values(
+      outlets.data.map((o) => ({
+        tenantId,
+        name: o.name,
+        addressLine: o.addressLine || null,
+        postcode: o.postcode || null,
+        city: o.city || null,
+        state: o.state || null,
+        country: o.country || null,
+      })),
+    );
     await tx.insert(schema.programs).values({
       tenantId,
       name: "Loyalty card",
@@ -238,13 +270,10 @@ export async function updateTenant(formData: FormData) {
     await tx
       .update(schema.tenants)
       .set({
-        // slug intentionally stable — it is the merchant's panel path
+        // slug intentionally stable — it is the merchant's panel path.
+        // Address is per-outlet now; not edited here.
         name: p.name,
         plan: p.plan,
-        addressLine: p.addressLine || null,
-        city: p.city || null,
-        state: p.state || null,
-        country: p.country,
         ...(p.logoDataUrl ? { logoUrl: p.logoDataUrl } : {}),
         modules: p.modules,
       })

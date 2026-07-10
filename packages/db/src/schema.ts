@@ -144,7 +144,18 @@ export const outlets = pgTable(
     timezone: text("timezone").notNull().default("Asia/Kuala_Lumpur"),
     createdAt: createdAt(),
   },
-  (t) => [tenantPolicy("outlets"), index("outlets_tenant_idx").on(t.tenantId)],
+  (t) => [
+    tenantPolicy("outlets"),
+    // Platform admins read/manage outlets across tenants (merchant directory
+    // location, creation). Set only by withPlatform after a verified session.
+    pgPolicy("outlets_platform_all", {
+      for: "all",
+      to: appRole,
+      using: sql`current_setting('app.platform_admin', true) = 'true'`,
+      withCheck: sql`current_setting('app.platform_admin', true) = 'true'`,
+    }),
+    index("outlets_tenant_idx").on(t.tenantId),
+  ],
 );
 
 export const staffUsers = pgTable(

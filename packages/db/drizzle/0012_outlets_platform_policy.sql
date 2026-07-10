@@ -1,0 +1,1 @@
+CREATE POLICY "outlets_platform_all" ON "outlets" AS PERMISSIVE FOR ALL TO "kembali_app" USING (current_setting('app.platform_admin', true) = 'true') WITH CHECK (current_setting('app.platform_admin', true) = 'true');

@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { LogoWordmark } from "@kembali/ui";
 
 import { schema, withPlatform } from "@kembali/db";
-import { and, asc, desc, eq, ilike, isNotNull, or, sql, type SQL } from "drizzle-orm";
+import { and, asc, desc, eq, ilike, inArray, isNotNull, or, sql, type SQL } from "drizzle-orm";
 
 import { adminLogout } from "@/lib/admin-actions";
 import { getAdminContext } from "@/lib/auth";
@@ -87,8 +87,16 @@ export default async function MerchantsPage({
     const where = conditions.length ? and(...conditions) : undefined;
 
     const orderCol = f.sort === "name" ? schema.tenants.name : schema.tenants.createdAt;
-    const rows = await tx
-      .select()
+    const tenantRows = await tx
+      .select({
+        id: schema.tenants.id,
+        name: schema.tenants.name,
+        slug: schema.tenants.slug,
+        plan: schema.tenants.plan,
+        logoUrl: schema.tenants.logoUrl,
+        modules: schema.tenants.modules,
+        createdAt: schema.tenants.createdAt,
+      })
       .from(schema.tenants)
       .where(where)
       .orderBy(f.dir === "asc" ? asc(orderCol) : desc(orderCol))
@@ -98,6 +106,31 @@ export default async function MerchantsPage({
       .select({ n: sql<number>`count(*)::int` })
       .from(schema.tenants)
       .where(where);
+
+    // Location comes from each tenant's first outlet (address moved to
+    // outlets, Decision Log 2026-07-11). One query, mapped in JS.
+    const tenantIds = tenantRows.map((t) => t.id);
+    const outletRows = tenantIds.length
+      ? await tx
+          .select({
+            tenantId: schema.outlets.tenantId,
+            city: schema.outlets.city,
+            state: schema.outlets.state,
+          })
+          .from(schema.outlets)
+          .where(inArray(schema.outlets.tenantId, tenantIds))
+          .orderBy(asc(schema.outlets.createdAt))
+      : [];
+    const locByTenant = new Map<string, string>();
+    for (const o of outletRows) {
+      if (!locByTenant.has(o.tenantId)) {
+        locByTenant.set(o.tenantId, [o.city, o.state].filter(Boolean).join(", "));
+      }
+    }
+    const rows = tenantRows.map((t) => ({
+      ...t,
+      location: locByTenant.get(t.id) || "",
+    }));
 
     const states = await tx
       .selectDistinct({ v: schema.tenants.state })
@@ -257,7 +290,7 @@ export default async function MerchantsPage({
                     {PLAN_LABELS[(t.plan as PlanType)] ?? t.plan}
                   </td>
                   <td className="px-4 py-3 text-text-secondary">
-                    {[t.state, t.country].filter(Boolean).join(", ") || "—"}
+                    {t.location || "—"}
                   </td>
                   <td className="px-4 py-3 text-text-secondary">{formatDate(t.createdAt)}</td>
                   <td className="px-4 py-3">
@@ -267,10 +300,6 @@ export default async function MerchantsPage({
                           id: t.id,
                           name: t.name,
                           plan: t.plan,
-                          addressLine: t.addressLine,
-                          city: t.city,
-                          state: t.state,
-                          country: t.country,
                           logoUrl: t.logoUrl,
                           modules: parseModules(t.modules),
                         }}

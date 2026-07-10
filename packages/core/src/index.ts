@@ -15,6 +15,7 @@ export {
   AA_UI,
   type TenantTheme,
 } from "./theme";
+export { customerJoinPath, customerJoinUrl } from "./join";
 export {
   hashPassword,
   verifyPassword,

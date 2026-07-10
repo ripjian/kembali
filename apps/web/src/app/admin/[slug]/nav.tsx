@@ -28,6 +28,7 @@ export function AdminNav({
   const links = [
     { href: base, label: "Overview", show: true },
     { href: `${base}/scan`, label: "Scan & stamp", show: modules.scan && allowed.scan },
+    { href: `${base}/qr-kit`, label: "QR kit", show: true },
     { href: `${base}/customers`, label: "Customers", show: allowed.customers },
     { href: `${base}/rewards`, label: "Rewards", show: modules.rewards && allowed.rewards },
     {

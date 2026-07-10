@@ -11,10 +11,16 @@ import { and, eq, gt, isNull } from "drizzle-orm";
 import { z } from "zod";
 
 import { IS_PRODUCTION, OTP_BYPASS_ENABLED } from "@/lib/config";
-import { DEMO_TENANT_ID, getDb } from "@/lib/db";
+import { getDb } from "@/lib/db";
+import { resolveJoinTenantId } from "@/lib/join";
 import { normalizePhone, phoneInputSchema } from "@/lib/phone";
 
-const bodySchema = z.object({ phone: phoneInputSchema });
+const bodySchema = z.object({
+  phone: phoneInputSchema,
+  // Set by the tenant-scoped join page so the customer is created under the
+  // right merchant; omitted on the demo login (falls back to the demo tenant).
+  tenantId: z.string().optional(),
+});
 
 export async function POST(req: Request) {
   const parsed = bodySchema.safeParse(await req.json().catch(() => null));
@@ -28,8 +34,11 @@ export async function POST(req: Request) {
 
   const db = await getDb();
   const code = generateOtpCode();
+  const tenantId = await resolveJoinTenantId(
+    parsed.success ? parsed.data.tenantId : undefined,
+  );
 
-  const limited = await withTenant(db, DEMO_TENANT_ID, async (tx) => {
+  const limited = await withTenant(db, tenantId, async (tx) => {
     // OTP rate limit (SECURITY.md rule 6): max 3 live codes per phone.
     const live = await tx
       .select({ id: schema.otpCodes.id })
@@ -43,7 +52,7 @@ export async function POST(req: Request) {
       );
     if (live.length >= 3) return true;
     await tx.insert(schema.otpCodes).values({
-      tenantId: DEMO_TENANT_ID,
+      tenantId,
       phone,
       codeHash: hashOtpCode(phone, code),
       expiresAt: new Date(Date.now() + OTP_TTL_MINUTES * 60_000),

@@ -55,8 +55,12 @@ async function setCookie(name: string, value: string, maxAgeSeconds: number) {
   });
 }
 
-export async function startCustomerSession(db: KembaliDb, customerId: string) {
-  const token = await createSession(db, "customer", customerId, DEMO_TENANT_ID);
+export async function startCustomerSession(
+  db: KembaliDb,
+  customerId: string,
+  tenantId: string = DEMO_TENANT_ID,
+) {
+  const token = await createSession(db, "customer", customerId, tenantId);
   await setCookie(CUSTOMER_COOKIE, token, CUSTOMER_SESSION_TTL_DAYS * 86400);
 }
 

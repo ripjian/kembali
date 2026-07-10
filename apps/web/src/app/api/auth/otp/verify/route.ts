@@ -7,12 +7,15 @@ import { z } from "zod";
 
 import { startCustomerSession } from "@/lib/auth";
 import { OTP_BYPASS_ENABLED } from "@/lib/config";
-import { DEMO_TENANT_ID, getDb } from "@/lib/db";
+import { getDb } from "@/lib/db";
+import { resolveJoinTenantId } from "@/lib/join";
 import { normalizePhone, phoneInputSchema } from "@/lib/phone";
 
 const bodySchema = z.object({
   phone: phoneInputSchema,
   code: z.string().regex(/^\d{6}$/, "Enter the 6-digit code"),
+  // The tenant whose join page issued the code (tenant-scoped join).
+  tenantId: z.string().optional(),
 });
 
 export async function POST(req: Request) {
@@ -29,8 +32,9 @@ export async function POST(req: Request) {
   }
   const { code } = parsed.data;
   const db = await getDb();
+  const tenantId = await resolveJoinTenantId(parsed.data.tenantId);
 
-  const result = await withTenant(db, DEMO_TENANT_ID, async (tx) => {
+  const result = await withTenant(db, tenantId, async (tx) => {
     if (!isOtpBypass(code, OTP_BYPASS_ENABLED)) {
       const [otp] = await tx
         .select()
@@ -68,7 +72,7 @@ export async function POST(req: Request) {
       isNew = true;
       [customer] = await tx
         .insert(schema.customers)
-        .values({ tenantId: DEMO_TENANT_ID, phone })
+        .values({ tenantId, phone })
         .returning();
     }
     if (!customer) return { ok: false as const };
@@ -87,7 +91,7 @@ export async function POST(req: Request) {
         .limit(1);
       if (program) {
         await tx.insert(schema.cards).values({
-          tenantId: DEMO_TENANT_ID,
+          tenantId,
           customerId: customer.id,
           programId: program.id,
         });
@@ -103,6 +107,6 @@ export async function POST(req: Request) {
     );
   }
 
-  await startCustomerSession(db, result.customerId);
+  await startCustomerSession(db, result.customerId, tenantId);
   return NextResponse.json({ ok: true, isNew: result.isNew });
 }

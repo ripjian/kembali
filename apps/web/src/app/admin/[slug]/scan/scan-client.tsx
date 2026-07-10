@@ -3,6 +3,13 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
+import { setServingOutlet } from "@/lib/admin-actions";
+
+interface Outlet {
+  id: string;
+  name: string;
+}
+
 /* Counter flow, two jobs two buttons (Phase 2):
  *  - Scan member: customer QR → optional amount → stamp + points.
  *  - Scan reward: coupon QR/code → see which reward & member → confirm.
@@ -154,25 +161,61 @@ const bigButton =
 export function ScanClient({
   tenantId,
   canRedeem,
+  outlets,
+  servingOutletId,
 }: {
   tenantId: string;
   canRedeem: boolean;
+  /** Empty for single-outlet tenants (no picker needed). */
+  outlets: Outlet[];
+  servingOutletId: string | null;
 }) {
   const [mode, setMode] = useState<"member" | "reward" | null>(null);
+  const multiOutlet = outlets.length > 1;
+
+  // Multi-outlet, not chosen yet today → ask before scanning.
+  if (multiOutlet && !servingOutletId) {
+    return <OutletPrompt tenantId={tenantId} outlets={outlets} />;
+  }
+
+  const outletBar = multiOutlet ? (
+    <OutletBar
+      tenantId={tenantId}
+      outlets={outlets}
+      servingOutletId={servingOutletId!}
+    />
+  ) : null;
 
   if (mode === "member") {
-    return <MemberScan onBack={() => setMode(null)} showBack={canRedeem} />;
+    return (
+      <>
+        {outletBar}
+        <MemberScan onBack={() => setMode(null)} showBack={canRedeem} />
+      </>
+    );
   }
   if (mode === "reward") {
-    return <RewardScan tenantId={tenantId} onBack={() => setMode(null)} />;
+    return (
+      <>
+        {outletBar}
+        <RewardScan tenantId={tenantId} onBack={() => setMode(null)} />
+      </>
+    );
   }
   if (!canRedeem) {
     // Only one job available — skip the chooser.
-    return <MemberScan onBack={() => {}} showBack={false} />;
+    return (
+      <>
+        {outletBar}
+        <MemberScan onBack={() => {}} showBack={false} />
+      </>
+    );
   }
 
   return (
-    <div className="grid gap-3 sm:grid-cols-2" data-scan-chooser>
+    <div className="flex flex-col gap-4">
+      {outletBar}
+      <div className="grid gap-3 sm:grid-cols-2" data-scan-chooser>
       <button type="button" onClick={() => setMode("member")} className={bigButton}>
         <span className="text-3xl" aria-hidden>
           🪪
@@ -191,6 +234,91 @@ export function ScanClient({
           Check a coupon and confirm the redemption
         </span>
       </button>
+      </div>
+    </div>
+  );
+}
+
+/* ---- serving outlet of the day ------------------------------------------- */
+
+function OutletPrompt({ tenantId, outlets }: { tenantId: string; outlets: Outlet[] }) {
+  return (
+    <form
+      action={setServingOutlet}
+      className="flex flex-col gap-3 rounded-2xl border border-border bg-surface p-6"
+    >
+      <input type="hidden" name="tenantId" value={tenantId} />
+      <div>
+        <h2 className="text-base font-semibold text-text">
+          Which outlet are you serving at today?
+        </h2>
+        <p className="mt-1 text-sm text-text-secondary">
+          We&apos;ll tag today&apos;s stamps and rewards to it. You can switch
+          anytime.
+        </p>
+      </div>
+      <select
+        name="outletId"
+        required
+        defaultValue=""
+        className="h-11 w-full rounded-xl border border-border bg-surface px-3 text-sm text-text outline-none focus:border-primary"
+      >
+        <option value="" disabled>
+          Choose an outlet…
+        </option>
+        {outlets.map((o) => (
+          <option key={o.id} value={o.id}>
+            {o.name}
+          </option>
+        ))}
+      </select>
+      <button className="inline-flex h-11 items-center justify-center rounded-xl bg-primary text-sm font-semibold text-on-primary hover:bg-primary-hover">
+        Start serving here
+      </button>
+    </form>
+  );
+}
+
+function OutletBar({
+  tenantId,
+  outlets,
+  servingOutletId,
+}: {
+  tenantId: string;
+  outlets: Outlet[];
+  servingOutletId: string;
+}) {
+  const current = outlets.find((o) => o.id === servingOutletId);
+  return (
+    <div
+      className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border bg-surface-alt px-4 py-2.5"
+      data-outlet-bar
+    >
+      <p className="text-sm text-text-secondary">
+        You&apos;re serving at{" "}
+        <span className="font-semibold text-text" data-serving-outlet>
+          {current?.name ?? "an outlet"}
+        </span>
+      </p>
+      <form action={setServingOutlet} className="flex items-center gap-2">
+        <input type="hidden" name="tenantId" value={tenantId} />
+        <label className="sr-only" htmlFor="switch-outlet">
+          Switch outlet
+        </label>
+        <select
+          id="switch-outlet"
+          name="outletId"
+          defaultValue={servingOutletId}
+          onChange={(e) => e.currentTarget.form?.requestSubmit()}
+          className="h-9 rounded-lg border border-border bg-surface px-2 text-xs text-text outline-none focus:border-primary"
+        >
+          {outlets.map((o) => (
+            <option key={o.id} value={o.id}>
+              {o.name}
+            </option>
+          ))}
+        </select>
+      </form>
     </div>
   );
 }

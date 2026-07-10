@@ -6,6 +6,7 @@ import { desc, eq, gte, sql } from "drizzle-orm";
 import { getDb } from "@/lib/db";
 import { formatDateTime, formatRM } from "@/lib/format";
 import { getPanelContext } from "@/lib/panel";
+import { readServingOutletId } from "@/lib/serving-outlet";
 
 import { ScanClient } from "./scan-client";
 
@@ -23,6 +24,10 @@ export default async function ScanPage({
   dayStart.setHours(0, 0, 0, 0);
 
   const data = await withTenant(db, ctx.tenant.id, async (tx) => {
+    const outlets = await tx
+      .select({ id: schema.outlets.id, name: schema.outlets.name })
+      .from(schema.outlets)
+      .orderBy(schema.outlets.createdAt);
     const todays = await tx
       .select({
         id: schema.stampEvents.id,
@@ -30,10 +35,12 @@ export default async function ScanPage({
         amountCents: schema.stampEvents.amountCents,
         customerName: schema.customers.name,
         customerPhone: schema.customers.phone,
+        outletName: schema.outlets.name,
       })
       .from(schema.stampEvents)
       .innerJoin(schema.cards, eq(schema.stampEvents.cardId, schema.cards.id))
       .innerJoin(schema.customers, eq(schema.cards.customerId, schema.customers.id))
+      .leftJoin(schema.outlets, eq(schema.stampEvents.outletId, schema.outlets.id))
       .where(gte(schema.stampEvents.createdAt, dayStart))
       .orderBy(desc(schema.stampEvents.createdAt))
       .limit(20);
@@ -44,8 +51,12 @@ export default async function ScanPage({
       })
       .from(schema.stampEvents)
       .where(gte(schema.stampEvents.createdAt, dayStart));
-    return { todays, totals };
+    return { outlets, todays, totals };
   });
+
+  // Serving outlet only matters when there's a choice to make.
+  const servingId = data.outlets.length > 1 ? await readServingOutletId(ctx.tenant.id) : null;
+  const multiOutlet = data.outlets.length > 1;
 
   return (
     <main className="flex max-w-2xl flex-col gap-6">
@@ -59,6 +70,8 @@ export default async function ScanPage({
       <ScanClient
         tenantId={ctx.tenant.id}
         canRedeem={ctx.tenant.modules.rewards && ctx.can("redeemRewards")}
+        outlets={multiOutlet ? data.outlets : []}
+        servingOutletId={servingId}
       />
 
       <section className="rounded-xl border border-border bg-surface">
@@ -85,6 +98,7 @@ export default async function ScanPage({
                   </span>
                   <span className="ml-2 text-xs text-text-muted">
                     {formatDateTime(row.createdAt)}
+                    {multiOutlet && row.outletName ? ` · ${row.outletName}` : ""}
                   </span>
                 </span>
                 <span className="tabular-nums text-text" data-stat>

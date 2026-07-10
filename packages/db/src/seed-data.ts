@@ -30,6 +30,7 @@ export const SEED_LOGINS = {
 export const SEED_IDS = {
   tenant: T,
   outlet: "22222222-2222-4222-8222-222222222201",
+  outlet2: "22222222-2222-4222-8222-222222222202",
   staffOwner: "33333333-3333-4333-8333-333333333301",
   staffCashier: "33333333-3333-4333-8333-333333333302",
   program: "44444444-4444-4444-8444-444444444401",
@@ -104,14 +105,33 @@ export async function seed(db: SeedDb, now: Date = new Date()): Promise<SeedSumm
 
   await db
     .insert(schema.outlets)
-    .values({
-      id: SEED_IDS.outlet,
-      tenantId: T,
-      name: "Corner Coffee — SS15 Subang Jaya",
-      lat: 3.0762,
-      lng: 101.5901,
-      timezone: "Asia/Kuala_Lumpur",
-    })
+    .values([
+      {
+        id: SEED_IDS.outlet,
+        tenantId: T,
+        name: "SS15 Subang Jaya",
+        addressLine: "12 Jalan SS15/4",
+        postcode: "47500",
+        city: "Subang Jaya",
+        state: "Selangor",
+        country: "Malaysia",
+        lat: 3.0762,
+        lng: 101.5901,
+        timezone: "Asia/Kuala_Lumpur",
+      },
+      {
+        // Second outlet so the cashier daily-outlet picker has a choice.
+        id: SEED_IDS.outlet2,
+        tenantId: T,
+        name: "Bangsar Village",
+        addressLine: "2 Jalan Telawi 5",
+        postcode: "59100",
+        city: "Bangsar",
+        state: "Kuala Lumpur",
+        country: "Malaysia",
+        timezone: "Asia/Kuala_Lumpur",
+      },
+    ])
     .onConflictDoNothing();
 
   await db
@@ -294,6 +314,7 @@ export async function seed(db: SeedDb, now: Date = new Date()): Promise<SeedSumm
     source: "transaction" as const,
     staffId: SEED_IDS.staffCashier,
     stampEventId: event.id,
+    outletId: SEED_IDS.outlet,
     createdAt: event.createdAt,
   }));
   await db.insert(schema.pointEvents).values(pointEvents).onConflictDoNothing();
@@ -333,7 +354,16 @@ export async function seed(db: SeedDb, now: Date = new Date()): Promise<SeedSumm
     .onConflictDoNothing();
   await db
     .insert(schema.outlets)
-    .values({ id: SEED_IDS.starterOutlet, tenantId: B, name: "Bloom Bakery — Bangsar" })
+    .values({
+      id: SEED_IDS.starterOutlet,
+      tenantId: B,
+      name: "Bangsar",
+      addressLine: "8 Jalan Telawi",
+      postcode: "59100",
+      city: "Bangsar",
+      state: "Kuala Lumpur",
+      country: "Malaysia",
+    })
     .onConflictDoNothing();
   await db
     .insert(schema.staffUsers)
@@ -361,7 +391,7 @@ export async function seed(db: SeedDb, now: Date = new Date()): Promise<SeedSumm
 
   return {
     tenants: 2,
-    outlets: 2,
+    outlets: 3,
     staff: 3,
     programs: 2,
     customers: 3,

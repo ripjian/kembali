@@ -71,6 +71,20 @@
       "when": 1783628015083,
       "tag": "0009_points_guards",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1783668511043,
+      "tag": "0010_outlets_attribution",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1783668524615,
+      "tag": "0011_migrate_address_to_outlet",
+      "breakpoints": true
     }
   ]
 }

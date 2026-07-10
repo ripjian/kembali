@@ -16,6 +16,7 @@ import { getAdminContext } from "@/lib/auth";
 import { qrTokenSecret } from "@/lib/config";
 import { getDb } from "@/lib/db";
 import { parseModules } from "@/lib/modules";
+import { resolveEventOutletId } from "@/lib/serving-outlet";
 
 const bodySchema = z.object({
   /** Signed QR token from the customer's card (camera or paste). */
@@ -109,18 +110,17 @@ export async function POST(req: Request) {
       };
     }
 
-    const [outlet] = await tx
-      .select({ id: schema.outlets.id })
-      .from(schema.outlets)
-      .limit(1);
-    if (!outlet) return { error: "This store has no outlet configured yet." };
+    // Attribute to the cashier's serving outlet of the day (falls back to
+    // the tenant's first outlet). ROADMAP §? / Decision Log 2026-07-11.
+    const servingOutletId = await resolveEventOutletId(tx, tenantId);
+    if (!servingOutletId) return { error: "This store has no outlet configured yet." };
 
     const [stampEvent] = await tx
       .insert(schema.stampEvents)
       .values({
         tenantId,
         cardId: card.id,
-        outletId: outlet.id,
+        outletId: servingOutletId,
         staffId: admin.kind === "staff" ? admin.subjectId : null,
         source,
         amountCents: parsed.data.amountCents ?? null,
@@ -141,6 +141,7 @@ export async function POST(req: Request) {
         source: "transaction",
         staffId: admin.kind === "staff" ? admin.subjectId : null,
         stampEventId: stampEvent.id,
+        outletId: servingOutletId,
       });
     }
 

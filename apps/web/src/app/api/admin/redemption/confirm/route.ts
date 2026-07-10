@@ -8,6 +8,7 @@ import { z } from "zod";
 import { getAdminContext } from "@/lib/auth";
 import { getDb } from "@/lib/db";
 import { authorizeRedeem } from "@/lib/redemption-api";
+import { resolveEventOutletId } from "@/lib/serving-outlet";
 
 /* Confirm a coupon at the counter. Single-use is enforced by the atomic
  * state-guarded UPDATE (proven under concurrency in packages/db tests);
@@ -77,6 +78,9 @@ export async function POST(req: Request) {
       return { error: "The member doesn't have enough points anymore." };
     }
 
+    // Attribute the redemption to the cashier's serving outlet of the day.
+    const servingOutletId = await resolveEventOutletId(tx, tenantId);
+
     // Atomic single-use flip: only one concurrent confirm matches this row.
     const [won] = await tx
       .update(schema.redemptions)
@@ -84,6 +88,7 @@ export async function POST(req: Request) {
         state: "redeemed",
         redeemedAt: new Date(),
         redeemedByStaffId: admin.kind === "staff" ? admin.subjectId : null,
+        outletId: servingOutletId,
       })
       .where(
         and(
@@ -102,6 +107,7 @@ export async function POST(req: Request) {
       source: "redemption",
       staffId: admin.kind === "staff" ? admin.subjectId : null,
       redemptionId: coupon.id,
+      outletId: servingOutletId,
     });
     await tx.insert(schema.auditLog).values({
       tenantId,

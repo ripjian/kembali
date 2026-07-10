@@ -1,5 +1,6 @@
 "use server";
 
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 import {
@@ -18,6 +19,7 @@ import { modulesSchema } from "./modules";
 import { authorizeTenantAction } from "./panel";
 import { normalizePhone } from "./phone";
 import { PLAN_TYPES } from "./plans";
+import { servingCookieValue } from "./serving-outlet";
 
 /* Server actions for the admin panel. Authorization = session identity +
  * per-role permission (lib/panel.ts) + RLS underneath. Privileged/platform
@@ -258,6 +260,34 @@ export async function updateTenant(formData: FormData) {
     });
   });
   redirect("/admin/merchants?saved=1");
+}
+
+/* ---- cashier: serving outlet of the day --------------------------------- */
+
+export async function setServingOutlet(formData: FormData) {
+  const tenantId = z.uuid().safeParse(formData.get("tenantId"));
+  const outletId = z.uuid().safeParse(formData.get("outletId"));
+  if (!tenantId.success || !outletId.success) redirect("/admin");
+  const { slug } = await authorizeTenantAction(tenantId.data, "scan");
+
+  const db = await getDb();
+  const ok = await withTenant(db, tenantId.data, async (tx) => {
+    const [outlet] = await tx
+      .select({ id: schema.outlets.id })
+      .from(schema.outlets)
+      .where(eq(schema.outlets.id, outletId.data));
+    return Boolean(outlet);
+  });
+  if (ok) {
+    const c = servingCookieValue(tenantId.data, outletId.data);
+    (await cookies()).set(c.name, c.value, {
+      httpOnly: true,
+      sameSite: "lax",
+      path: "/",
+      maxAge: c.maxAge,
+    });
+  }
+  redirect(`/admin/${slug}/scan`);
 }
 
 /* ---- team --------------------------------------------------------------- */

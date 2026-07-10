@@ -131,6 +131,14 @@ export const outlets = pgTable(
     id: id(),
     tenantId: tenantId(),
     name: text("name").notNull(),
+    /** Address lives on the outlet — the attribution + billing unit
+     * (Decision Log 2026-07-11). tenants.address_* is deprecated; migration
+     * 0011 copies it into each tenant's first outlet. */
+    addressLine: text("address_line"),
+    postcode: text("postcode"),
+    city: text("city"),
+    state: text("state"),
+    country: text("country"),
     lat: doublePrecision("lat"),
     lng: doublePrecision("lng"),
     timezone: text("timezone").notNull().default("Asia/Kuala_Lumpur"),
@@ -391,6 +399,9 @@ export const pointEvents = pgTable(
     /** Required for adjustments — customer-visible in their history. */
     reason: text("reason"),
     staffId: uuid("staff_id").references(() => staffUsers.id),
+    /** Outlet this movement is attributed to (Decision Log 2026-07-11);
+     * nullable for adjustments made from the back office. */
+    outletId: uuid("outlet_id").references(() => outlets.id),
     /** Set for source=transaction: the stamp event the points came from. */
     stampEventId: uuid("stamp_event_id").references(() => stampEvents.id),
     /** Set for source=redemption: the coupon the points paid for. */

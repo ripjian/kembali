@@ -3,6 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 
+import { contrastRatio, deriveTenantTheme } from "@kembali/core";
+
 import { ImageDataUrlInput, inputClass, Modal } from "@/components/admin/form-bits";
 import { createTenant, updateTenant } from "@/lib/admin-actions";
 import { modulesForPlan, type TenantModules } from "@/lib/modules";
@@ -186,6 +188,145 @@ function OwnerSection() {
   );
 }
 
+const KEMBALI_PRIMARY = "#0f3d32";
+const KEMBALI_ACCENT = "#e0684b";
+const PREVIEW_SURFACE = "#ffffff"; // the customer card is white in light mode
+
+function ContrastBadge({ ratio, label }: { ratio: number; label: string }) {
+  const ok = ratio >= 4.5;
+  return (
+    <span
+      className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium ${
+        ok
+          ? "bg-success/15 text-success"
+          : "bg-warning/15 text-warning"
+      }`}
+    >
+      {label} {ratio.toFixed(1)}:1 {ok ? "AA" : "low"}
+    </span>
+  );
+}
+
+/** Platform-admin brand theming: two colour pickers, a live customer-card
+ * preview and live AA badges. Colours are derived with the same
+ * @kembali/core maths the customer surfaces use, so this preview matches
+ * production. Empty (toggle off) clears back to the Kembali default. */
+function ThemeSection({
+  defaults,
+}: {
+  defaults?: { brandPrimary: string | null; brandAccent: string | null };
+}) {
+  const [enabled, setEnabled] = useState(
+    Boolean(defaults?.brandPrimary || defaults?.brandAccent),
+  );
+  const [primary, setPrimary] = useState(defaults?.brandPrimary ?? KEMBALI_PRIMARY);
+  const [accent, setAccent] = useState(defaults?.brandAccent ?? KEMBALI_ACCENT);
+
+  const theme = deriveTenantTheme(primary, accent, PREVIEW_SURFACE);
+  const buttonRatio = contrastRatio(theme.onPrimary, theme.primary);
+  const primaryOnSurface = contrastRatio(primary, PREVIEW_SURFACE);
+
+  return (
+    <>
+      <SectionLabel>Brand theme</SectionLabel>
+      <label className="inline-flex items-center gap-2 text-xs text-text-secondary">
+        <input
+          type="checkbox"
+          checked={enabled}
+          onChange={(e) => setEnabled(e.target.checked)}
+          className="size-4 accent-[var(--primary)]"
+        />
+        Use custom brand colours (off keeps the Kembali default)
+      </label>
+      {/* Hidden inputs carry the submitted values; empty means "default". */}
+      <input type="hidden" name="brandPrimary" value={enabled ? primary : ""} />
+      <input type="hidden" name="brandAccent" value={enabled ? accent : ""} />
+
+      {enabled && (
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="flex flex-col gap-3">
+            <label className="flex items-center justify-between text-xs font-medium text-text">
+              Primary (buttons, links, progress)
+              <input
+                type="color"
+                value={primary}
+                onChange={(e) => setPrimary(e.target.value)}
+                className="h-8 w-12 cursor-pointer rounded border border-border bg-surface"
+                aria-label="Primary colour"
+              />
+            </label>
+            <label className="flex items-center justify-between text-xs font-medium text-text">
+              Accent (stamps, rewards)
+              <input
+                type="color"
+                value={accent}
+                onChange={(e) => setAccent(e.target.value)}
+                className="h-8 w-12 cursor-pointer rounded border border-border bg-surface"
+                aria-label="Accent colour"
+              />
+            </label>
+            <div className="flex flex-wrap gap-1.5">
+              <ContrastBadge label="Button text" ratio={buttonRatio} />
+              <ContrastBadge label="Primary on card" ratio={primaryOnSurface} />
+            </div>
+            <p className="text-[11px] text-text-muted">
+              Text and progress are auto-tuned to stay readable, so a low
+              &quot;primary on card&quot; score is corrected on the customer&apos;s
+              screen. Aim for AA on both where you can.
+            </p>
+          </div>
+
+          {/* Live customer-card preview on a white surface */}
+          <div
+            className="rounded-xl border border-border p-4"
+            style={{ backgroundColor: PREVIEW_SURFACE }}
+          >
+            <div className="flex items-baseline justify-between">
+              <p className="text-xs font-semibold" style={{ color: "#16261e" }}>
+                Stamp card
+              </p>
+              <p className="font-mono text-[10px]" style={{ color: "#8b9689" }}>
+                4/10
+              </p>
+            </div>
+            <div className="mt-3 grid grid-cols-5 gap-1.5">
+              {Array.from({ length: 10 }, (_, i) => (
+                <span
+                  key={i}
+                  className="aspect-square w-full rounded-full"
+                  style={
+                    i < 4
+                      ? { backgroundColor: theme.accent }
+                      : { border: "2px dashed #dcd5bf" }
+                  }
+                />
+              ))}
+            </div>
+            <div
+              className="mt-3 h-1.5 w-full overflow-hidden rounded-full"
+              style={{ backgroundColor: "#ede6d2" }}
+            >
+              <div
+                className="h-full rounded-full"
+                style={{ width: "40%", backgroundColor: theme.primary }}
+              />
+            </div>
+            <p className="mt-2 text-[10px]" style={{ color: theme.primaryText }}>
+              6 more stamps to a free coffee
+            </p>
+            <span
+              className="mt-3 flex h-8 items-center justify-center rounded-lg text-[11px] font-semibold"
+              style={{ backgroundColor: theme.primary, color: theme.onPrimary }}
+            >
+              Show QR to collect stamps
+            </span>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
 export function CreateMerchantButton() {
   return (
     <Modal
@@ -216,6 +357,8 @@ export function EditMerchantButton({
     plan: string;
     logoUrl: string | null;
     modules: TenantModules;
+    brandPrimary: string | null;
+    brandAccent: string | null;
   };
 }) {
   return (
@@ -228,6 +371,7 @@ export function EditMerchantButton({
         <input type="hidden" name="tenantId" value={tenant.id} />
         <GeneralSection defaults={tenant} />
         <PlanModulesSection defaultPlan={tenant.plan} defaultModules={tenant.modules} />
+        <ThemeSection defaults={tenant} />
         <p className="text-xs text-text-muted">
           Outlets and their addresses are managed per branch.
         </p>

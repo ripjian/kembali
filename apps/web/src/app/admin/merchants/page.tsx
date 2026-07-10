@@ -95,6 +95,8 @@ export default async function MerchantsPage({
         plan: schema.tenants.plan,
         logoUrl: schema.tenants.logoUrl,
         modules: schema.tenants.modules,
+        brandPrimary: schema.tenants.brandPrimary,
+        brandAccent: schema.tenants.brandAccent,
         createdAt: schema.tenants.createdAt,
       })
       .from(schema.tenants)
@@ -302,6 +304,8 @@ export default async function MerchantsPage({
                           plan: t.plan,
                           logoUrl: t.logoUrl,
                           modules: parseModules(t.modules),
+                          brandPrimary: t.brandPrimary,
+                          brandAccent: t.brandAccent,
                         }}
                       />
                       <ManageMerchantButton name={t.name} slug={t.slug} />

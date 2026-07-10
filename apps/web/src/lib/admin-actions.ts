@@ -105,11 +105,22 @@ const logoSchema = z
 
 // Address now lives on outlets (Decision Log 2026-07-11); tenants.address_*
 // is deprecated and no longer written from here.
+// Hex brand colour or empty (empty clears it back to the Kembali default).
+// Platform-admin only; merchants never submit this.
+const brandColorSchema = z
+  .string()
+  .trim()
+  .transform((v) => v.toLowerCase())
+  .refine((v) => v === "" || /^#[0-9a-f]{6}$/.test(v), "invalid hex colour")
+  .transform((v) => (v === "" ? null : v));
+
 const merchantProfileSchema = z.object({
   name: z.string().trim().min(2).max(80),
   plan: z.enum(PLAN_TYPES),
   logoDataUrl: logoSchema,
   modules: modulesSchema,
+  brandPrimary: brandColorSchema,
+  brandAccent: brandColorSchema,
 });
 
 function readMerchantProfile(formData: FormData) {
@@ -124,6 +135,8 @@ function readMerchantProfile(formData: FormData) {
       points: formData.get("mod_points") === "on",
       rewards: formData.get("mod_rewards") === "on",
     },
+    brandPrimary: formData.get("brandPrimary") ?? "",
+    brandAccent: formData.get("brandAccent") ?? "",
   });
 }
 
@@ -209,6 +222,8 @@ export async function createTenant(formData: FormData) {
         plan: p.plan,
         logoUrl: p.logoDataUrl || null,
         modules: p.modules,
+        brandPrimary: p.brandPrimary,
+        brandAccent: p.brandAccent,
         pointsPerRm: extra.data.pointsPerRm,
       })
       .onConflictDoNothing()
@@ -277,6 +292,9 @@ export async function updateTenant(formData: FormData) {
         plan: p.plan,
         ...(p.logoDataUrl ? { logoUrl: p.logoDataUrl } : {}),
         modules: p.modules,
+        // Brand colours: null clears back to the Kembali default theme.
+        brandPrimary: p.brandPrimary,
+        brandAccent: p.brandAccent,
       })
       .where(eq(schema.tenants.id, tenantId.data));
     await audit(tx, {

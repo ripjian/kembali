@@ -67,6 +67,12 @@ export default async function AdminOverviewPage({
 
   return (
     <main className="flex flex-col gap-6">
+      {/* Founder-approved exception to the English-only rule (2026-07-11):
+          this one greeting on the merchant overview may use Malay. Nothing
+          else may — see brand/BRAND.md §5 and ROADMAP §13. */}
+      <p className="text-lg font-medium text-text" data-greeting>
+        Selamat kembali ke {ctx.tenant.name} 👋
+      </p>
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold text-text">Overview</h1>

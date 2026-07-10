@@ -21,7 +21,8 @@ system admin).
 | Auth / OTP | customer · `/app/login`, `/api/auth/otp/*` | customer | Phone OTP login/register; dev bypass `888888` (non-prod only) | — | All | 1 | Live |
 | Stamp card | customer · `/app` | customer | Branded card, stamp progress, earned rewards, recent visits | — | All | 1 | Live |
 | Show QR | customer · `/app` modal, `/api/app/qr-token` | customer | Rotating signed QR (90s TTL) + fallback code to collect stamps | — | All | 1 | Live |
-| Scan-to-stamp | cashier · `/admin/[slug]/scan` (Scan member), `/api/admin/stamp` | cashier, merchant admin | Scan a member's QR, key in amount, add a stamp (+ points) | `scan` | All | 1 | Live |
+| Scan-to-stamp | cashier · `/admin/[slug]/scan` (Scan member), `/api/admin/stamp` | cashier, merchant admin | Scan a member's QR, key in amount, add a stamp (+ points); attributed to the serving outlet | `scan` | All | 1 | Live |
+| Outlets & attribution | cashier · `/admin/[slug]/scan`; system · all event writes | cashier, merchant admin | Cashier picks a serving outlet once/day (skipped for single-outlet); every stamp/point/redemption records `outlet_id`. Per-branch permissions + cross-outlet analytics are Phase 6 | `scan` (to set) | All | 1 (light), 6 (deep) | Live |
 | Points accrual | system · `/api/admin/stamp` | (automatic) | Earns points from the keyed-in amount × the tenant rate; append-only `point_events`, read-only `points_balance` | — (module: points) | All | 2 | Live |
 | Points settings / rate | merchant admin · `/admin/[slug]/rewards` | merchant admin | Set RM→points rate (0 pauses earning) | `manageRewards` | All | 2 | Live |
 | Point adjustments | merchant admin · `/admin/[slug]/customers/[id]` | merchant admin | Add/deduct points with a required reason; ledgered + customer-visible; floored at zero | `adjustPoints` | All | 2 | Live |
@@ -31,10 +32,11 @@ system admin).
 | Customers CRM | merchant admin · `/admin/[slug]/customers` (+ `/[id]`, `/new`) | merchant admin | List with search/sort/filter + clickable rows; detail with stats & history; create; edit in a modal | `manageCustomers` (view/create), `editCustomers` (edit) | All | 1 | Live |
 | Team & roles | merchant admin · `/admin/[slug]/team` | merchant admin | Add/edit/remove staff (one modal), per-tenant role-permission matrix | `manageTeam` | All | 1 | Live |
 | Reports overview | merchant admin · `/admin/[slug]/reports` | merchant admin | Headline tiles + previews (latest 25 each) with "See full report" links | `viewReports` | All | 1 (+2 points/rewards) | Live |
-| Full reports | merchant admin · `/admin/[slug]/reports/{customers,transactions,rewards}` | merchant admin | Paginated reports with date range; transactions unify stamps + points + amounts with a type filter | `viewReports` | All | 2 | Live |
+| Full reports | merchant admin · `/admin/[slug]/reports/{customers,transactions,rewards}` | merchant admin | Paginated reports with date range; transactions unify stamps + points + amounts with type + outlet filters (outlet hidden for single-outlet) | `viewReports` | All | 2 | Live |
 | Report downloads (CSV) | merchant admin · `/admin/[slug]/reports/export` | merchant admin | CSV of the analytics reports above | `viewReports` + plan gate | **Founding + Growth** | 2 | Live |
 | Rewards / points module toggles | platform admin · `/admin/merchants` create/edit | platform admin | Enable/disable per-tenant modules (stamps, scan, reports, points, rewards) | platform only | All | 1 | Live |
-| Merchant directory | platform admin · `/admin/merchants` | platform admin | Search/filter/sort/paginate; create & edit merchants (plan, address, logo, modules) | platform only | n/a | 1 | Live |
+| Merchant directory | platform admin · `/admin/merchants` | platform admin | Search/filter/sort/paginate; sectioned create (General → Plan & modules → Program → Outlets → Owner) with repeatable outlets incl. postcode; edit plan/modules/logo. Location reads the first outlet | platform only | n/a | 1 | Live |
+| Admin appearance & nav | merchant + platform admin · admin sidebar/drawer | merchant + platform admin | Auto/Light/Dark toggle (persisted); Reports submenu; sticky full-height rail; left hamburger drawer below `lg` | — | All | 1 | Live |
 | Audit log | system · written by privileged actions | platform + merchant admin | Append-only record of privileged actions (staff, points, redemptions, tenant changes) | — (write); viewer UI planned | All | 1 | Live (viewer UI planned) |
 | Marketing site | public · `/`, `/roadmap`, `/pricing` | prospect | Landing (with reach-out qualifier), public roadmap, pricing | — | n/a | 0.5–2 | Live |
 

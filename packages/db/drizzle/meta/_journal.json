@@ -92,6 +92,13 @@
       "when": 1783669767369,
       "tag": "0012_outlets_platform_policy",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1783704640722,
+      "tag": "0013_tenant_brand_colors",
+      "breakpoints": true
     }
   ]
 }

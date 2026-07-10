@@ -84,6 +84,13 @@ export const tenants = pgTable(
     branding: jsonb("branding").notNull().default({}),
     /** Square brand logo - data URL in v1, object storage later. */
     logoUrl: text("logo_url"),
+    /** Per-tenant brand colours, set by the PLATFORM admin only (never
+     * merchant-side). Null = the Kembali default Pandan theme (BRAND.md).
+     * Stored as hex; on-colours and readable text/line variants are derived
+     * at render time via @kembali/core deriveTenantTheme so every pairing
+     * clears WCAG AA. */
+    brandPrimary: text("brand_primary"),
+    brandAccent: text("brand_accent"),
     addressLine: text("address_line"),
     city: text("city"),
     state: text("state"),

@@ -98,7 +98,11 @@ export async function seed(db: SeedDb, now: Date = new Date()): Promise<SeedSumm
       city: "Subang Jaya",
       state: "Selangor",
       country: "Malaysia",
-      // Default theme = Pandan palette (BRAND.md); white-label overrides later.
+      // Corner Coffee shows off a custom theme (a warm coffee brown + amber);
+      // the platform admin set these. Bloom Bakery leaves them null to keep the
+      // Kembali default Pandan theme, so both states are visible in the demo.
+      brandPrimary: "#5b3a29",
+      brandAccent: "#d98a2b",
       branding: { primaryColor: "#0F3D32", accentColor: "#E0684B" },
     })
     .onConflictDoNothing();

@@ -61,6 +61,39 @@
   }
 }
 
+/* Explicit theme override (admin light/dark toggle). Set on the admin
+   subtree via data-theme; wins over prefers-color-scheme because the
+   attribute selector outranks a plain :root. */
+[data-theme="light"] {
+  --bg: #f6f1e3;
+  --surface: #ffffff;
+  --surface-alt: #ede6d2;
+  --text: #16261e;
+  --text-secondary: #5c6b60;
+  --text-muted: #8b9689;
+  --border: #dcd5bf;
+  --primary: #0f3d32;
+  --primary-hover: #0a2c24;
+  --on-primary: #ffffff;
+  --accent: #e0684b;
+  --accent-deep: #a93e24;
+}
+
+[data-theme="dark"] {
+  --bg: #10201a;
+  --surface: #182b23;
+  --surface-alt: #20362c;
+  --text: #edeee2;
+  --text-secondary: #afbca9;
+  --text-muted: #7e8c80;
+  --border: #2f443a;
+  --primary: #3e8a72;
+  --primary-hover: color-mix(in srgb, #3e8a72 85%, black);
+  --on-primary: #0b1712;
+  --accent: #ec7f63;
+  --accent-deep: #f4a98f;
+}
+
 /* Map tokens into Tailwind v4 theme → utilities like bg-bg, text-text,
    bg-primary, text-on-primary, bg-accent, bg-leaf, border-border. */
 @theme inline {

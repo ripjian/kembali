@@ -17,6 +17,7 @@ import { destroySessions, getAdminContext, startAdminSession } from "./auth";
 import { getDb } from "./db";
 import { modulesSchema } from "./modules";
 import { authorizeTenantAction } from "./panel";
+import { THEME_COOKIE } from "./admin-theme";
 import { normalizePhone } from "./phone";
 import { PLAN_TYPES } from "./plans";
 import { servingCookieValue } from "./serving-outlet";
@@ -289,6 +290,27 @@ export async function updateTenant(formData: FormData) {
     });
   });
   redirect("/admin/merchants?saved=1");
+}
+
+/* ---- admin appearance ---------------------------------------------------- */
+
+export async function setAdminTheme(formData: FormData) {
+  const theme = z
+    .enum(["light", "dark", ""])
+    .catch("")
+    .parse(formData.get("theme"));
+  const store = await cookies();
+  if (theme === "") {
+    store.delete(THEME_COOKIE);
+  } else {
+    store.set(THEME_COOKIE, theme, {
+      httpOnly: true,
+      sameSite: "lax",
+      path: "/",
+      maxAge: 365 * 24 * 60 * 60,
+    });
+  }
+  // No redirect — the current route re-renders with the new cookie.
 }
 
 /* ---- cashier: serving outlet of the day --------------------------------- */

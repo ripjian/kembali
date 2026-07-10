@@ -186,6 +186,19 @@
   transform-origin: top right;
 }
 
+/* Mobile nav drawer — slide in from the left. */
+@keyframes admin-drawer-in {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: none;
+  }
+}
+.admin-drawer {
+  animation: admin-drawer-in 200ms var(--ease-out-strong) both;
+}
+
 /* ---------- roadmap illustrations (decorative loops) ------------------ */
 /* Loops pause until their section is in view (animation-play-state). */
 
@@ -521,7 +534,8 @@
   }
   .admin-modal[open],
   .admin-modal[open]::backdrop,
-  .admin-menu {
+  .admin-menu,
+  .admin-drawer {
     animation-duration: 1ms;
   }
   .press:active {

@@ -9,7 +9,7 @@ import {
   type RolePermissionMatrix,
 } from "@kembali/core";
 import { schema, withPlatform, withTenant, type KembaliDb } from "@kembali/db";
-import { and, asc, eq } from "drizzle-orm";
+import { and, asc, eq, ne, sql } from "drizzle-orm";
 import { z } from "zod";
 
 import { destroySessions, getAdminContext, startAdminSession } from "./auth";
@@ -262,62 +262,6 @@ export async function updateTenant(formData: FormData) {
 
 /* ---- team --------------------------------------------------------------- */
 
-export async function setStaffRole(formData: FormData) {
-  const tenantId = z.uuid().safeParse(formData.get("tenantId"));
-  const staffId = z.uuid().safeParse(formData.get("staffId"));
-  const role = z.enum(["owner", "manager", "cashier"]).safeParse(formData.get("role"));
-  if (!tenantId.success || !staffId.success || !role.success) redirect("/admin");
-  const { admin, slug } = await authorizeTenantAction(tenantId.data, "manageTeam");
-
-  const db = await getDb();
-  await withTenant(db, tenantId.data, async (tx) => {
-    await tx
-      .update(schema.staffUsers)
-      .set({ role: role.data })
-      .where(eq(schema.staffUsers.id, staffId.data));
-    await audit(tx, {
-      tenantId: tenantId.data,
-      actorType: admin.kind,
-      actorId: admin.subjectId,
-      action: "staff.role_changed",
-      entity: "staff_user",
-      entityId: staffId.data,
-      meta: { role: role.data },
-    });
-  });
-  redirect(`/admin/${slug}/team`);
-}
-
-export async function resetStaffPassword(formData: FormData) {
-  const admin = await requirePlatform();
-  const staffId = z.uuid().safeParse(formData.get("staffId"));
-  const password = z.string().min(8).safeParse(formData.get("password"));
-  const slug = z.string().min(1).safeParse(formData.get("slug"));
-  if (!staffId.success || !password.success || !slug.success) {
-    redirect("/admin/merchants");
-  }
-
-  const db = await getDb();
-  await withPlatform(db, async (tx) => {
-    const [staff] = await tx
-      .update(schema.staffUsers)
-      .set({ passwordHash: hashPassword(password.data) })
-      .where(eq(schema.staffUsers.id, staffId.data))
-      .returning();
-    if (staff) {
-      await audit(tx, {
-        tenantId: staff.tenantId,
-        actorType: "platform",
-        actorId: admin.subjectId,
-        action: "staff.password_reset",
-        entity: "staff_user",
-        entityId: staff.id,
-      });
-    }
-  });
-  redirect(`/admin/${slug.data}/team?reset=1`);
-}
-
 export async function saveRolePermissions(formData: FormData) {
   const tenantId = z.uuid().safeParse(formData.get("tenantId"));
   if (!tenantId.success) redirect("/admin");
@@ -350,6 +294,188 @@ export async function saveRolePermissions(formData: FormData) {
     });
   });
   redirect(`/admin/${slug}/team?permissions=1`);
+}
+
+const staffFieldsSchema = z.object({
+  name: z.string().trim().min(2).max(120),
+  email: z.email(),
+  role: z.enum(["owner", "manager", "cashier"]),
+});
+
+export async function createStaff(formData: FormData) {
+  const tenantId = z.uuid().safeParse(formData.get("tenantId"));
+  if (!tenantId.success) redirect("/admin");
+  const { admin, slug } = await authorizeTenantAction(tenantId.data, "manageTeam");
+  const parsed = staffFieldsSchema.safeParse({
+    name: formData.get("name"),
+    email: formData.get("email"),
+    role: formData.get("role"),
+  });
+  const password = z.string().min(8).safeParse(formData.get("password"));
+  if (!parsed.success || !password.success) {
+    redirect(`/admin/${slug}/team?error=invalid`);
+  }
+
+  const db = await getDb();
+  const created = await withTenant(db, tenantId.data, async (tx) => {
+    const [existing] = await tx
+      .select({ id: schema.staffUsers.id })
+      .from(schema.staffUsers)
+      .where(eq(schema.staffUsers.email, parsed.data.email));
+    if (existing) return false;
+    const [row] = await tx
+      .insert(schema.staffUsers)
+      .values({
+        tenantId: tenantId.data,
+        name: parsed.data.name,
+        email: parsed.data.email,
+        role: parsed.data.role,
+        passwordHash: hashPassword(password.data),
+      })
+      .returning({ id: schema.staffUsers.id });
+    await audit(tx, {
+      tenantId: tenantId.data,
+      actorType: admin.kind,
+      actorId: admin.subjectId,
+      action: "staff.created",
+      entity: "staff_user",
+      entityId: row?.id,
+      meta: { role: parsed.data.role },
+    });
+    return true;
+  });
+  redirect(`/admin/${slug}/team?${created ? "added=1" : "error=exists"}`);
+}
+
+export async function updateStaff(formData: FormData) {
+  const tenantId = z.uuid().safeParse(formData.get("tenantId"));
+  const staffId = z.uuid().safeParse(formData.get("staffId"));
+  if (!tenantId.success || !staffId.success) redirect("/admin");
+  const { admin, slug } = await authorizeTenantAction(tenantId.data, "manageTeam");
+  const parsed = staffFieldsSchema.safeParse({
+    name: formData.get("name"),
+    email: formData.get("email"),
+    role: formData.get("role"),
+  });
+  // Optional "set new password" — blank means keep the current one.
+  const rawPassword = String(formData.get("password") ?? "");
+  if (!parsed.success || (rawPassword !== "" && rawPassword.length < 8)) {
+    redirect(`/admin/${slug}/team?error=invalid`);
+  }
+
+  const db = await getDb();
+  const ok = await withTenant(db, tenantId.data, async (tx) => {
+    const [target] = await tx
+      .select()
+      .from(schema.staffUsers)
+      .where(eq(schema.staffUsers.id, staffId.data));
+    if (!target) return false;
+    // Don't strand the store: the last owner can't be demoted.
+    if (target.role === "owner" && parsed.data.role !== "owner") {
+      const [owners] = await tx
+        .select({ n: sql`count(*)::int`.mapWith(Number) })
+        .from(schema.staffUsers)
+        .where(eq(schema.staffUsers.role, "owner"));
+      if ((owners?.n ?? 0) <= 1) return "lastowner";
+    }
+    // Email must stay unique within the store.
+    const [clash] = await tx
+      .select({ id: schema.staffUsers.id })
+      .from(schema.staffUsers)
+      .where(
+        and(
+          eq(schema.staffUsers.email, parsed.data.email),
+          ne(schema.staffUsers.id, staffId.data),
+        ),
+      );
+    if (clash) return "exists";
+
+    await tx
+      .update(schema.staffUsers)
+      .set({
+        name: parsed.data.name,
+        email: parsed.data.email,
+        role: parsed.data.role,
+        ...(rawPassword ? { passwordHash: hashPassword(rawPassword) } : {}),
+      })
+      .where(eq(schema.staffUsers.id, staffId.data));
+    await audit(tx, {
+      tenantId: tenantId.data,
+      actorType: admin.kind,
+      actorId: admin.subjectId,
+      action: "staff.updated",
+      entity: "staff_user",
+      entityId: staffId.data,
+      meta: { role: parsed.data.role, passwordChanged: Boolean(rawPassword) },
+    });
+    return true;
+  });
+  if (ok === "lastowner") redirect(`/admin/${slug}/team?error=lastowner`);
+  if (ok === "exists") redirect(`/admin/${slug}/team?error=exists`);
+  redirect(`/admin/${slug}/team?saved=1`);
+}
+
+export async function deleteStaff(formData: FormData) {
+  const tenantId = z.uuid().safeParse(formData.get("tenantId"));
+  const staffId = z.uuid().safeParse(formData.get("staffId"));
+  if (!tenantId.success || !staffId.success) redirect("/admin");
+  const { admin, slug } = await authorizeTenantAction(tenantId.data, "manageTeam");
+
+  // You can't remove yourself.
+  if (admin.kind === "staff" && admin.subjectId === staffId.data) {
+    redirect(`/admin/${slug}/team?error=self`);
+  }
+
+  const db = await getDb();
+  const result = await withTenant(db, tenantId.data, async (tx) => {
+    const [target] = await tx
+      .select()
+      .from(schema.staffUsers)
+      .where(eq(schema.staffUsers.id, staffId.data));
+    if (!target) return "gone";
+    if (target.role === "owner") {
+      const [owners] = await tx
+        .select({ n: sql`count(*)::int`.mapWith(Number) })
+        .from(schema.staffUsers)
+        .where(eq(schema.staffUsers.role, "owner"));
+      if ((owners?.n ?? 0) <= 1) return "lastowner";
+    }
+    // Ledgers reference the staff id and are append-only, so a member with
+    // history can't be erased without breaking the record — block it and
+    // suggest changing their role instead.
+    const [stampRef] = await tx
+      .select({ n: sql`count(*)::int`.mapWith(Number) })
+      .from(schema.stampEvents)
+      .where(eq(schema.stampEvents.staffId, staffId.data));
+    const [pointRef] = await tx
+      .select({ n: sql`count(*)::int`.mapWith(Number) })
+      .from(schema.pointEvents)
+      .where(eq(schema.pointEvents.staffId, staffId.data));
+    const [redRef] = await tx
+      .select({ n: sql`count(*)::int`.mapWith(Number) })
+      .from(schema.redemptions)
+      .where(eq(schema.redemptions.redeemedByStaffId, staffId.data));
+    if ((stampRef?.n ?? 0) + (pointRef?.n ?? 0) + (redRef?.n ?? 0) > 0) {
+      return "hasactivity";
+    }
+
+    await tx.delete(schema.staffUsers).where(eq(schema.staffUsers.id, staffId.data));
+    await audit(tx, {
+      tenantId: tenantId.data,
+      actorType: admin.kind,
+      actorId: admin.subjectId,
+      action: "staff.deleted",
+      entity: "staff_user",
+      entityId: staffId.data,
+      meta: { name: target.name, role: target.role },
+    });
+    return "deleted";
+  });
+  redirect(
+    result === "deleted"
+      ? `/admin/${slug}/team?deleted=1`
+      : `/admin/${slug}/team?error=${result}`,
+  );
 }
 
 /* ---- customers ----------------------------------------------------------- */

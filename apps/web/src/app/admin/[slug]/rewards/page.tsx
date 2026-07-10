@@ -71,7 +71,7 @@ export default async function RewardsPage({
       )}
 
       {ctx.tenant.modules.points && (
-        <section className="rounded-xl border border-border bg-surface p-4">
+        <section className="rounded-xl border border-border bg-surface p-4 sm:p-5">
           <h2 className="text-sm font-semibold text-text">Points settings</h2>
           <p className="mt-1 text-xs text-text-muted">
             Members earn points from the amount keyed in at the counter.
@@ -79,12 +79,23 @@ export default async function RewardsPage({
           </p>
           <form
             action={updatePointsRate}
-            className="mt-3 flex flex-wrap items-end gap-3"
+            className="mt-4 flex w-full flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"
           >
             <input type="hidden" name="tenantId" value={ctx.tenant.id} />
-            <label className="text-xs font-medium text-text">
-              Points per RM1 spent
+            {/* left: label + live preview of the current rate */}
+            <div>
+              <label htmlFor="pointsPerRm" className="text-sm font-medium text-text">
+                Points per RM1 spent
+              </label>
+              <p className="mt-1 text-xs text-text-muted">
+                RM10.00 → {Math.floor((1000 * data.pointsPerRm) / 100)} points at the
+                current rate
+              </p>
+            </div>
+            {/* right: input + save together */}
+            <div className="flex items-end gap-2">
               <input
+                id="pointsPerRm"
                 name="pointsPerRm"
                 type="number"
                 step="0.1"
@@ -92,16 +103,12 @@ export default async function RewardsPage({
                 max={1000}
                 required
                 defaultValue={data.pointsPerRm}
-                className="mt-1 h-10 w-36 rounded-lg border border-border bg-surface px-3 text-sm tabular-nums text-text outline-none focus:border-primary"
+                className="h-10 w-28 rounded-lg border border-border bg-surface px-3 text-sm tabular-nums text-text outline-none focus:border-primary"
               />
-            </label>
-            <p className="pb-2.5 text-xs text-text-muted">
-              RM10.00 → {Math.floor(1000 * data.pointsPerRm / 100)} points at the
-              current rate
-            </p>
-            <button className="h-10 rounded-lg bg-primary px-4 text-xs font-semibold text-on-primary hover:bg-primary-hover">
-              Save rate
-            </button>
+              <button className="h-10 shrink-0 rounded-lg bg-primary px-4 text-xs font-semibold text-on-primary hover:bg-primary-hover">
+                Save rate
+              </button>
+            </div>
           </form>
         </section>
       )}

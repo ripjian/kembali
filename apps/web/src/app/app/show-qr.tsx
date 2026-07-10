@@ -20,7 +20,7 @@ export function ShowQrButton() {
           setOpen(true);
           ref.current?.showModal();
         }}
-        className="inline-flex h-12 w-full items-center justify-center rounded-xl bg-primary text-sm font-semibold text-on-primary hover:bg-primary-hover"
+        className="inline-flex h-12 w-full items-center justify-center rounded-xl bg-tenant-primary text-sm font-semibold text-tenant-on-primary hover:bg-tenant-primary-hover"
       >
         Show QR to collect stamps
       </button>

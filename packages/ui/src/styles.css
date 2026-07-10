@@ -38,6 +38,20 @@
   --warning: #b45309;
   --error: #c0392b;
   --info: #2d6cb5;
+
+  /* Per-tenant theme slots (Decision Log 2026-07-11). Default to the Kembali
+     tokens via var() so every surface resolves; customer-facing pages
+     override these on a scoped wrapper for a merchant with brand colours.
+     var() substitutes at the point of use, so these track light/dark and the
+     admin data-theme override without needing to be redeclared per mode. */
+  --tenant-primary: var(--primary);
+  --tenant-primary-hover: var(--primary-hover);
+  --tenant-on-primary: var(--on-primary);
+  --tenant-primary-text: var(--primary);
+  --tenant-accent: var(--accent);
+  --tenant-on-accent: #16261e;
+  --tenant-accent-deep: var(--accent-deep);
+  --tenant-progress: var(--leaf);
 }
 
 /* Dark mode (BRAND.md §2) - coral stamps stay coral; unlisted tokens keep
@@ -114,6 +128,15 @@
   --color-accent: var(--accent);
   --color-accent-deep: var(--accent-deep);
   --color-leaf: var(--leaf);
+  /* Per-tenant white-label slots (default to Kembali tokens above) */
+  --color-tenant-primary: var(--tenant-primary);
+  --color-tenant-primary-hover: var(--tenant-primary-hover);
+  --color-tenant-on-primary: var(--tenant-on-primary);
+  --color-tenant-primary-text: var(--tenant-primary-text);
+  --color-tenant-accent: var(--tenant-accent);
+  --color-tenant-on-accent: var(--tenant-on-accent);
+  --color-tenant-accent-deep: var(--tenant-accent-deep);
+  --color-tenant-progress: var(--tenant-progress);
   --color-success: var(--success);
   --color-warning: var(--warning);
   --color-error: var(--error);

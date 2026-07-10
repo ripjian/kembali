@@ -40,7 +40,7 @@ export function RedeemConfirm({
       <button
         type="button"
         onClick={() => ref.current?.showModal()}
-        className="inline-flex h-12 w-full items-center justify-center rounded-xl bg-primary text-sm font-semibold text-on-primary hover:bg-primary-hover"
+        className="inline-flex h-12 w-full items-center justify-center rounded-xl bg-tenant-primary text-sm font-semibold text-tenant-on-primary hover:bg-tenant-primary-hover"
       >
         Redeem for {pointsCost} points
       </button>
@@ -59,7 +59,7 @@ export function RedeemConfirm({
         <div className="mt-4 flex flex-col gap-2">
           <form action={reserveRedemption}>
             <input type="hidden" name="rewardItemId" value={rewardItemId} />
-            <button className="inline-flex h-11 w-full items-center justify-center rounded-xl bg-primary text-sm font-semibold text-on-primary hover:bg-primary-hover">
+            <button className="inline-flex h-11 w-full items-center justify-center rounded-xl bg-tenant-primary text-sm font-semibold text-tenant-on-primary hover:bg-tenant-primary-hover">
               Yes, show my coupon
             </button>
           </form>

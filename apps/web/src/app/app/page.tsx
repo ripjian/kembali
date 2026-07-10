@@ -195,7 +195,7 @@ export default async function CardPage() {
       {openCoupon && (
         <Link
           href={`/app/coupons/${openCoupon.id}`}
-          className="rounded-xl border border-accent/40 bg-surface p-3 text-sm font-medium text-accent-deep"
+          className="rounded-xl border border-tenant-accent/40 bg-surface p-3 text-sm font-medium text-tenant-accent-deep"
         >
           Your coupon for {openCoupon.title.toLowerCase()} is ready. Show it
           at the counter →
@@ -218,7 +218,7 @@ export default async function CardPage() {
         </div>
         <div className="mt-5 h-2 w-full overflow-hidden rounded-full bg-surface-alt">
           <div
-            className="h-full rounded-full bg-leaf"
+            className="h-full rounded-full bg-tenant-progress"
             style={{ width: `${progress.progress * 100}%` }}
           />
         </div>
@@ -320,10 +320,10 @@ export default async function CardPage() {
             openRewards.map((reward) => (
               <div
                 key={reward.id}
-                className="flex items-center justify-between rounded-xl border border-accent/40 bg-surface p-3"
+                className="flex items-center justify-between rounded-xl border border-tenant-accent/40 bg-surface p-3"
               >
                 <div>
-                  <p className="text-sm font-medium text-accent-deep">
+                  <p className="text-sm font-medium text-tenant-accent-deep">
                     {rewardTitle}, ready to redeem
                   </p>
                   {reward.expiresAt && (
@@ -332,7 +332,7 @@ export default async function CardPage() {
                     </p>
                   )}
                 </div>
-                <span className="size-3 rounded-full bg-accent" aria-hidden />
+                <span className="size-3 rounded-full bg-tenant-accent" aria-hidden />
               </div>
             ))
           )}

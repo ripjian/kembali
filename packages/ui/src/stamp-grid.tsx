@@ -1,5 +1,7 @@
-/* Stamp grid - coral = earned stamps (the "earn" color), border/muted =
- * empty slots. Leaf is reserved for progress bars, not stamps. */
+/* Stamp grid - earned stamps use the tenant "earn" colour (coral by
+ * default, a merchant's brand accent when white-labelled), border/muted =
+ * empty slots. --tenant-accent defaults to the Kembali coral token, so this
+ * renders unchanged on non-themed surfaces. */
 
 export interface StampGridProps {
   earned: number;
@@ -20,7 +22,7 @@ export function StampGrid({ earned, total, className }: StampGridProps) {
           key={i}
           className={
             i < clamped
-              ? "size-10 rounded-full bg-accent"
+              ? "size-10 rounded-full bg-tenant-accent"
               : "size-10 rounded-full border-2 border-dashed border-border bg-surface-alt"
           }
         />

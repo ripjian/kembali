@@ -87,7 +87,7 @@ export default function CustomerLoginPage() {
           <button
             type="submit"
             disabled={busy}
-            className="mt-1 inline-flex h-12 items-center justify-center rounded-xl bg-primary text-sm font-semibold text-on-primary hover:bg-primary-hover disabled:opacity-60"
+            className="mt-1 inline-flex h-12 items-center justify-center rounded-xl bg-tenant-primary text-sm font-semibold text-tenant-on-primary hover:bg-tenant-primary-hover disabled:opacity-60"
           >
             {busy ? "Sending…" : "Send code"}
           </button>
@@ -116,7 +116,7 @@ export default function CustomerLoginPage() {
           <button
             type="submit"
             disabled={busy || code.length !== 6}
-            className="mt-1 inline-flex h-12 items-center justify-center rounded-xl bg-primary text-sm font-semibold text-on-primary hover:bg-primary-hover disabled:opacity-60"
+            className="mt-1 inline-flex h-12 items-center justify-center rounded-xl bg-tenant-primary text-sm font-semibold text-tenant-on-primary hover:bg-tenant-primary-hover disabled:opacity-60"
           >
             {busy ? "Checking…" : "Open my card"}
           </button>

@@ -1,8 +1,9 @@
 import { DemoCard } from "@/components/marketing/demo-card";
 import { FeatureShowcase } from "@/components/marketing/feature-showcase";
-import { LeadQualifier } from "@/components/marketing/lead-qualifier";
+import { HeroFloats } from "@/components/marketing/hero-floats";
 import { ActionLink, Tag } from "@/components/marketing/pill";
 import { ReceiptCard } from "@/components/marketing/receipt-card";
+import { ShopPreview } from "@/components/marketing/shop-preview";
 import { Reveal } from "@/components/marketing/reveal";
 
 const FEATURES = [
@@ -120,15 +121,9 @@ export default function Home() {
               </div>
             </div>
 
-            {/* glass activity cards floating over the panel */}
-            <div aria-hidden className="glass backdrop-blur-md absolute left-3 top-24 z-10 rounded-xl px-3.5 py-2.5 sm:left-10">
-              <p className="text-xs font-medium text-text">+1 stamp collected</p>
-              <p className="mt-0.5 text-[11px] text-text-muted">Aisyah is 3 away from a free coffee</p>
-            </div>
-            <div aria-hidden className="glass backdrop-blur-md absolute right-3 top-40 z-10 rounded-xl px-3.5 py-2.5 sm:right-10">
-              <p className="font-mono text-sm text-text">↗ 41%</p>
-              <p className="mt-0.5 text-[11px] text-text-muted">repeat visits this month</p>
-            </div>
+            {/* glass activity cards floating over the panel — drift gently,
+                pause off-screen (see HeroFloats) */}
+            <HeroFloats />
           </div>
         </div>
       </section>
@@ -248,18 +243,18 @@ export default function Home() {
       <section id="reach-out" className="scroll-mt-20 bg-surface-alt">
         <div className="mx-auto w-full max-w-[1200px] px-6 py-16">
           <Reveal className="mx-auto max-w-2xl text-center">
-            <p className="text-sm font-medium text-text-muted">Let&apos;s talk</p>
+            <p className="text-sm font-medium text-text-muted">Try it now</p>
             <h2 className="mt-2 text-3xl font-medium leading-tight tracking-[-0.02em] text-text sm:text-4xl">
-              Curious how it would look in your shop?
+              See your card before you sign up.
             </h2>
             <p className="mt-4 text-base leading-relaxed text-text-secondary">
-              Answer three quick questions and we&apos;ll sketch it out for
-              you — no signup, no pressure.
+              Add your shop name, your reward and a color. The card updates as
+              you type. No signup, no pressure.
             </p>
           </Reveal>
 
           <Reveal delay={120} className="mt-10">
-            <LeadQualifier />
+            <ShopPreview />
           </Reveal>
         </div>
       </section>

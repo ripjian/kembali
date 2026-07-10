@@ -2,8 +2,8 @@ import { DemoCard } from "@/components/marketing/demo-card";
 import { FeatureShowcase } from "@/components/marketing/feature-showcase";
 import { HeroFloats } from "@/components/marketing/hero-floats";
 import { ActionLink, Tag } from "@/components/marketing/pill";
+import { ReachOut } from "@/components/marketing/reach-out";
 import { ReceiptCard } from "@/components/marketing/receipt-card";
-import { ShopPreview } from "@/components/marketing/shop-preview";
 import { Reveal } from "@/components/marketing/reveal";
 
 const FEATURES = [
@@ -243,18 +243,19 @@ export default function Home() {
       <section id="reach-out" className="scroll-mt-20 bg-surface-alt">
         <div className="mx-auto w-full max-w-[1200px] px-6 py-16">
           <Reveal className="mx-auto max-w-2xl text-center">
-            <p className="text-sm font-medium text-text-muted">Try it now</p>
+            <p className="text-sm font-medium text-text-muted">Let&apos;s talk</p>
             <h2 className="mt-2 text-3xl font-medium leading-tight tracking-[-0.02em] text-text sm:text-4xl">
-              See your card before you sign up.
+              See how it fits your shop.
             </h2>
             <p className="mt-4 text-base leading-relaxed text-text-secondary">
-              Add your shop name, your reward and a color. The card updates as
-              you type. No signup, no pressure.
+              Answer three quick questions. We&apos;ll show you how Kembali
+              works for your kind of shop, then you can shape a card of your
+              own. No signup, no pressure.
             </p>
           </Reveal>
 
           <Reveal delay={120} className="mt-10">
-            <ShopPreview />
+            <ReachOut />
           </Reveal>
         </div>
       </section>

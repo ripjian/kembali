@@ -15,6 +15,60 @@ import { getDb } from "@/lib/db";
  * scan (see /api/admin/redemption/confirm). An abandoned coupon simply
  * expires, so nothing needs refunding. */
 
+/* One-screen registration after OTP verify. Full name is required; the phone
+ * is already verified (not resubmitted); email and birthday are optional;
+ * marketing consent is opt-in (PDPA). Session-scoped + withTenant, so a
+ * customer can only complete their OWN profile under their own tenant. */
+const profileSchema = z.object({
+  name: z.string().trim().min(2, "Enter your name").max(80),
+  email: z
+    .union([z.literal(""), z.email()])
+    .transform((v) => (v === "" ? null : v.toLowerCase())),
+  birthday: z
+    .union([z.literal(""), z.string().regex(/^\d{4}-\d{2}-\d{2}$/)])
+    .transform((v) => (v === "" ? null : v)),
+  marketing: z.boolean(),
+});
+
+export async function completeCustomerProfile(formData: FormData) {
+  const session = await getCustomerSession();
+  if (!session) redirect("/app/login");
+
+  const parsed = profileSchema.safeParse({
+    name: formData.get("name"),
+    email: formData.get("email") ?? "",
+    birthday: formData.get("birthday") ?? "",
+    marketing: formData.get("marketing") === "on",
+  });
+  if (!parsed.success) redirect("/app/register?error=invalid");
+  const p = parsed.data;
+
+  const db = await getDb();
+  await withTenant(db, session.tenantId, async (tx) => {
+    await tx
+      .update(schema.customers)
+      .set({
+        name: p.name,
+        email: p.email,
+        birthday: p.birthday,
+        // PDPA: consent per channel; empty means no marketing.
+        marketingOptIns: p.marketing ? { whatsapp: true } : {},
+      })
+      .where(eq(schema.customers.id, session.customerId));
+    await tx.insert(schema.auditLog).values({
+      tenantId: session.tenantId,
+      actorType: "customer",
+      actorId: session.customerId,
+      action: "customer.profile_completed",
+      entity: "customer",
+      entityId: session.customerId,
+      meta: { marketing: p.marketing, hasEmail: p.email !== null },
+    });
+  });
+
+  redirect("/app");
+}
+
 export async function reserveRedemption(formData: FormData) {
   const session = await getCustomerSession();
   if (!session) redirect("/app/login");

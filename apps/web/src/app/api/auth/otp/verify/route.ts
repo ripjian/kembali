@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 
-import { hashOtpCode, isOtpBypass, OTP_MAX_ATTEMPTS } from "@kembali/core";
+import {
+  hashOtpCode,
+  isOtpBypass,
+  needsRegistration,
+  OTP_MAX_ATTEMPTS,
+} from "@kembali/core";
 import { schema, withTenant } from "@kembali/db";
 import { and, asc, desc, eq, gt, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
@@ -62,14 +67,13 @@ export async function POST(req: Request) {
         .where(eq(schema.otpCodes.id, otp.id));
     }
 
-    // Login doubles as registration: first verified phone = new customer.
-    let isNew = false;
+    // First verified phone for this tenant = a new phone-only customer; the
+    // registration screen fills in the rest.
     let [customer] = await tx
       .select()
       .from(schema.customers)
       .where(eq(schema.customers.phone, phone));
     if (!customer) {
-      isNew = true;
       [customer] = await tx
         .insert(schema.customers)
         .values({ tenantId, phone })
@@ -97,7 +101,13 @@ export async function POST(req: Request) {
         });
       }
     }
-    return { ok: true as const, customerId: customer.id, isNew };
+    return {
+      ok: true as const,
+      customerId: customer.id,
+      // A nameless customer (new, or an old phone-only record) still needs
+      // the one-screen registration before their card.
+      needsProfile: needsRegistration(customer),
+    };
   });
 
   if (!result.ok) {
@@ -108,5 +118,5 @@ export async function POST(req: Request) {
   }
 
   await startCustomerSession(db, result.customerId, tenantId);
-  return NextResponse.json({ ok: true, isNew: result.isNew });
+  return NextResponse.json({ ok: true, needsProfile: result.needsProfile });
 }

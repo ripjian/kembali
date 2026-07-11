@@ -1,0 +1,304 @@
+/* Concept 6 - Shop stories, photography-forward.
+ *
+ * PLACEHOLDER IMAGERY: every ".p-photo" panel here is a CSS duotone stand-in
+ * (layered warm gradients + grain + vignette), NOT a real photograph. It reads
+ * as a warm, moody scene of Malaysian shop life so the layout can be judged.
+ * Production must replace each .p-photo with licensed or own photography of
+ * real shops. Never hotlink external images; ship them from /public. The scene
+ * tint classes (.is-morning / .is-hands / .is-phone / .is-counter) mark where a
+ * specific photo belongs. A visible on-page note says the same thing.
+ *
+ * Kembali palette, stretched warm: coral is the earned reward, pandan is the
+ * action, leaf is progress. Oversized type sits over a dark scrim so white
+ * copy clears WCAG AA on the photos. */
+
+[data-concept="6"] {
+  color-scheme: light;
+  --bg: #f2ebdd; /* warm paper between photos */
+  --surface: #fffdf6;
+  --ink: #20302a; /* body ink on paper */
+  --ink-soft: #5a6157;
+  --pandan: #0f3d32;
+  --pandan-ink: #0a2c24;
+  --coral: #e0684b; /* earned */
+  --coral-deep: #a93e24; /* coral as text on paper */
+  --leaf: #7fb069;
+  --leaf-deep: #42702f; /* leaf as text on paper, AA (4.93:1) */
+  --hair: #ddd2ba;
+  --photo-ink: #fffdf7; /* type on photos */
+  --photo-ink-soft: rgba(255, 253, 247, 0.82);
+
+  color: var(--ink);
+  font-family: var(--font-jakarta);
+}
+
+.p-page {
+  min-height: 100dvh;
+  background-color: var(--bg);
+  overflow-x: clip;
+}
+.p-wrap {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+
+/* ---- type ---- */
+.p-kicker {
+  font-family: var(--font-space), ui-monospace, monospace;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.p-display {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 0.98;
+}
+.p-serif {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.p-lede {
+  font-size: 1.08rem;
+  line-height: 1.62;
+}
+
+/* ---- the placeholder "photo" ------------------------------------------- *
+ * Duotone warm scene. .is-* variants change base + light bloom so the
+ * sections do not all look identical. A dark scrim keeps overlaid white
+ * type AA. Grain + vignette sell the "photo" read. */
+.p-photo {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background-color: #2a1c12;
+  background-image:
+    radial-gradient(115% 80% at 22% 12%, rgba(255, 224, 170, 0.5), transparent 52%),
+    radial-gradient(95% 95% at 82% 92%, rgba(12, 38, 28, 0.72), transparent 60%),
+    linear-gradient(158deg, #6d4c2f 0%, #3a2818 55%, #241710 100%);
+}
+.p-photo.is-hands {
+  background-color: #3a1d13;
+  background-image:
+    radial-gradient(110% 78% at 78% 18%, rgba(255, 170, 130, 0.42), transparent 52%),
+    radial-gradient(95% 95% at 15% 90%, rgba(40, 18, 10, 0.72), transparent 60%),
+    linear-gradient(150deg, #8a4a30 0%, #4a271a 55%, #2a160e 100%);
+}
+.p-photo.is-phone {
+  background-color: #14261f;
+  background-image:
+    radial-gradient(110% 80% at 25% 16%, rgba(190, 235, 205, 0.34), transparent 52%),
+    radial-gradient(95% 95% at 85% 92%, rgba(8, 24, 18, 0.78), transparent 60%),
+    linear-gradient(160deg, #2f6350 0%, #1c3a2e 55%, #10241b 100%);
+}
+.p-photo.is-counter {
+  background-color: #241a10;
+  background-image:
+    radial-gradient(120% 85% at 50% 6%, rgba(255, 214, 150, 0.46), transparent 54%),
+    radial-gradient(90% 90% at 78% 96%, rgba(30, 20, 10, 0.7), transparent 60%),
+    linear-gradient(172deg, #7a5432 0%, #3c2817 60%, #21150c 100%);
+}
+/* film grain + vignette (decorative, non-interactive) */
+.p-photo::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.4;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)' opacity='0.55'/%3E%3C/svg%3E");
+}
+/* scrim: darker toward the bottom where captions/type sit */
+.p-photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    to top,
+    rgba(15, 20, 14, 0.72) 0%,
+    rgba(15, 20, 14, 0.28) 42%,
+    rgba(15, 20, 14, 0.08) 100%
+  );
+  box-shadow: inset 0 0 120px rgba(0, 0, 0, 0.45);
+}
+.p-photo > * {
+  position: relative;
+  z-index: 1;
+}
+/* tiny "placeholder" tag pinned to a photo */
+.p-ph-tag {
+  position: absolute;
+  top: 0.8rem;
+  right: 0.8rem;
+  z-index: 2;
+  font-family: var(--font-space), ui-monospace, monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--photo-ink);
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 9999px;
+  padding: 0.2rem 0.55rem;
+}
+
+/* ---- hero ---- */
+.p-hero {
+  position: relative;
+  min-height: min(92vh, 760px);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 1.25rem;
+  border-radius: 0 0 28px 28px;
+}
+.p-hero-inner {
+  max-width: 72rem;
+  margin: 0 auto;
+  width: 100%;
+}
+.p-overlay-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.4rem 2.2rem;
+}
+.p-overlay-stat b {
+  display: block;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-weight: 600;
+  font-size: 1.7rem;
+  line-height: 1;
+  color: var(--photo-ink);
+}
+.p-overlay-stat span {
+  font-size: 0.82rem;
+  color: var(--photo-ink-soft);
+}
+
+/* ---- buttons ---- */
+.p-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1.35rem;
+  border-radius: 9999px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1),
+    background-color 160ms ease;
+}
+.p-btn:active {
+  transform: translateY(1px) scale(0.99);
+}
+.p-btn-primary {
+  background: var(--pandan);
+  color: var(--photo-ink);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3);
+}
+.p-btn-primary:hover {
+  background: var(--pandan-ink);
+}
+/* on a photo, a light button reads as the second option */
+.p-btn-light {
+  background: rgba(255, 253, 247, 0.92);
+  color: var(--pandan);
+}
+.p-btn-light:hover {
+  background: #fffdf7;
+}
+
+/* ---- story cards ---- */
+.p-story {
+  position: relative;
+  min-height: 300px;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 1.2rem;
+}
+.p-story-step {
+  font-family: var(--font-space), ui-monospace, monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--photo-ink-soft);
+}
+.p-story-cap {
+  margin-top: 0.35rem;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-weight: 600;
+  font-size: 1.4rem;
+  line-height: 1.12;
+  color: var(--photo-ink);
+}
+.p-story-detail {
+  margin-top: 0.4rem;
+  font-size: 0.9rem;
+  color: var(--photo-ink-soft);
+}
+
+/* ---- proof band ---- */
+.p-proof-chip {
+  background: rgba(255, 253, 247, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 14px;
+  padding: 1rem 1.1rem;
+  backdrop-filter: blur(6px);
+}
+.p-proof-num {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-weight: 600;
+  font-size: 2rem;
+  line-height: 1;
+  color: var(--photo-ink);
+  font-variant-numeric: tabular-nums;
+}
+.p-proof-num[data-earn="true"] {
+  color: #f4a98f; /* lifted coral reads on the dark photo */
+}
+.p-proof-label {
+  margin-top: 0.3rem;
+  font-size: 0.78rem;
+  color: var(--photo-ink-soft);
+}
+
+/* ---- pricing (on warm paper) ---- */
+.p-plan {
+  border: 1px solid var(--hair);
+  border-radius: 16px;
+  background: var(--surface);
+  padding: 1.3rem;
+}
+.p-plan[data-featured="true"] {
+  border-color: var(--coral);
+  box-shadow: 0 0 0 3px rgba(224, 104, 75, 0.14);
+}
+.p-plan-price {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-weight: 600;
+  font-size: 2rem;
+  color: var(--pandan);
+}
+
+/* ---- small note ---- */
+.p-note {
+  font-family: var(--font-space), ui-monospace, monospace;
+  font-size: 0.72rem;
+  color: var(--ink-soft);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .p-btn {
+    transition: none;
+  }
+}

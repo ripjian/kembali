@@ -53,14 +53,28 @@
   color: #f6f1e3;
   background: rgba(255, 255, 255, 0.1);
 }
-.cx-switch a[data-current="true"] {
-  background: #e0684b;
-  color: #16261e;
-  font-weight: 600;
-}
 .cx-switch .cx-switch-home {
   color: rgba(246, 241, 227, 0.9);
   padding-inline: 0.7rem;
+  white-space: nowrap;
+}
+.cx-switch .cx-switch-arrow {
+  font-size: 1.15rem;
+  line-height: 1;
+  padding-bottom: 0.15rem;
+}
+.cx-switch .cx-switch-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 3.2rem;
+  height: 1.9rem;
+  padding: 0 0.6rem;
+  border-radius: 9999px;
+  background: #e0684b;
+  color: #16261e;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 

@@ -127,4 +127,9 @@ export const CONCEPTS = [
   { n: 3, path: "/concepts/3", name: "Motion scrollytelling", label: "The scan-to-reward journey plays out as you scroll." },
   { n: 4, path: "/concepts/4", name: "Neo-brutalist poster", label: "Massive type, hard borders, flat coral and pandan blocks." },
   { n: 5, path: "/concepts/5", name: "Editorial zine", label: "Serif-led newspaper layout with halftone and generous whitespace." },
+  { n: 6, path: "/concepts/6", name: "Shop stories", label: "Full-bleed shop photography with oversized type and stats laid over the scene." },
+  { n: 7, path: "/concepts/7", name: "Kinetic type specimen", label: "A variable font at poster scale is the whole design; the line returns on scroll." },
+  { n: 8, path: "/concepts/8", name: "Bento product tour", label: "A grid where each tile is a live micro-demo of a real feature." },
+  { n: 9, path: "/concepts/9", name: "Dimensional card", label: "The stamp card as a 3D object that tilts to your pointer and splits into layers." },
+  { n: 10, path: "/concepts/10", name: "Conversational landing", label: "A short chat builds the page around your shop, with pricing to match." },
 ] as const;

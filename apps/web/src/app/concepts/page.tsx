@@ -20,7 +20,7 @@ export default function ConceptsIndex() {
         <header className="cx-index-head">
           <span className="cx-index-eyebrow">Design sandbox</span>
           <h1 className="cx-index-title">
-            Five ways Kembali could look
+            Ten ways Kembali could look
           </h1>
           <p className="cx-index-lede">
             Each is a full landing page with the same Kembali content, pushed

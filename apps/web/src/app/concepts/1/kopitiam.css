@@ -1,10 +1,11 @@
-/* Concept 1 — Kopitiam skeuomorphism.
+/* Concept 1 - Kopitiam skeuomorphism.
  * A real paper stamp card on a marble tabletop in warm daylight. Kembali
  * palette, stretched warm: coral is the rubber-stamp ink (earned), pandan is
  * the buttons (do), leaf is progress. Textures are CSS + tiny inline SVG
  * grain; all motion is transform/opacity and pauses under reduced-motion. */
 
 [data-concept="1"] {
+  color-scheme: light;
   --paper: #f7f1e2;
   --paper-edge: #e7dcc2;
   --marble: #ece5d5;

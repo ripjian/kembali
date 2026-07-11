@@ -1,0 +1,123 @@
+/* /concepts index - the house Pandan palette, pinned so OS dark mode can't
+ * flip it. Sand canvas, pandan ink, coral numerals (earned = coral). */
+[data-concept="index"] {
+  color-scheme: light;
+  --bg: #f6f1e3;
+  --surface: #fffdf7;
+  --ink: #16261e;
+  --pandan: #0f3d32;
+  --coral: #cf5636; /* stretched deeper coral: AA-large on sand (3.69:1) */
+  --coral-deep: #a93e24;
+  --leaf: #7fb069;
+  --border: #ddd4bd;
+  --muted: #5c6b60; /* BRAND text-secondary: AA body on sand (4.99:1) */
+}
+
+.cx-index {
+  background-color: #f6f1e3;
+  background-image: radial-gradient(
+    120% 80% at 50% -10%,
+    rgba(255, 255, 255, 0.75),
+    transparent 60%
+  );
+  color: var(--ink);
+  min-height: 100dvh;
+  padding: clamp(3rem, 8vw, 6rem) 1.25rem 6rem;
+}
+.cx-index-wrap {
+  max-width: 46rem;
+  margin: 0 auto;
+}
+.cx-index-eyebrow {
+  display: inline-block;
+  font-family: var(--font-jakarta);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--coral-deep);
+}
+.cx-index-title {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: clamp(2.4rem, 7vw, 4rem);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  color: var(--pandan);
+  margin-top: 0.75rem;
+}
+.cx-index-lede {
+  margin-top: 1.1rem;
+  max-width: 34rem;
+  font-size: 1.02rem;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.cx-index-list {
+  list-style: none;
+  margin: clamp(2.5rem, 6vw, 4rem) 0 0;
+  padding: 0;
+  border-top: 1px solid var(--border);
+}
+.cx-index-card {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 1.1rem;
+  padding: 1.5rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+  text-decoration: none;
+  color: inherit;
+  border-radius: 12px;
+  transition: transform 220ms cubic-bezier(0.23, 1, 0.32, 1),
+    background-color 220ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.cx-index-card:hover,
+.cx-index-card:focus-visible {
+  transform: translateX(6px);
+  background: linear-gradient(90deg, rgba(224, 104, 75, 0.08), transparent 70%);
+  outline: none;
+}
+.cx-index-num {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: var(--coral);
+  font-variant-numeric: tabular-nums;
+  min-width: 2.5rem;
+}
+.cx-index-name {
+  display: block;
+  font-size: 1.18rem;
+  font-weight: 600;
+  color: var(--pandan);
+  letter-spacing: -0.01em;
+}
+.cx-index-label {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+.cx-index-arrow {
+  font-size: 1.3rem;
+  color: var(--pandan);
+  transition: transform 220ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.cx-index-card:hover .cx-index-arrow,
+.cx-index-card:focus-visible .cx-index-arrow {
+  transform: translateX(4px);
+}
+.cx-index-foot {
+  margin-top: 2.5rem;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cx-index-card,
+  .cx-index-arrow {
+    transition: none;
+  }
+}

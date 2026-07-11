@@ -27,3 +27,6 @@ service-account*.json
 coverage/
 *.tsbuildinfo
 .pglite/
+
+# Impeccable design hook local cache
+.impeccable/

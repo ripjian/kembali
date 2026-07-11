@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "note": "Pinned sources for externally installed Claude Code skills under .claude/skills. Built-in project skills (emil-design-eng, frontend-design, remotion-best-practices, ux-writing) are vendored and not tracked here.",
+  "skills": {
+    "impeccable": {
+      "source": "npm:impeccable",
+      "installer": "npx impeccable install",
+      "version": "3.9.1",
+      "repository": "https://github.com/pbakaus/impeccable",
+      "path": ".claude/skills/impeccable",
+      "installedOn": "2026-07-11"
+    },
+    "stop-slop": {
+      "source": "github:hardikpandya/stop-slop",
+      "ref": "main",
+      "commit": "8da1f030185bdfe8471220585162991eaeb970e9",
+      "repository": "https://github.com/hardikpandya/stop-slop",
+      "path": ".claude/skills/stop-slop",
+      "installedOn": "2026-07-11"
+    },
+    "caveman": {
+      "source": "github:juliusbrussee/caveman",
+      "ref": "main",
+      "commit": "0d95a81d35a9f2d123a5e9430d1cfc43d55f1bb0",
+      "repository": "https://github.com/juliusbrussee/caveman",
+      "subpath": "skills/caveman",
+      "path": ".claude/skills/caveman",
+      "installedOn": "2026-07-11"
+    }
+  }
+}

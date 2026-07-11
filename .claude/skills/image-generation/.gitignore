@@ -1,0 +1,5 @@
+poster_*.jpg
+video_output.*
+*.mp4
+scripts/.env
+scripts/node_modules/

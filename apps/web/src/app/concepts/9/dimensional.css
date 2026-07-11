@@ -1,0 +1,659 @@
+/* Concept 9 - Dimensional card.
+ * The stamp card as a CSS 3D object on a calm, deep-pandan backdrop. No WebGL,
+ * no libraries: pure perspective + preserve-3d. On a desktop fine pointer the
+ * hero card tilts toward the cursor with a specular gloss that tracks it, and
+ * on scroll its layers (face, stamp row, QR, coupon chips) separate on the Z
+ * axis via CSS scroll-driven animation. Everything 3D is gated behind
+ * prefers-reduced-motion: no-preference AND (hover: hover) and (pointer: fine)
+ * AND @supports (animation-timeline). Any miss -> the card renders FLAT and
+ * fully readable in normal flow. Coral = earned stamps, leaf = progress,
+ * pandan = actions, warm paper = the card body. */
+
+[data-concept="9"] {
+  color-scheme: dark;
+
+  --bg-solid: #0a1f18; /* solid page base */
+  --pandan: #0f3d32;
+  --pandan-btn: #15503f;
+  --pandan-btn-2: #1d6a53;
+  --leaf: #7fb069;
+  --coral: #e0684b; /* earned stamps (graphic) */
+  --coral-deep: #a93e24; /* coral text on paper */
+  --coral-lift: #f4a98f; /* coral text on the dark backdrop */
+  --sand: #f6f1e3;
+
+  --paper: #f7f1e2; /* card face */
+  --paper-2: #efe7d3;
+  --paper-edge: #e3dac2;
+  --ink: #16261e; /* text on paper */
+  --ink-soft: #55604f;
+
+  --text: #f6f1e3; /* text on the dark backdrop */
+  --text-soft: rgba(246, 241, 227, 0.75);
+  --text-muted: rgba(246, 241, 227, 0.56);
+  --hair: rgba(246, 241, 227, 0.14);
+  --panel: rgba(246, 241, 227, 0.05);
+  --panel-line: rgba(246, 241, 227, 0.12);
+
+  color: var(--text);
+  font-family: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* ---- deep, calm pandan backdrop ---- */
+.d9-page {
+  position: relative;
+  min-height: 100dvh;
+  isolation: isolate;
+  overflow-x: clip; /* 3D layers never widen the page */
+  background-color: var(--bg-solid);
+}
+.d9-page::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(78% 55% at 78% 4%, rgba(31, 92, 74, 0.55), transparent 60%),
+    radial-gradient(70% 60% at 8% 100%, rgba(15, 61, 50, 0.6), transparent 62%),
+    linear-gradient(180deg, #0d2a21 0%, var(--bg-solid) 46%, #081a14 100%);
+}
+
+.d9-wrap {
+  position: relative;
+  z-index: 1;
+  max-width: 68rem;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+
+/* ---- shared type ---- */
+.d9-eyebrow {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--coral-lift);
+}
+.d9-h1 {
+  font-family: var(--font-space), var(--font-jakarta), sans-serif;
+  font-weight: 600;
+  font-size: clamp(2.35rem, 6.2vw, 3.9rem);
+  line-height: 1.03;
+  letter-spacing: -0.02em;
+  color: var(--sand);
+}
+.d9-h2 {
+  font-family: var(--font-space), var(--font-jakarta), sans-serif;
+  font-weight: 600;
+  font-size: clamp(1.7rem, 3.6vw, 2.5rem);
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+  color: var(--sand);
+}
+.d9-lede {
+  font-size: 1.05rem;
+  line-height: 1.62;
+  color: var(--text-soft);
+}
+.d9-num {
+  font-family: var(--font-space), ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- buttons ---- */
+.d9-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.82rem 1.35rem;
+  border-radius: 9999px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1),
+    background-color 160ms ease, border-color 160ms ease;
+}
+/* pandan = the action, lifted off the dark canvas with a leaf-lit rim */
+.d9-btn-primary {
+  background: linear-gradient(180deg, var(--pandan-btn-2), var(--pandan-btn));
+  color: var(--sand);
+  border-color: rgba(127, 176, 105, 0.42);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.12) inset,
+    0 12px 26px -12px rgba(0, 0, 0, 0.7);
+}
+.d9-btn-primary:hover {
+  background: linear-gradient(180deg, #227c62, var(--pandan-btn-2));
+}
+.d9-btn-ghost {
+  background: transparent;
+  color: var(--sand);
+  border-color: var(--hair);
+}
+.d9-btn-ghost:hover {
+  border-color: rgba(246, 241, 227, 0.34);
+  background: rgba(246, 241, 227, 0.05);
+}
+.d9-btn:active {
+  transform: translateY(1px) scale(0.99);
+}
+
+/* ---- fast facts ---- */
+.d9-fact-num {
+  font-family: var(--font-space), ui-monospace, monospace;
+  font-weight: 600;
+  font-size: 1.65rem;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  color: var(--sand);
+}
+.d9-fact-label {
+  margin-top: 0.3rem;
+  font-size: 0.86rem;
+  line-height: 1.35;
+  color: var(--text-muted);
+}
+
+/* =====================================================================
+   THE HERO CARD - flat, readable defaults. 3D is added later, gated.
+   ===================================================================== */
+.d9-stage {
+  position: relative;
+  width: 100%;
+  max-width: 24rem;
+  margin: 0 auto;
+}
+.d9-halo {
+  position: absolute;
+  inset: -16% -12% -22%;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: 50%;
+  background: radial-gradient(
+    50% 50% at 50% 45%,
+    rgba(224, 104, 75, 0.34),
+    transparent 70%
+  );
+  filter: blur(26px);
+  opacity: 0.75;
+}
+.d9-card {
+  position: relative;
+  z-index: 1;
+}
+
+/* the paper face */
+.d9-face {
+  position: relative;
+  background: linear-gradient(180deg, #fbf6ea, var(--paper) 34%, var(--paper-2) 100%);
+  border: 1px solid var(--paper-edge);
+  border-radius: 18px;
+  padding: 1.35rem 1.35rem 1.25rem;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset,
+    0 26px 50px -22px rgba(0, 0, 0, 0.7);
+}
+.d9-face-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1.5px dashed var(--paper-edge);
+}
+.d9-shop {
+  font-family: var(--font-space), var(--font-jakarta), sans-serif;
+  font-weight: 600;
+  font-size: 1.1rem;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.d9-shop-sub {
+  margin-top: 0.15rem;
+  font-size: 0.76rem;
+  color: var(--ink-soft);
+}
+.d9-code {
+  font-family: var(--font-space), ui-monospace, monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  color: var(--coral-deep);
+  background: rgba(224, 104, 75, 0.12);
+  border: 1px solid rgba(224, 104, 75, 0.32);
+  border-radius: 7px;
+  padding: 0.18rem 0.45rem;
+  white-space: nowrap;
+}
+
+/* stamp row - a distinct Z layer in 3D mode */
+.d9-stamps {
+  margin-top: 1.1rem;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.55rem;
+}
+.d9-slot {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 9999px;
+  border: 1.5px dashed color-mix(in srgb, var(--paper-edge) 80%, var(--ink));
+  display: grid;
+  place-items: center;
+}
+.d9-slot-num {
+  font-family: var(--font-space), ui-monospace, monospace;
+  font-size: 0.82rem;
+  color: color-mix(in srgb, var(--ink-soft) 66%, transparent);
+}
+.d9-slot[data-filled="true"] {
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--coral) 46%, var(--paper-edge));
+  background: rgba(224, 104, 75, 0.08);
+}
+.d9-slot-mark {
+  width: 74%;
+  height: 74%;
+  color: var(--coral);
+}
+.d9-slot[data-reward="true"] {
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--coral) 56%, var(--paper-edge));
+}
+.d9-slot-star {
+  font-size: 0.95rem;
+  color: var(--coral-deep);
+}
+
+/* progress foot (leaf) */
+.d9-foot {
+  margin-top: 1.05rem;
+}
+.d9-track {
+  height: 8px;
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--paper-edge) 78%, transparent);
+  overflow: hidden;
+}
+.d9-track-fill {
+  height: 100%;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, var(--leaf), #9cc487);
+  transform-origin: left;
+}
+.d9-meta {
+  margin-top: 0.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+}
+.d9-meta .d9-num {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* extras: QR + coupon chips. Flat = a tidy row under the face. */
+.d9-extras {
+  margin-top: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+.d9-qr {
+  flex: none;
+  width: 64px;
+  height: 64px;
+  padding: 6px;
+  border-radius: 12px;
+  background: var(--paper);
+  border: 1px solid var(--paper-edge);
+  box-shadow: 0 10px 22px -12px rgba(0, 0, 0, 0.7);
+}
+.d9-qr svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.d9-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.42rem 0.7rem;
+  border-radius: 9999px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+.d9-chip::before {
+  content: "";
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 9999px;
+  flex: none;
+}
+.d9-chip-earn {
+  background: rgba(224, 104, 75, 0.14);
+  border-color: rgba(224, 104, 75, 0.34);
+  color: var(--coral-lift);
+}
+.d9-chip-earn::before {
+  background: var(--coral);
+}
+.d9-chip-prog {
+  background: rgba(127, 176, 105, 0.14);
+  border-color: rgba(127, 176, 105, 0.34);
+  color: #cfe6bd;
+}
+.d9-chip-prog::before {
+  background: var(--leaf);
+}
+
+/* specular gloss - only visible in 3D mode */
+.d9-gloss {
+  display: none;
+}
+
+/* =====================================================================
+   SECTIONS on the dark backdrop
+   ===================================================================== */
+.d9-rule {
+  border: 0;
+  border-top: 1px solid var(--hair);
+  margin: 0;
+}
+
+.d9-panel {
+  background: var(--panel);
+  border: 1px solid var(--panel-line);
+  border-radius: 18px;
+  padding: 1.4rem 1.5rem 1.5rem;
+}
+.d9-step-head {
+  font-family: var(--font-space), var(--font-jakarta), sans-serif;
+  font-weight: 600;
+  font-size: 1.02rem;
+  color: var(--sand);
+}
+.d9-step-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: baseline;
+  gap: 0.7rem;
+  padding: 0.62rem 0;
+  border-top: 1px solid var(--hair);
+  font-size: 0.94rem;
+}
+.d9-step-row:first-of-type {
+  border-top: 0;
+}
+.d9-step-idx {
+  font-family: var(--font-space), ui-monospace, monospace;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+.d9-step-text {
+  color: var(--text);
+}
+.d9-step-tag {
+  font-family: var(--font-space), ui-monospace, monospace;
+  font-size: 0.74rem;
+  color: var(--coral-lift);
+  white-space: nowrap;
+}
+
+/* proof */
+.d9-stat {
+  background: var(--panel);
+  border: 1px solid var(--panel-line);
+  border-radius: 14px;
+  padding: 1rem 1.05rem;
+}
+.d9-stat-num {
+  font-family: var(--font-space), ui-monospace, monospace;
+  font-weight: 600;
+  font-size: 1.85rem;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  color: var(--sand);
+}
+.d9-stat-num[data-earn="true"] {
+  color: var(--coral-lift);
+}
+.d9-stat-label {
+  margin-top: 0.35rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+.d9-dot {
+  width: 0.52rem;
+  height: 0.52rem;
+  border-radius: 9999px;
+  flex: none;
+  background: var(--leaf);
+}
+.d9-dot[data-kind="reward"] {
+  background: var(--coral);
+}
+.d9-act-who {
+  font-weight: 600;
+  color: var(--text);
+}
+.d9-act-who[data-earn="true"] {
+  color: var(--coral-lift);
+}
+
+/* pricing */
+.d9-plan {
+  background: var(--panel);
+  border: 1px solid var(--panel-line);
+  border-radius: 16px;
+  padding: 1.35rem;
+}
+.d9-plan[data-featured="true"] {
+  border-color: rgba(224, 104, 75, 0.55);
+  box-shadow: 0 0 0 1px rgba(224, 104, 75, 0.3),
+    0 22px 46px -26px rgba(224, 104, 75, 0.5);
+  background: linear-gradient(
+    180deg,
+    rgba(224, 104, 75, 0.08),
+    rgba(246, 241, 227, 0.04)
+  );
+}
+.d9-plan-name {
+  font-weight: 600;
+  color: var(--sand);
+}
+.d9-plan-price {
+  font-family: var(--font-space), ui-monospace, monospace;
+  font-weight: 600;
+  font-size: 2rem;
+  letter-spacing: -0.01em;
+  color: var(--sand);
+}
+.d9-badge {
+  border-radius: 9999px;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  border: 1px solid var(--hair);
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+.d9-badge[data-featured="true"] {
+  background: var(--coral);
+  border-color: transparent;
+  color: #2a0f07;
+}
+
+/* final CTA card */
+.d9-cta {
+  background: linear-gradient(180deg, rgba(29, 106, 83, 0.22), var(--panel));
+  border: 1px solid var(--panel-line);
+  border-radius: 22px;
+}
+
+/* =====================================================================
+   3D LAYER - added only when the device can carry it well.
+   prefers-reduced-motion: no-preference + fine pointer + scroll timeline.
+   ===================================================================== */
+@media (prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine) {
+  @supports (animation-timeline: view()) {
+    .d9-stage {
+      perspective: 1150px;
+      perspective-origin: 50% 42%;
+      contain: layout paint;
+    }
+
+    /* the tilting plane. --rx / --ry come from the pointer (JS, rAF). */
+    .d9-card {
+      --rx: 0deg;
+      --ry: 0deg;
+      --gx: 50%;
+      --gy: 38%;
+      transform-style: preserve-3d;
+      transform: rotateX(var(--rx)) rotateY(var(--ry));
+      will-change: transform;
+    }
+    .d9-card[data-tilt="on"] {
+      transition: transform 140ms ease-out;
+    }
+
+    .d9-face {
+      transform-style: preserve-3d;
+    }
+
+    /* stamp row lifts off the face and drifts as the card scrolls past */
+    .d9-stamps {
+      animation-name: d9-lift-stamps;
+      animation-fill-mode: both;
+      animation-timing-function: linear;
+      animation-timeline: view();
+      animation-range: entry 0% exit 100%;
+      will-change: transform;
+    }
+    @keyframes d9-lift-stamps {
+      from {
+        transform: translateZ(14px) translateY(10px);
+      }
+      to {
+        transform: translateZ(64px) translateY(-14px);
+      }
+    }
+
+    /* QR floats to the lower-left, higher on Z, moving faster on scroll */
+    .d9-extras {
+      display: contents;
+    }
+    .d9-qr {
+      position: absolute;
+      left: -30px;
+      bottom: 24px;
+      margin: 0;
+      animation-name: d9-float-qr;
+      animation-fill-mode: both;
+      animation-timing-function: linear;
+      animation-timeline: view();
+      animation-range: entry 0% exit 100%;
+      will-change: transform;
+    }
+    @keyframes d9-float-qr {
+      from {
+        transform: translateZ(48px) translateY(16px) rotate(-3deg);
+      }
+      to {
+        transform: translateZ(104px) translateY(-30px) rotate(-6deg);
+      }
+    }
+
+    /* coupon chips float highest and separate the most */
+    .d9-chip {
+      position: absolute;
+      box-shadow: 0 14px 30px -16px rgba(0, 0, 0, 0.75);
+      animation-fill-mode: both;
+      animation-timing-function: linear;
+      animation-timeline: view();
+      animation-range: entry 0% exit 100%;
+      will-change: transform;
+    }
+    .d9-chip-earn {
+      top: -18px;
+      right: -22px;
+      animation-name: d9-float-chip-a;
+    }
+    @keyframes d9-float-chip-a {
+      from {
+        transform: translateZ(70px) translateY(14px);
+      }
+      to {
+        transform: translateZ(132px) translateY(-34px);
+      }
+    }
+    .d9-chip-prog {
+      bottom: -14px;
+      right: 8px;
+      animation-name: d9-float-chip-b;
+    }
+    @keyframes d9-float-chip-b {
+      from {
+        transform: translateZ(58px) translateY(12px);
+      }
+      to {
+        transform: translateZ(116px) translateY(-26px);
+      }
+    }
+
+    /* specular highlight that tracks the pointer across the face */
+    .d9-gloss {
+      display: block;
+      position: absolute;
+      inset: 0;
+      border-radius: 18px;
+      pointer-events: none;
+      transform: translateZ(2px);
+      background: radial-gradient(
+        34% 40% at var(--gx) var(--gy),
+        rgba(255, 255, 255, 0.5),
+        rgba(255, 255, 255, 0.06) 46%,
+        transparent 70%
+      );
+      mix-blend-mode: soft-light;
+      opacity: 0.9;
+    }
+
+    /* slow, calm breathing on the coral halo, transform/opacity only */
+    .d9-halo {
+      animation: d9-halo-breathe 7s ease-in-out infinite alternate;
+    }
+    @keyframes d9-halo-breathe {
+      from {
+        opacity: 0.6;
+        transform: scale(0.97);
+      }
+      to {
+        opacity: 0.85;
+        transform: scale(1.03);
+      }
+    }
+  }
+}
+
+/* progress fill grows on view where motion is welcome (both fallbacks static) */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .d9-track-fill {
+      transform: scaleX(0.14);
+      animation: d9-fill both linear;
+      animation-timeline: view();
+      animation-range: entry 10% cover 34%;
+    }
+    @keyframes d9-fill {
+      to {
+        transform: scaleX(var(--fill, 0.6));
+      }
+    }
+  }
+}

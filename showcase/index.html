@@ -3,18 +3,17 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Kembali · The tenth coffee is free</title>
-<meta name="description" content="Kembali puts a stamp card in every customer's phone. Follow one regular through ten visits at a Malaysian coffee shop.">
+<title>Kembali · Digital stamp cards for shops that run on regulars</title>
+<meta name="description" content="Kembali puts a stamp card in every customer's phone. Staff scan a code, the stamp lands in seconds, and you see it the moment it happens.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='none' stroke='%230F3D32' stroke-width='5'/%3E%3Ccircle cx='16' cy='16' r='5' fill='%23E0684B'/%3E%3C/svg%3E">
-<meta property="og:title" content="Kembali · The tenth coffee is free">
-<meta property="og:description" content="A stamp card that lives in the phone. Follow one regular through ten visits.">
+<meta property="og:title" content="Kembali · Digital stamp cards">
+<meta property="og:description" content="A stamp card that lives in the phone. For cafes, gyms, salons, car washes, and any shop that runs on repeat visits.">
 <meta property="og:image" content="assets/hero-pull.jpg">
 <meta name="theme-color" content="#071E18">
 <link rel="stylesheet" href="css/main.css">
 </head>
 <body data-loading>
 
-<!-- press-in loader -->
 <div class="loader" id="loader" aria-hidden="true">
   <div class="loader-stamp">
     <svg viewBox="0 0 96 96" class="loader-mark">
@@ -25,14 +24,19 @@
 </div>
 
 <header class="topbar" id="topbar">
-  <a class="lockup" href="#top" aria-label="Kembali home">
+  <a class="lockup" href="index.html" aria-label="Kembali home">
     <svg viewBox="0 0 96 96" class="lockup-mark" aria-hidden="true">
       <circle cx="48" cy="48" r="34" fill="none" stroke="currentColor" stroke-width="10"/>
       <circle cx="48" cy="48" r="12" fill="var(--coral)"/>
     </svg>
     <span class="lockup-word">kembal<span class="lockup-i">i</span></span>
   </a>
-  <a class="chip-cta" href="#start">Start your card</a>
+  <nav class="topnav" aria-label="Main">
+    <a class="tn-link mono" href="story.html">Story</a>
+    <a class="tn-link mono" href="roadmap.html">Roadmap</a>
+    <a class="tn-link mono" href="pricing.html">Pricing</a>
+  </nav>
+  <a class="chip-cta" href="pricing.html">Start your card</a>
 </header>
 
 <main id="top">
@@ -47,78 +51,95 @@
           <span class="line"><span class="w">are</span> <span class="w">the</span> <span class="w">whole</span></span>
           <span class="line"><span class="w">business.</span></span>
         </h1>
-        <p class="hero-sub">Kembali puts a stamp card in every customer's phone.<br>
-        Staff scan a code and the stamp lands in seconds.</p>
+        <p class="hero-sub">Kembali puts a stamp card in every customer's phone.
+        Staff scan a code and the stamp lands in seconds, at any kind of counter.</p>
         <div class="hero-actions">
-          <a class="btn btn-solid" href="#start">Start your card</a>
-          <a class="btn btn-ghost" href="#visit-1">Watch a card fill</a>
+          <a class="btn btn-solid" href="pricing.html">Start your card</a>
+          <a class="btn btn-ghost" href="story.html">Watch a card fill</a>
         </div>
       </div>
       <figure class="hero-panel">
-        <canvas class="hero-canvas" id="heroCanvas" aria-hidden="true"></canvas>
+        <canvas class="hero-canvas" id="heroCanvas" data-tex="assets/hero-pull.jpg" aria-hidden="true"></canvas>
         <img class="hero-fallback" src="assets/hero-pull.jpg" alt="A drink seller pulls tea in a long stream at a Penang stall" loading="eager">
         <figcaption class="hero-panel-cap mono">Penang, 7:42 am · the day's first pull</figcaption>
       </figure>
     </div>
     <div class="hero-foot">
-      <p class="scroll-hint mono">Scroll<span class="hint-arrow">&darr;</span> each chapter is one visit</p>
+      <p class="scroll-hint mono">Scroll<span class="hint-arrow">&darr;</span> see how it works</p>
       <p class="click-hint mono">Click anywhere: leave a stamp</p>
-      <p class="hero-place mono">Corner Coffee, Petaling Jaya · one regular, ten visits</p>
+      <p class="hero-place mono">No app to build · no hardware to buy</p>
     </div>
   </section>
 
   <!-- ================= LEDGER TICKER ================= -->
   <div class="ticker" aria-hidden="true">
     <div class="ticker-track" id="tickerTrack">
-      <span>7:42 am · Aisyah joined · SS2</span>
       <span>7:48 am · white coffee · RM 4.00 · stamp 3 of 10</span>
-      <span>7:51 am · pulled tea, toast · RM 8.50 · stamp 7 of 10</span>
-      <span>7:55 am · reward confirmed · free coffee · SS2</span>
-      <span>8:01 am · iced white coffee · RM 5.50 · stamp 1 of 10</span>
-      <span>8:04 am · white coffee, eggs · RM 9.00 · stamp 9 of 10</span>
-      <span>8:09 am · Ming Wei joined · Damansara</span>
-      <span>8:12 am · white coffee · RM 4.00 · stamp 4 of 10</span>
+      <span>9:15 am · wash and vacuum · RM 28.00 · stamp 6 of 9</span>
+      <span>10:20 am · gym check-in · visit 11 · guest pass earned</span>
+      <span>12:05 pm · chicken rice set · RM 12.50 · 12 points</span>
+      <span>3:30 pm · iced dessert bowl · RM 7.00 · stamp 2 of 10</span>
+      <span>5:45 pm · haircut · RM 38.00 · stamp 4 of 6</span>
+      <span>7:12 pm · reward confirmed · free coffee</span>
+      <span>8:40 pm · foot massage · RM 68.00 · 68 points</span>
     </div>
   </div>
 
-  <!-- ================= MANIFESTO ================= -->
-  <section class="manifesto paper" id="manifesto" data-theme="light">
+  <!-- ================= INDUSTRIES ================= -->
+  <section class="industries" id="industries" data-theme="dark">
     <div class="wrap">
-      <p class="eyebrow reveal">Chapter zero · the problem</p>
-      <h2 class="manifesto-title">
-        <span class="reveal-line">The tenth coffee</span>
-        <span class="reveal-line">has always been free.</span>
-        <span class="reveal-line muted-line">The paper card was</span>
-        <span class="reveal-line muted-line">the problem.</span>
+      <p class="eyebrow reveal">One card, many counters</p>
+      <h2 class="section-title reveal-line-group">
+        <span class="reveal-line">Anywhere people</span>
+        <span class="reveal-line">come back.</span>
       </h2>
-      <div class="manifesto-cols">
-        <p class="reveal">Cards tear, fade, and go through the wash. The shop forgets. The customer gives up, and the habit quietly dies.</p>
-        <p class="reveal">Kembali keeps the card where nobody loses it. It opens in the phone's browser, with nothing to install and nothing to print twice.</p>
-      </div>
-      <div class="manifesto-stage">
-        <figure class="manifesto-photo reveal" data-parallax="-0.03">
-          <img src="assets/scene-interior.jpg" alt="Regulars filling the tables of an old coffee shop in the evening" loading="lazy">
-          <figcaption class="mono">the regulars, 7 pm</figcaption>
-        </figure>
-      <figure class="paper-card reveal" data-parallax="0.045" aria-hidden="true">
-        <div class="pcard">
-          <p class="pcard-head">COFFEE CARD</p>
-          <div class="pcard-grid">
-            <span class="pstamp filled"></span><span class="pstamp filled"></span><span class="pstamp filled"></span><span class="pstamp"></span><span class="pstamp"></span>
-            <span class="pstamp"></span><span class="pstamp"></span><span class="pstamp"></span><span class="pstamp"></span><span class="pstamp free">FREE</span>
-          </div>
-          <p class="pcard-foot">buy 9, get the 10th on us</p>
+      <p class="ind-sub reveal">You set what a visit earns and what the reward is. Kembali does the counting, the coupons, and the reports.</p>
+      <div class="ind-grid">
+        <div class="ind-card reveal">
+          <div class="ic-photo"><img class="ic-duo" src="assets/ind-cafe-duo.jpg" alt="" loading="lazy"><img class="ic-col" src="assets/ind-cafe-col.jpg" alt="A tall glass of white coffee on a marble table" loading="lazy"></div>
+          <div class="ic-meta"><b>Coffee shops</b><span class="mono">Buy 9, the 10th free</span></div>
         </div>
-        <figcaption class="mono">last seen: jacket pocket, March</figcaption>
-      </figure>
+        <div class="ind-card reveal">
+          <div class="ic-photo"><img class="ic-duo" src="assets/ind-restaurant-duo.jpg" alt="" loading="lazy"><img class="ic-col" src="assets/ind-restaurant-col.jpg" alt="A bowl of curry laksa" loading="lazy"></div>
+          <div class="ic-meta"><b>Restaurants</b><span class="mono">RM 1 spent = 1 point</span></div>
+        </div>
+        <div class="ind-card reveal">
+          <div class="ic-photo"><img class="ic-duo" src="assets/ind-dessert-duo.jpg" alt="" loading="lazy"><img class="ic-col" src="assets/ind-dessert-col.jpg" alt="Two bowls of iced cendol held up" loading="lazy"></div>
+          <div class="ic-meta"><b>Dessert shops</b><span class="mono">10 visits, one free bowl</span></div>
+        </div>
+        <div class="ind-card reveal">
+          <div class="ic-photo"><img class="ic-duo" src="assets/ind-gym-duo.jpg" alt="" loading="lazy"><img class="ic-col" src="assets/ind-gym-col.jpg" alt="A bench press and weight plates in a gym" loading="lazy"></div>
+          <div class="ic-meta"><b>Gyms</b><span class="mono">12 check-ins, one guest pass</span></div>
+        </div>
+        <div class="ind-card reveal">
+          <div class="ic-photo"><img class="ic-duo" src="assets/ind-salon-duo.jpg" alt="" loading="lazy"><img class="ic-col" src="assets/ind-salon-col.jpg" alt="A hair salon seen through its front window" loading="lazy"></div>
+          <div class="ic-meta"><b>Salons</b><span class="mono">5 cuts, half off the 6th</span></div>
+        </div>
+        <div class="ind-card reveal">
+          <div class="ic-photo"><img class="ic-duo" src="assets/ind-carwash-duo.jpg" alt="" loading="lazy"><img class="ic-col" src="assets/ind-carwash-col.jpg" alt="Cars under the canopy of a Johor car wash" loading="lazy"></div>
+          <div class="ic-meta"><b>Car washes</b><span class="mono">Wash 9, the 10th free</span></div>
+        </div>
+        <div class="ind-card reveal">
+          <div class="ic-photo"><img class="ic-duo" src="assets/ind-wellness-duo.jpg" alt="" loading="lazy"><img class="ic-col" src="assets/ind-wellness-col.jpg" alt="A foot massage in progress" loading="lazy"></div>
+          <div class="ic-meta"><b>Wellness</b><span class="mono">10 sessions, 1 upgrade</span></div>
+        </div>
+        <a class="ind-card ind-yours reveal" href="pricing.html">
+          <div class="iy-inner">
+            <svg viewBox="0 0 96 96" aria-hidden="true">
+              <circle cx="48" cy="48" r="34" fill="none" stroke="currentColor" stroke-width="8" stroke-dasharray="8 10" stroke-linecap="round"/>
+              <circle cx="48" cy="48" r="12" fill="var(--coral)"/>
+            </svg>
+            <div class="ic-meta"><b>Your shop</b><span class="mono">Name the reward, we count</span></div>
+          </div>
+        </a>
       </div>
     </div>
   </section>
 
-  <!-- ================= VISIT 01 · JOIN ================= -->
+  <!-- ================= JOIN ================= -->
   <section class="visit-join" id="visit-1" data-theme="dark">
     <div class="wrap">
-      <p class="ledger-tag mono reveal">Visit 01 · Tue 7:42 am</p>
+      <p class="ledger-tag mono reveal">For your customers</p>
       <h2 class="section-title reveal-line-group">
         <span class="reveal-line">Join at the counter</span>
         <span class="reveal-line">in one scan.</span>
@@ -139,15 +160,15 @@
           <figcaption class="mono">printed from the QR kit, one per outlet</figcaption>
         </figure>
         <div class="join-copy">
-          <p class="reveal">Aisyah scans the poster beside the till. Her number is checked with a six digit code.</p>
-          <p class="reveal">The card opens in her browser, already in the shop's colours. No app store, no password, no form longer than one screen.</p>
+          <p class="reveal">Your customer scans the poster beside the till. Their number is checked with a six digit code.</p>
+          <p class="reveal">The card opens in their browser, already in your colours. No app store, no password, no form longer than one screen.</p>
           <ul class="join-facts">
             <li class="reveal"><span class="mono">01</span>Phone number is the account</li>
             <li class="reveal"><span class="mono">02</span>Works on any phone with a camera</li>
             <li class="reveal"><span class="mono">03</span>First stamp lands the same minute</li>
           </ul>
         </div>
-        <div class="join-phone reveal" id="joinPhone" data-parallax="-0.04"><p class="col-label mono">On her phone</p>
+        <div class="join-phone reveal" id="joinPhone" data-parallax="-0.04"><p class="col-label mono">On their phone</p>
           <div class="phone">
             <div class="phone-notch"></div>
             <div class="phone-screen" id="phoneScreen">
@@ -159,76 +180,22 @@
     </div>
   </section>
 
-  <!-- ================= VISITS 02..09 · THE RITUAL ================= -->
-  <section class="ritual" id="ritual" data-theme="dark">
-    <div class="ritual-sticky">
-      <div class="ritual-bg">
-        <img src="assets/food-kaya.jpg" alt="" class="ritual-photo" data-idx="0">
-        <img src="assets/food-kopi.jpg" alt="" class="ritual-photo" data-idx="1">
-        <img src="assets/food-teh.jpg" alt="" class="ritual-photo" data-idx="2">
-        <img src="assets/food-egg.jpg" alt="" class="ritual-photo" data-idx="3">
-        <div class="ritual-shade"></div>
-      </div>
-      <div class="ritual-content wrap">
-        <div class="ritual-left">
-          <p class="ledger-tag mono">Visits 02 to 09 · the ritual</p>
-          <h2 class="section-title">Three seconds<br>at the till.</h2>
-          <p class="ritual-sub">Farid scans her code, types the amount, done. The stamp, the ringgit value, and the outlet are written to a ledger that nothing can quietly edit.</p>
-          <ol class="ledger" id="ledger">
-            <li class="ledger-row" data-stamp="2"><span class="mono lr-date">Wed 8:01</span><span class="lr-item">white coffee, toast</span><span class="mono lr-amt">RM 8.50</span></li>
-            <li class="ledger-row" data-stamp="3"><span class="mono lr-date">Thu 7:56</span><span class="lr-item">white coffee</span><span class="mono lr-amt">RM 4.00</span></li>
-            <li class="ledger-row" data-stamp="4"><span class="mono lr-date">Fri 8:03</span><span class="lr-item">pulled tea, eggs</span><span class="mono lr-amt">RM 9.00</span></li>
-            <li class="ledger-row" data-stamp="5"><span class="mono lr-date">Mon 7:49</span><span class="lr-item">white coffee</span><span class="mono lr-amt">RM 4.00</span></li>
-            <li class="ledger-row" data-stamp="6"><span class="mono lr-date">Tue 8:12</span><span class="lr-item">iced white coffee</span><span class="mono lr-amt">RM 5.50</span></li>
-            <li class="ledger-row" data-stamp="7"><span class="mono lr-date">Wed 7:58</span><span class="lr-item">white coffee, toast</span><span class="mono lr-amt">RM 8.50</span></li>
-            <li class="ledger-row" data-stamp="8"><span class="mono lr-date">Thu 8:04</span><span class="lr-item">white coffee</span><span class="mono lr-amt">RM 4.00</span></li>
-            <li class="ledger-row" data-stamp="9"><span class="mono lr-date">Fri 7:51</span><span class="lr-item">pulled tea, toast set</span><span class="mono lr-amt">RM 10.00</span></li>
-          </ol>
-          <p class="ledger-total mono" id="ledgerTotal">RM 0.00 recorded · 1 visit</p>
-        </div>
-        <div class="ritual-right">
-          <div class="big-card" id="bigCard">
-            <div class="bc-head">
-              <span class="bc-name">Aisyah</span>
-              <span class="bc-shop mono">CORNER COFFEE</span>
-            </div>
-            <div class="bc-grid" id="bcGrid">
-              <!-- 10 stamp cells by JS -->
-            </div>
-            <div class="bc-foot">
-              <span class="mono" id="bcCount">1 of 10</span>
-              <span class="bc-hint">10th coffee free</span>
-            </div>
-          </div>
-          <p class="bc-caption mono">stamp_events · append only · amount per stamp</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ================= VISIT 10 · REWARD ================= -->
-  <section class="reward" id="reward" data-theme="coral">
-    <canvas class="reward-ink" id="rewardInk" aria-hidden="true"></canvas>
-    <div class="wrap reward-content">
-      <p class="ledger-tag mono reveal">Visit 10 · Sat 9:15 am</p>
-      <h2 class="reward-title" id="rewardTitle"><span class="reveal-line">Visit ten.</span><span class="reveal-line">The free one.</span></h2>
-      <div class="reward-grid">
-        <div class="coupon reveal" id="coupon" data-parallax="0.035">
-          <p class="coupon-label mono">REWARD COUPON</p>
-          <p class="coupon-code mono">KMB-7F2K-QX3D</p>
-          <div class="coupon-meta">
-            <span>Single use</span>
-            <span class="dot-sep"></span>
-            <span>Expires in 15:00</span>
-          </div>
-          <div class="coupon-tear" aria-hidden="true"></div>
-          <div class="redeemed-stamp mono" id="redeemedStamp" aria-hidden="true">Redeemed<br>Sat 9:17 am</div>
-        </div>
-        <div class="reward-copy">
-          <p class="reveal">Aisyah taps redeem and shows the code. Farid scans it, hits confirm, and the tenth coffee is free.</p>
-          <p class="reveal">Points come off only when staff confirm. A screenshot from yesterday buys nothing.</p>
-          <p class="reveal reward-fact mono">tested: two cashiers, one coupon, one payout</p>
-        </div>
+  <!-- ================= STORY TEASER ================= -->
+  <section class="teaser paper" id="teaser" data-theme="light">
+    <div class="wrap teaser-grid">
+      <figure class="teaser-photo reveal" data-parallax="-0.03">
+        <img src="assets/scene-interior.jpg" alt="Regulars filling the tables of an old coffee shop in the evening" loading="lazy">
+        <figcaption class="mono">Corner Coffee, 7 pm</figcaption>
+      </figure>
+      <div class="teaser-copy">
+        <p class="eyebrow reveal">One regular, ten visits</p>
+        <h2 class="section-title reveal-line-group">
+          <span class="reveal-line">See the card</span>
+          <span class="reveal-line">from her side.</span>
+        </h2>
+        <p class="reveal">We followed Aisyah through her card at Corner Coffee, stamp by stamp, to the free one.</p>
+        <p class="reveal">It is the quickest way to feel what your customers get.</p>
+        <a class="btn btn-solid reveal" href="story.html">Follow the story</a>
       </div>
     </div>
   </section>
@@ -317,7 +284,10 @@
         <p class="price-line"><span class="price">RM99</span> per outlet, per month at the founding price.</p>
         <p class="price-sub">No card reader, no contract, no charge until your card is live.</p>
       </div>
-      <a class="btn btn-solid btn-big reveal" href="mailto:hello@kembali.app">Start your card</a>
+      <div class="hero-actions">
+        <a class="btn btn-solid btn-big reveal" href="mailto:hello@kembali.app">Start your card</a>
+        <a class="btn btn-ghost btn-big reveal" href="pricing.html">See pricing</a>
+      </div>
       <p class="cta-sub mono reveal">hello@kembali.app · reply within one working day</p>
     </div>
   </section>
@@ -334,23 +304,21 @@
       <p class="footer-word">kembal<span class="lockup-i">i</span></p>
       <p class="footer-line">Loyalty your customers will love.</p>
     </div>
+    <nav class="footer-nav mono" aria-label="Footer">
+      <a href="index.html">Home</a>
+      <a href="story.html">Story</a>
+      <a href="roadmap.html">Roadmap</a>
+      <a href="pricing.html">Pricing</a>
+    </nav>
     <div class="footer-meta mono">
       <p>Built for Malaysian shops · Petaling Jaya</p>
       <p>Photography: Wikimedia Commons contributors, CC licensed.<br>
-      Thanakrit Gu · Chongkian · Cheng · Alpha · Sharon Hahn Darlin · さえぼー · Uwe Aranas · Slleong · Pinklily08</p>
+      Thanakrit Gu · Chongkian · Cheng · Alpha · Sharon Hahn Darlin · さえぼー · Slleong · Pinklily08 · Aditya Oberai · Paul Ng · Xlr8ion · Kolobetsoo · Ka23 13</p>
       <p>&copy; 2026 Kembali</p>
     </div>
   </div>
 </footer>
 
-<!-- persistent stamp-card HUD -->
-<aside class="hud" id="hud" aria-label="Story progress, styled as a stamp card">
-  <p class="hud-label mono">AISYAH’S CARD</p>
-  <div class="hud-grid" id="hudGrid"></div>
-  <p class="hud-count mono" id="hudCount">0 of 10</p>
-</aside>
-
-<!-- ink overlay + cursor -->
 <canvas id="inkCanvas" aria-hidden="true"></canvas>
 <div class="cursor-dot" id="cursorDot" aria-hidden="true"></div>
 

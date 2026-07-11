@@ -1,10 +1,23 @@
-# Kembali showcase · "Ten visits"
+# Kembali showcase
 
-A standalone, dependency-free showcase site for Kembali. The page is structured as a
-stamp card being filled: scrolling the story stamps a persistent card in the corner,
-and the tenth stamp earns the reward. Not part of the production marketing surface
-(`apps/web`); it deliberately breaks the DESIGN-dub frosted-SaaS system as an
-art-directed piece while staying inside the BRAND.md Pandan palette and §5 copy rules.
+A standalone, dependency-free showcase site for Kembali. Four pages share one
+engine (`js/main.js`, feature-guarded per page):
+
+- `index.html` — business-first landing: industry band (cafes, restaurants,
+  dessert, gyms, salons, car washes, wellness; duotone at rest, colour on hover),
+  join-in-one-scan with the live phone demo, merchant dashboard + real product
+  proof, setup + founding price.
+- `story.html` — "Ten visits", Aisyah's story: the original scroll narrative.
+  Scrolling fills her card in the corner; the tenth stamp is the reward, and a
+  closing chapter starts card number two.
+- `roadmap.html` — the ledger timeline: live rows are stamped coral, upcoming
+  rows dashed. Content mirrors ROADMAP.md in public language.
+- `pricing.html` — PRICING.md §8: Founding RM99 hero coupon (rubber-stamped),
+  Starter RM149, Growth RM279, notes and FAQ.
+
+Not part of the production marketing surface (`apps/web`); it deliberately breaks
+the DESIGN-dub frosted-SaaS system as an art-directed piece while staying inside
+the BRAND.md Pandan palette and §5 copy rules.
 
 ## Run
 
@@ -44,6 +57,13 @@ Wikimedia Commons, graded in-house into a pandan duotone / warm filmic pair
 | food-kopi.jpg | "Kopi Rasa" | さえぼー | CC0 |
 | food-teh.jpg | "Teh tarik 2" | Alpha (Melbourne) | CC BY-SA 2.0 |
 | food-egg.jpg | "Kaya toast dip into soft boiled egg" | Pinklily08 | CC BY-SA 4.0 |
+| ind-gym-*.jpg | "Bench Press" | Aditya Oberai | CC BY-SA 4.0 |
+| ind-carwash-*.jpg | "Car wash in Jln Yahya Awal Johor Bahru" | Paul Ng | CC BY-SA 3.0 |
+| ind-dessert-*.jpg | "Cendol in Penang" | Xlr8ion | CC BY-SA 4.0 |
+| ind-wellness-*.jpg | "Foot massage at a spa" | Kolobetsoo | CC BY-SA 4.0 |
+| ind-salon-*.jpg | "Beauty salon 20211024 171434" | Ka23 13 | CC BY-SA 4.0 |
+| ind-restaurant-*.jpg | "Curry Laksa Chicken, Old Town Kopitiam Mamak" | Alpha (Melbourne) | CC BY-SA 2.0 |
+| ind-cafe-*.jpg | "Kopi Rasa" | さえぼー | CC0 |
 
 Attribution also appears in the site footer. Full source URLs: see
 `credits.json` from the sourcing run (scratchpad) or the Commons file pages by title.

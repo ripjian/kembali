@@ -1,0 +1,481 @@
+/* Concept 1 — Kopitiam skeuomorphism.
+ * A real paper stamp card on a marble tabletop in warm daylight. Kembali
+ * palette, stretched warm: coral is the rubber-stamp ink (earned), pandan is
+ * the buttons (do), leaf is progress. Textures are CSS + tiny inline SVG
+ * grain; all motion is transform/opacity and pauses under reduced-motion. */
+
+[data-concept="1"] {
+  --paper: #f7f1e2;
+  --paper-edge: #e7dcc2;
+  --marble: #ece5d5;
+  --ink: #23302a; /* warm near-black, body copy */
+  --ink-soft: #5c6154;
+  --pandan: #0f3d32;
+  --pandan-ink: #0c3228;
+  --coral: #e0684b; /* stamp ink, earned */
+  --coral-deep: #a93e24; /* coral where it must be text */
+  --leaf: #6f9e58;
+  --hair: #d8ccae;
+  --gold: #c98a2e; /* kopi & kunyit warmth, garnish only */
+
+  color: var(--ink);
+  font-family: var(--font-jakarta);
+}
+
+/* ---- marble tabletop + warm daylight ---- */
+.k-page {
+  position: relative;
+  min-height: 100dvh;
+  isolation: isolate;
+  background:
+    radial-gradient(120% 90% at 12% -5%, rgba(255, 252, 242, 0.9), transparent 55%),
+    radial-gradient(90% 70% at 88% 8%, rgba(255, 246, 224, 0.55), transparent 60%),
+    linear-gradient(180deg, #efe9db 0%, var(--marble) 40%, #e4dcc9 100%);
+}
+/* faint marble veins + paper-fine grain, layered and non-interactive */
+.k-page::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.5;
+  background-image:
+    linear-gradient(72deg, transparent 0 48%, rgba(120, 116, 96, 0.09) 48.4% 48.7%, transparent 49%),
+    linear-gradient(101deg, transparent 0 61%, rgba(120, 116, 96, 0.07) 61.3% 61.6%, transparent 62%),
+    linear-gradient(58deg, transparent 0 27%, rgba(140, 132, 108, 0.06) 27.3% 27.5%, transparent 28%);
+  background-size: 100% 100%;
+}
+.k-grain {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.5;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
+}
+
+.k-wrap {
+  position: relative;
+  z-index: 1;
+  max-width: 68rem;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+
+/* ---- shared type ---- */
+.k-eyebrow {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--coral-deep);
+}
+.k-serif {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--pandan);
+}
+.k-h1 {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-weight: 600;
+  font-size: clamp(2.6rem, 7vw, 4.5rem);
+  line-height: 1.0;
+  letter-spacing: -0.02em;
+  color: var(--pandan);
+}
+.k-lede {
+  font-size: 1.06rem;
+  line-height: 1.62;
+  color: var(--ink-soft);
+}
+
+/* ---- buttons (pandan = do) ---- */
+.k-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.8rem 1.3rem;
+  border-radius: 9999px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1),
+    background-color 160ms ease;
+}
+.k-btn-primary {
+  background: var(--pandan);
+  color: #f7f1e2;
+  box-shadow: 0 2px 0 var(--pandan-ink), 0 10px 22px rgba(15, 61, 50, 0.24);
+}
+.k-btn-primary:hover {
+  background: var(--pandan-ink);
+}
+.k-btn-ghost {
+  background: rgba(255, 253, 246, 0.6);
+  color: var(--pandan);
+  border-color: var(--hair);
+}
+.k-btn:active {
+  transform: translateY(1px) scale(0.99);
+}
+
+/* ---- the paper stamp card ---- */
+.k-card {
+  position: relative;
+  background:
+    linear-gradient(180deg, #fbf6ea, var(--paper) 30%, #f2ead6 100%);
+  border: 1px solid var(--paper-edge);
+  border-radius: 14px;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.7) inset,
+    0 18px 40px -18px rgba(60, 48, 24, 0.45),
+    0 3px 8px rgba(60, 48, 24, 0.12);
+  padding: 1.4rem 1.4rem 1.2rem;
+}
+/* torn/deckled feel: soft dark edge + a paper-grain multiply on the card */
+.k-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  pointer-events: none;
+  opacity: 0.4;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='2'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)' opacity='0.3'/%3E%3C/svg%3E");
+}
+.k-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-bottom: 0.9rem;
+  border-bottom: 2px dashed var(--hair);
+}
+.k-card-shop {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: var(--ink);
+}
+.k-card-sub {
+  font-size: 0.76rem;
+  color: var(--ink-soft);
+}
+.k-punchcode {
+  font-family: var(--font-space), ui-monospace, monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  color: var(--ink-soft);
+  background: rgba(201, 138, 46, 0.14);
+  border: 1px solid rgba(201, 138, 46, 0.35);
+  border-radius: 6px;
+  padding: 0.15rem 0.45rem;
+}
+
+/* stamp grid */
+.k-grid {
+  margin-top: 1.1rem;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.6rem;
+}
+.k-slot {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 9999px;
+  border: 2px dashed color-mix(in srgb, var(--hair) 82%, var(--ink));
+  display: grid;
+  place-items: center;
+}
+.k-slot-num {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 0.95rem;
+  color: color-mix(in srgb, var(--ink-soft) 70%, transparent);
+}
+/* an earned stamp: coral ink return-loop, slightly rough + off-kilter */
+.k-stamp {
+  position: absolute;
+  inset: 6%;
+  color: var(--coral);
+  filter: url(#k-inkrough);
+  opacity: 0.94;
+}
+.k-slot[data-filled="true"] {
+  border-color: color-mix(in srgb, var(--coral) 45%, var(--hair));
+}
+.k-slot[data-filled="true"] .k-slot-num {
+  opacity: 0;
+}
+/* landing animation: pop in (never from 0), tiny rotate for hand-pressed feel */
+.k-stamp-land {
+  animation: k-land 460ms cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+@keyframes k-land {
+  0% {
+    opacity: 0;
+    transform: scale(1.5) rotate(-9deg);
+  }
+  55% {
+    opacity: 1;
+    transform: scale(0.92) rotate(-4deg);
+  }
+  100% {
+    opacity: 0.94;
+    transform: scale(1) rotate(-6deg);
+  }
+}
+/* ink bloom ring behind a fresh stamp */
+.k-bloom {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  border: 2px solid var(--coral);
+  opacity: 0;
+  pointer-events: none;
+}
+.k-bloom-go {
+  animation: k-bloom 520ms ease-out both;
+}
+@keyframes k-bloom {
+  0% {
+    opacity: 0.5;
+    transform: scale(0.7);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.7);
+  }
+}
+
+/* progress line under the grid (leaf) */
+.k-progress {
+  margin-top: 1rem;
+  height: 8px;
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--hair) 70%, transparent);
+  overflow: hidden;
+}
+.k-progress-fill {
+  height: 100%;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, var(--leaf), #8db877);
+  transform-origin: left;
+  transition: transform 480ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* ---- the rubber stamp tool + ink pad ---- */
+.k-tool-zone {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1.4rem;
+}
+.k-inkpad {
+  width: 88px;
+  height: 26px;
+  border-radius: 9999px;
+  background:
+    radial-gradient(60% 120% at 50% 20%, #ef8267, var(--coral) 60%, #c14e33 100%);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.25), 0 4px 10px rgba(60, 30, 20, 0.25);
+}
+.k-stamp-tool {
+  position: relative;
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: translateY(-6px);
+  transition: transform 180ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.k-stamp-tool:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+.k-stamp-tool:hover:not(:disabled) {
+  transform: translateY(-9px) rotate(-1deg);
+}
+.k-stamp-tool:active:not(:disabled) {
+  transform: translateY(2px);
+}
+.k-stamp-knob {
+  width: 34px;
+  height: 46px;
+  border-radius: 12px 12px 8px 8px;
+  background: linear-gradient(180deg, #3a4b3f, #26332b);
+  box-shadow: inset 0 2px 2px rgba(255, 255, 255, 0.14), 0 6px 12px rgba(0, 0, 0, 0.28);
+}
+.k-stamp-base {
+  margin-top: -3px;
+  width: 62px;
+  height: 22px;
+  border-radius: 6px;
+  background: linear-gradient(180deg, #d9b25f, #b5842d);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.4), 0 4px 8px rgba(60, 40, 15, 0.3);
+}
+.k-stamp-press {
+  animation: k-press 400ms cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+@keyframes k-press {
+  0% {
+    transform: translateY(-6px);
+  }
+  32% {
+    transform: translateY(14px) scale(0.98);
+  }
+  100% {
+    transform: translateY(-6px);
+  }
+}
+.k-tool-hint {
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+  min-height: 1.4em;
+}
+.k-link-reset {
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  font: inherit;
+  color: var(--pandan);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+/* reward (10th) slot: a coral ring even when empty, so the goal reads */
+.k-slot[data-reward="true"] {
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--coral) 55%, var(--hair));
+}
+.k-slot[data-reward="true"] .k-slot-num {
+  color: var(--coral-deep);
+  opacity: 0.85;
+}
+
+/* card shake on impact */
+.k-card-hit {
+  animation: k-hit 260ms ease-out both;
+}
+@keyframes k-hit {
+  0%, 100% { transform: translate(0, 0); }
+  30% { transform: translate(0.5px, 1.5px); }
+  60% { transform: translate(-0.5px, -0.5px); }
+}
+
+/* ---- coffee ring stain on the tabletop (decorative) ---- */
+.k-stain {
+  position: absolute;
+  width: 132px;
+  height: 132px;
+  border-radius: 9999px;
+  border: 7px solid rgba(120, 78, 40, 0.13);
+  box-shadow: inset 0 0 0 3px rgba(120, 78, 40, 0.06);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ---- receipts (how it works) ---- */
+.k-receipt {
+  background: linear-gradient(180deg, #fdfaf1, #f6efdd);
+  border: 1px solid var(--paper-edge);
+  border-radius: 4px;
+  padding: 1.1rem 1.2rem 1.3rem;
+  box-shadow: 0 12px 26px -16px rgba(60, 48, 24, 0.4);
+  position: relative;
+}
+.k-receipt-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+  font-size: 0.92rem;
+}
+.k-receipt-row .lead {
+  flex: 1;
+  border-bottom: 2px dotted var(--hair);
+  transform: translateY(-4px);
+  margin: 0 4px;
+}
+.k-receipt-val {
+  font-family: var(--font-space), ui-monospace, monospace;
+  font-size: 0.82rem;
+  color: var(--coral-deep);
+}
+
+/* ---- stat block ---- */
+.k-stat {
+  background: rgba(255, 253, 246, 0.7);
+  border: 1px solid var(--hair);
+  border-radius: 12px;
+  padding: 1rem;
+  text-align: left;
+}
+.k-stat-num {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-weight: 600;
+  font-size: 1.8rem;
+  color: var(--pandan);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.k-stat-num[data-earn="true"] {
+  color: var(--coral-deep);
+}
+.k-stat-label {
+  margin-top: 0.3rem;
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+}
+
+/* ---- pricing chips ---- */
+.k-plan {
+  border: 1px solid var(--hair);
+  border-radius: 14px;
+  background: rgba(255, 253, 246, 0.75);
+  padding: 1.2rem;
+}
+.k-plan[data-featured="true"] {
+  border-color: var(--coral);
+  box-shadow: 0 0 0 3px rgba(224, 104, 75, 0.14);
+  background: linear-gradient(180deg, #fffdf6, #f7efdd);
+}
+.k-plan-price {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-weight: 600;
+  font-size: 2rem;
+  color: var(--pandan);
+}
+
+/* ---- section rule (dashed, like a perforation) ---- */
+.k-rule {
+  border: 0;
+  border-top: 2px dashed var(--hair);
+  margin: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .k-stamp-land,
+  .k-bloom-go,
+  .k-stamp-press,
+  .k-card-hit {
+    animation: none !important;
+  }
+  .k-stamp-land {
+    opacity: 0.94;
+    transform: rotate(-6deg);
+  }
+  .k-progress-fill,
+  .k-stamp-tool,
+  .k-btn {
+    transition: none;
+  }
+}

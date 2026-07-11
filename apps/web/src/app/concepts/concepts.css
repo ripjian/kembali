@@ -1,0 +1,71 @@
+/* Shared base for the /concepts sandbox. Each concept pins its own palette
+ * and textures in its own CSS file (imported by its page.tsx); this file only
+ * holds what every concept shares: the wrapper defaults and the little
+ * cross-concept switcher. Tailwind utilities come from globals.css (root
+ * layout). Colour utilities are restricted to the Kembali tokens because
+ * globals.css resets --color-* to initial, so concepts theme by overriding
+ * the raw CSS vars (--bg, --primary, --accent ...) on their [data-concept]
+ * wrapper. A wrapper's declarations win over :root for its subtree, which is
+ * how a concept stays immune to OS dark mode. */
+
+.cx-root {
+  font-family: var(--font-jakarta), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100dvh;
+}
+
+/* Cross-concept switcher: fixed, self-contained colours so it reads on any of
+ * the five very different canvases. Frosted dark pill, one accent dot. */
+.cx-switch {
+  position: fixed;
+  z-index: 50;
+  left: 50%;
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.55rem;
+  border-radius: 9999px;
+  background: rgba(16, 32, 26, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(10px);
+  color: #f6f1e3;
+  font-size: 0.8rem;
+}
+.cx-switch a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.9rem;
+  height: 1.9rem;
+  padding: 0 0.55rem;
+  border-radius: 9999px;
+  color: rgba(246, 241, 227, 0.72);
+  text-decoration: none;
+  font-variant-numeric: tabular-nums;
+  transition: background-color 160ms cubic-bezier(0.23, 1, 0.32, 1),
+    color 160ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.cx-switch a:hover {
+  color: #f6f1e3;
+  background: rgba(255, 255, 255, 0.1);
+}
+.cx-switch a[data-current="true"] {
+  background: #e0684b;
+  color: #16261e;
+  font-weight: 600;
+}
+.cx-switch .cx-switch-home {
+  color: rgba(246, 241, 227, 0.9);
+  padding-inline: 0.7rem;
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cx-switch a {
+    transition: none;
+  }
+}

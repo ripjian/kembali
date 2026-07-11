@@ -1,0 +1,276 @@
+/* Concept 7 - Kinetic type specimen.
+ * A variable font (Roboto Flex, --font-flex) at poster scale is the entire
+ * design language. Near-zero imagery. The hero line about customers coming
+ * back animates its weight and width on scroll, so the word "back" returns.
+ * Letters also thicken and widen toward the pointer (kinetic.tsx). Everything
+ * kinetic is gated behind prefers-reduced-motion: no-preference (and a fine
+ * pointer for the cursor effect); the static fallback is a fixed, tasteful
+ * weight with nothing hidden. Kembali palette: pandan ink on warm paper,
+ * coral is the earned accent, leaf is progress. */
+
+[data-concept="7"] {
+  color-scheme: light;
+  --bg: #f4efe1; /* warm paper */
+  --ink: #142e25; /* near-black pandan ink, body + display */
+  --ink-soft: #566056;
+  --pandan: #0f3d32;
+  --pandan-ink: #0a2c24;
+  --coral: #e0684b; /* earned (large/decorative only) */
+  --coral-deep: #a93e24; /* coral as text */
+  --leaf: #7fb069;
+  --leaf-deep: #42702f; /* leaf as text */
+  --hair: #ddd4bd;
+  --muted: #5c6b60; /* AA on paper (>=4.5:1); plan badges */
+
+  color: var(--ink);
+  font-family: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+}
+
+.k7-page {
+  min-height: 100dvh;
+  background-color: var(--bg);
+  overflow-x: clip;
+}
+.k7-wrap {
+  max-width: 74rem;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+
+/* ---- the variable display face ---- */
+.k7-flex {
+  font-family: var(--font-flex), var(--font-jakarta), sans-serif;
+  font-variation-settings: "wght" var(--wght, 560), "wdth" var(--wdth, 100),
+    "opsz" 40, "GRAD" 0;
+  letter-spacing: -0.02em;
+  line-height: 0.92;
+  color: var(--ink);
+}
+.k7-eyebrow {
+  font-family: var(--font-space), ui-monospace, monospace;
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--coral-deep);
+}
+
+/* hero line: giant, tightly set */
+.k7-hero-line {
+  font-size: clamp(3.1rem, 15vw, 11rem);
+  margin: 0;
+}
+.k7-hero-line .k7-word {
+  display: inline-block;
+}
+/* per-letter span the pointer drives (kinetic.tsx sets --wght/--wdth) */
+.k7-ch {
+  display: inline-block;
+  font-variation-settings: "wght" var(--wght, 520), "wdth" var(--wdth, 100),
+    "opsz" 60, "GRAD" 0;
+  transition: font-variation-settings 120ms linear;
+  white-space: pre;
+}
+/* the returning word carries the coral accent + an underline mark */
+.k7-return {
+  color: var(--coral-deep);
+  position: relative;
+}
+
+/* section heading, oversized, weight settles on entry */
+.k7-h2 {
+  font-size: clamp(2rem, 6vw, 4rem);
+  margin: 0;
+  --wght: 620;
+}
+.k7-kicker {
+  font-family: var(--font-space), ui-monospace, monospace;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--coral-deep);
+}
+.k7-lede {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: var(--ink-soft);
+  max-width: 44ch;
+}
+
+/* ---- buttons (pandan = action) ---- */
+.k7-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1.4rem;
+  border-radius: 9999px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1),
+    background-color 160ms ease;
+}
+.k7-btn-primary {
+  background: var(--pandan);
+  color: #f6f1e3;
+}
+.k7-btn-primary:hover {
+  background: var(--pandan-ink);
+}
+.k7-btn-ghost {
+  color: var(--pandan);
+  border-color: var(--hair);
+}
+.k7-btn:active {
+  transform: translateY(1px) scale(0.99);
+}
+
+/* ---- fast facts as type ---- */
+.k7-fact-num {
+  font-family: var(--font-flex), var(--font-jakarta), sans-serif;
+  font-variation-settings: "wght" 680, "wdth" 118, "opsz" 40;
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  line-height: 1;
+  color: var(--pandan);
+  font-variant-numeric: tabular-nums;
+}
+.k7-fact-label {
+  margin-top: 0.35rem;
+  font-size: 0.86rem;
+  color: var(--ink-soft);
+}
+
+/* ---- steps: big numerals + text ---- */
+.k7-step {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 0.9rem 1.1rem;
+  align-items: baseline;
+  padding: 1rem 0;
+  border-top: 1px solid var(--hair);
+}
+.k7-step-n {
+  font-family: var(--font-flex), sans-serif;
+  font-variation-settings: "wght" 620, "wdth" 60, "opsz" 40;
+  font-size: 2rem;
+  line-height: 0.9;
+  color: var(--coral-deep);
+  font-variant-numeric: tabular-nums;
+}
+.k7-step-text {
+  font-size: 1.05rem;
+  color: var(--ink);
+}
+.k7-step-tag {
+  font-family: var(--font-space), ui-monospace, monospace;
+  font-size: 0.78rem;
+  color: var(--leaf-deep);
+  white-space: nowrap;
+}
+
+/* ---- proof ---- */
+.k7-stat-num {
+  font-family: var(--font-flex), sans-serif;
+  font-variation-settings: "wght" 720, "wdth" 125, "opsz" 40;
+  font-size: clamp(2.6rem, 6vw, 4rem);
+  line-height: 0.92;
+  color: var(--pandan);
+  font-variant-numeric: tabular-nums;
+}
+.k7-stat-num[data-earn="true"] {
+  color: var(--coral-deep);
+}
+.k7-stat-label {
+  margin-top: 0.2rem;
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+}
+.k7-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 9999px;
+  flex: none;
+}
+
+/* ---- pricing ---- */
+.k7-plan {
+  border-top: 2px solid var(--ink);
+  padding-top: 1rem;
+}
+.k7-plan[data-featured="true"] {
+  border-color: var(--coral);
+}
+.k7-plan-price {
+  font-family: var(--font-flex), sans-serif;
+  font-variation-settings: "wght" 700, "wdth" 118, "opsz" 40;
+  font-size: 2.4rem;
+  line-height: 1;
+  color: var(--pandan);
+}
+.k7-badge {
+  font-family: var(--font-space), ui-monospace, monospace;
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+.k7-plan[data-featured="true"] .k7-badge {
+  color: var(--coral-deep);
+  font-weight: 700;
+}
+
+.k7-rule {
+  border: 0;
+  border-top: 1px solid var(--hair);
+}
+
+/* ====================== MOTION (added, never hides) ====================== */
+@media (prefers-reduced-motion: no-preference) {
+  /* section headings settle their weight/width on entry */
+  @supports (animation-timeline: view()) {
+    .k7-h2,
+    .k7-stat-num {
+      animation: k7-settle both linear;
+      animation-timeline: view();
+      animation-range: entry 0% entry 80%;
+    }
+    @keyframes k7-settle {
+      from {
+        font-variation-settings: "wght" 300, "wdth" 62, "opsz" 40;
+        opacity: 0.5;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    /* the hero word "back" returns: it slides in from the right and its
+       width/weight expand as the hero scrolls into place */
+    .k7-return {
+      display: inline-block;
+      animation: k7-return both linear;
+      animation-timeline: view(block);
+      animation-range: entry 10% cover 40%;
+    }
+    @keyframes k7-return {
+      from {
+        transform: translateX(0.35em);
+        font-variation-settings: "wght" 300, "wdth" 40, "opsz" 60;
+        opacity: 0.4;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .k7-ch {
+    transition: none;
+  }
+  .k7-btn {
+    transition: none;
+  }
+}

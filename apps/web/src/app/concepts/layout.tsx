@@ -3,14 +3,15 @@ import {
   Archivo,
   Fraunces,
   Plus_Jakarta_Sans,
+  Roboto_Flex,
   Space_Grotesk,
 } from "next/font/google";
 
 import "./concepts.css";
 
 /* Design-exploration sandbox layout. Deliberately bare: no site nav, no
- * footer, no marketing chrome. Five landing-page concepts live under here at
- * /concepts/1..5 and are not linked from the real site. noindex so a stray
+ * footer, no marketing chrome. Ten landing-page concepts live under here at
+ * /concepts/1..10 and are not linked from the real site. noindex so a stray
  * crawl never treats a sandbox concept as the product. Each concept pins its
  * own palette on a [data-concept] wrapper (concepts.css), so this layout sets
  * no theme of its own. Fonts are loaded once here and shared across concepts. */
@@ -42,6 +43,15 @@ const archivo = Archivo({
   variable: "--font-archivo",
 });
 
+// Variable font with weight AND width (plus optical size, slant, grade) axes,
+// for the kinetic type specimen (7): font-variation-settings respond to
+// pointer and scroll. Kept off the other concepts.
+const robotoFlex = Roboto_Flex({
+  subsets: ["latin"],
+  axes: ["wdth", "opsz", "GRAD", "slnt"],
+  variable: "--font-flex",
+});
+
 export const metadata: Metadata = {
   title: "Concept explorations · Kembali",
   robots: { index: false, follow: false },
@@ -52,7 +62,7 @@ export default function ConceptsLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <div
-      className={`${jakarta.variable} ${fraunces.variable} ${spaceGrotesk.variable} ${archivo.variable}`}
+      className={`${jakarta.variable} ${fraunces.variable} ${spaceGrotesk.variable} ${archivo.variable} ${robotoFlex.variable}`}
     >
       {children}
     </div>

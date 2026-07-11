@@ -1,0 +1,858 @@
+/* Concept 3 - Motion-maximal scrollytelling.
+ * The scan-to-reward journey plays out as you scroll: a sticky phone stage on
+ * the left crossfades through four scenes while tall chapter blocks scroll past
+ * on the right. Kembali palette on a warm near-white canvas, deep pandan stage
+ * for drama. Coral = earned reward/stamp, pandan = actions, leaf = progress.
+ *
+ * ACCESSIBILITY: every default rule shows content in full (opacity 1, no
+ * transform, sticky stage hidden, static per-beat figures shown). All
+ * scroll-driven hiding/crossfading lives ONLY inside
+ * `@supports (animation-timeline: view())` + `prefers-reduced-motion:
+ * no-preference`, gated to desktop for the sticky stage. If scroll-timeline is
+ * unsupported OR motion is reduced, the four beats read as static stacked
+ * sections and nothing is hidden. Motion is transform/opacity only, ease-out. */
+
+[data-concept="3"] {
+  color-scheme: light;
+
+  --bg: #fbfaf4;
+  --surface: #ffffff;
+  --surface-alt: #f4efe2;
+  --ink: #15251d;
+  --text: #15251d;
+  --text-secondary: #53605a; /* AA on --bg */
+  --text-muted: #78827c;
+  --border: #e7e0cf;
+
+  --pandan: #0f3d32;
+  --pandan-deep: #0a2a22;
+  --pandan-ink: #0c3228;
+  --coral: #e0684b; /* earned / stamps - decorative + status only */
+  --coral-deep: #a93e24; /* coral as text on light */
+  --leaf: #7fb069;
+  --leaf-deep: #4e7a3a; /* leaf as text on light */
+  --sand: #f6f1e3;
+
+  --stage-1: #10493c;
+  --stage-2: #092620;
+
+  font-family: var(--font-jakarta), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", sans-serif;
+  color: var(--text);
+}
+
+/* solid canvas that fills fully; clip kinetic type so nothing overflows x */
+.sc-page {
+  position: relative;
+  min-height: 100dvh;
+  background: var(--bg);
+  overflow-x: clip;
+}
+
+.sc-wrap {
+  position: relative;
+  z-index: 1;
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+
+/* ---------------------------------------------------------------- type ---- */
+.sc-eyebrow {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--coral-deep);
+}
+.sc-kinetic {
+  font-family: var(--font-space), var(--font-jakarta), sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 0.98;
+  color: var(--pandan);
+}
+.sc-h1 {
+  font-size: clamp(2.1rem, 8.5vw, 5.4rem);
+  overflow-wrap: break-word;
+}
+.sc-h2 {
+  font-family: var(--font-space), var(--font-jakarta), sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.02;
+  color: var(--pandan);
+  font-size: clamp(2rem, 5.5vw, 3.4rem);
+}
+.sc-lede {
+  font-size: 1.06rem;
+  line-height: 1.62;
+  color: var(--text-secondary);
+}
+
+/* -------------------------------------------------------------- buttons ---- */
+.sc-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1.4rem;
+  border-radius: 9999px;
+  font-weight: 600;
+  font-size: 0.98rem;
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition: transform 160ms var(--ease-out-strong, cubic-bezier(0.23, 1, 0.32, 1)),
+    background-color 160ms ease;
+}
+.sc-btn-primary {
+  background: var(--pandan);
+  color: var(--sand);
+  box-shadow: 0 2px 0 var(--pandan-ink), 0 12px 26px rgba(15, 61, 50, 0.24);
+}
+.sc-btn-primary:hover {
+  background: var(--pandan-deep);
+}
+.sc-btn-ghost {
+  background: var(--surface);
+  color: var(--pandan);
+  border-color: var(--border);
+}
+.sc-btn:active {
+  transform: translateY(1px) scale(0.99);
+}
+
+/* --------------------------------------------------------------- hero ---- */
+.sc-hero {
+  position: relative;
+  padding: clamp(3.5rem, 9vw, 7rem) 0 clamp(2.5rem, 6vw, 4rem);
+  text-align: center;
+}
+.sc-hero-line {
+  display: block;
+}
+.sc-hero-line .accent {
+  color: var(--coral-deep);
+}
+.sc-facts {
+  margin: 2.6rem auto 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem;
+  max-width: 40rem;
+}
+.sc-fact {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 14px;
+  padding: 0.95rem 1rem;
+  text-align: left;
+}
+.sc-fact-v {
+  font-family: var(--font-space), var(--font-jakarta), sans-serif;
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: var(--pandan);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+.sc-fact-l {
+  margin-top: 0.35rem;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+.sc-cue {
+  margin-top: 2.6rem;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.sc-cue span {
+  width: 1px;
+  height: 2rem;
+  background: linear-gradient(var(--leaf), transparent);
+}
+
+/* ------------------------------------------------------------ journey ---- */
+.sc-journey {
+  position: relative;
+  padding: clamp(2rem, 5vw, 3.5rem) 0;
+}
+.sc-journey-head {
+  text-align: center;
+  max-width: 42rem;
+  margin: 0 auto clamp(2rem, 5vw, 3.5rem);
+}
+
+/* the sticky phone stage - hidden by default; only the enhanced desktop path
+ * turns it on. Static per-beat figures carry the visuals otherwise. */
+.sc-stage {
+  display: none;
+  position: sticky;
+  top: 0;
+  height: 100dvh;
+  place-items: center;
+}
+.sc-phone-stack {
+  position: relative;
+  width: min(80vw, 288px);
+  height: 576px;
+}
+
+/* chapters: static stacked beats by default (fully readable, no motion needed) */
+.sc-chapters {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(2.5rem, 7vw, 5rem);
+}
+.sc-chapter {
+  display: grid;
+  gap: 1.5rem;
+  align-items: center;
+}
+@media (min-width: 40rem) {
+  .sc-chapter {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .sc-chapter:nth-of-type(even) .sc-chapter-figure {
+    order: -1;
+  }
+}
+.sc-beat-no {
+  font-family: var(--font-space), var(--font-jakarta), sans-serif;
+  font-weight: 700;
+  font-size: clamp(3rem, 9vw, 5.5rem);
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  color: var(--leaf);
+  -webkit-text-stroke: 0;
+}
+.sc-beat-title {
+  font-family: var(--font-space), var(--font-jakarta), sans-serif;
+  font-weight: 700;
+  font-size: clamp(1.7rem, 4.5vw, 2.6rem);
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  color: var(--pandan);
+  margin-top: 0.5rem;
+}
+.sc-beat-detail {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 1rem;
+  padding: 0.4rem 0.85rem;
+  border-radius: 9999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-family: var(--font-space), var(--font-jakarta), sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+.sc-beat-detail[data-earn="true"] {
+  color: var(--coral-deep);
+  border-color: color-mix(in srgb, var(--coral) 45%, var(--border));
+  background: color-mix(in srgb, var(--coral) 8%, var(--surface));
+}
+.sc-beat-detail .dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 9999px;
+  background: var(--leaf);
+}
+.sc-beat-detail[data-earn="true"] .dot {
+  background: var(--coral);
+}
+.sc-chapter-figure {
+  display: flex;
+  justify-content: center;
+}
+
+/* ------------------------------------------------------- phone + scenes ---- */
+.sc-phone {
+  width: min(80vw, 288px);
+  border-radius: 34px;
+  background: linear-gradient(160deg, #14332a, var(--pandan-deep));
+  padding: 12px;
+  box-shadow: 0 30px 60px -28px rgba(9, 38, 32, 0.7),
+    0 4px 14px rgba(9, 38, 32, 0.25);
+}
+.sc-screen {
+  position: relative;
+  border-radius: 24px;
+  background: linear-gradient(180deg, #fffdf7, var(--sand));
+  height: 520px;
+  padding: 1.2rem 1.1rem;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.sc-notch {
+  position: absolute;
+  top: 0.6rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 34%;
+  height: 6px;
+  border-radius: 9999px;
+  background: rgba(15, 61, 50, 0.18);
+}
+.sc-screen-shop {
+  font-family: var(--font-space), var(--font-jakarta), sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--pandan);
+  letter-spacing: -0.01em;
+}
+.sc-screen-sub {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  margin-top: 0.1rem;
+}
+.sc-screen-cap {
+  margin-top: auto;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-align: center;
+}
+.sc-screen-cap b {
+  color: var(--pandan);
+}
+
+/* scene 1 - QR scan */
+.sc-qr {
+  margin: 1.6rem auto 0;
+  width: 62%;
+  aspect-ratio: 1;
+  display: block;
+}
+.sc-qr rect {
+  fill: var(--pandan);
+}
+.sc-scanline {
+  position: absolute;
+  left: 18%;
+  right: 18%;
+  top: 22%;
+  height: 3px;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, transparent, var(--coral), transparent);
+  box-shadow: 0 0 12px 2px color-mix(in srgb, var(--coral) 55%, transparent);
+  opacity: 0.9;
+}
+
+/* scene 2 + 3 - stamp card */
+.sc-grid {
+  margin-top: 1.3rem;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.5rem;
+}
+.sc-slot {
+  aspect-ratio: 1;
+  border-radius: 9999px;
+  border: 2px dashed color-mix(in srgb, var(--border) 70%, var(--ink));
+  display: grid;
+  place-items: center;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+.sc-slot[data-filled="true"] {
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--coral) 45%, var(--border));
+  color: var(--coral);
+}
+.sc-slot[data-reward="true"] {
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--coral) 60%, var(--border));
+  color: var(--coral-deep);
+}
+.sc-loop {
+  width: 68%;
+  height: 68%;
+  color: var(--coral);
+}
+.sc-plus {
+  margin: 1.2rem auto 0;
+  font-family: var(--font-space), var(--font-jakarta), sans-serif;
+  font-weight: 700;
+  font-size: 1.4rem;
+  color: var(--coral-deep);
+  text-align: center;
+}
+.sc-progress {
+  margin-top: 1rem;
+  height: 8px;
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--border) 75%, transparent);
+  overflow: hidden;
+}
+.sc-progress > i {
+  display: block;
+  height: 100%;
+  width: 70%;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, var(--leaf), #a6cf8f);
+  transform-origin: left;
+}
+
+/* scene 4 - reward coupon */
+.sc-coupon {
+  margin: 1.6rem auto 0;
+  width: 92%;
+  border-radius: 16px;
+  border: 1px solid color-mix(in srgb, var(--coral) 40%, var(--border));
+  background: color-mix(in srgb, var(--coral) 9%, var(--surface));
+  padding: 1.1rem;
+  text-align: center;
+}
+.sc-coupon-eyebrow {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--coral-deep);
+}
+.sc-coupon-reward {
+  font-family: var(--font-space), var(--font-jakarta), sans-serif;
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: var(--pandan);
+  margin-top: 0.35rem;
+}
+.sc-coupon-code {
+  margin-top: 0.8rem;
+  font-family: var(--font-space), ui-monospace, monospace;
+  font-size: 0.92rem;
+  letter-spacing: 0.14em;
+  color: var(--coral-deep);
+  padding: 0.45rem;
+  border-radius: 8px;
+  border: 1px dashed color-mix(in srgb, var(--coral) 50%, var(--border));
+  background: var(--surface);
+}
+
+/* ---------------------------------------------------------- staff strip ---- */
+.sc-staff {
+  margin-top: clamp(2.5rem, 7vw, 4.5rem);
+  border-radius: 20px;
+  background: linear-gradient(160deg, var(--stage-1), var(--pandan-deep));
+  color: var(--sand);
+  padding: clamp(1.5rem, 4vw, 2.2rem);
+}
+.sc-staff h3 {
+  font-family: var(--font-space), var(--font-jakarta), sans-serif;
+  font-weight: 700;
+  font-size: 1.25rem;
+  letter-spacing: -0.01em;
+}
+.sc-staff p.sub {
+  color: rgba(246, 241, 227, 0.78);
+  font-size: 0.9rem;
+  margin-top: 0.3rem;
+}
+.sc-staff-steps {
+  margin-top: 1.3rem;
+  display: grid;
+  gap: 0.75rem;
+}
+@media (min-width: 40rem) {
+  .sc-staff-steps {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+.sc-staff-step {
+  border: 1px solid rgba(246, 241, 227, 0.18);
+  background: rgba(246, 241, 227, 0.06);
+  border-radius: 14px;
+  padding: 0.9rem 1rem;
+}
+.sc-staff-step .n {
+  font-family: var(--font-space), var(--font-jakarta), sans-serif;
+  font-weight: 700;
+  color: #a6cf8f;
+  font-size: 0.85rem;
+}
+.sc-staff-step .t {
+  margin-top: 0.35rem;
+  font-size: 0.95rem;
+  color: var(--sand);
+}
+.sc-staff-step .d {
+  margin-top: 0.2rem;
+  font-size: 0.78rem;
+  color: rgba(246, 241, 227, 0.68);
+}
+
+/* ---------------------------------------------------------------- proof ---- */
+.sc-section {
+  padding: clamp(3rem, 8vw, 5.5rem) 0;
+}
+.sc-stats {
+  margin-top: 2rem;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.9rem;
+}
+@media (min-width: 48rem) {
+  .sc-stats {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+.sc-stat {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 16px;
+  padding: 1.2rem 1.1rem;
+}
+.sc-stat-v {
+  font-family: var(--font-space), var(--font-jakarta), sans-serif;
+  font-weight: 700;
+  font-size: 2.1rem;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--pandan);
+  font-variant-numeric: tabular-nums;
+}
+.sc-stat-v[data-earn="true"] {
+  color: var(--coral-deep);
+}
+.sc-stat-l {
+  margin-top: 0.45rem;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+.sc-activity {
+  margin-top: 1.6rem;
+  display: grid;
+  gap: 0.6rem;
+}
+.sc-activity li {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.95rem;
+}
+.sc-activity .dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 9999px;
+  flex: none;
+}
+.sc-activity b {
+  color: var(--ink);
+  font-weight: 600;
+}
+.sc-activity span.w {
+  color: var(--text-secondary);
+}
+
+/* -------------------------------------------------------------- pricing ---- */
+.sc-plans {
+  margin-top: 2rem;
+  display: grid;
+  gap: 1rem;
+}
+@media (min-width: 56rem) {
+  .sc-plans {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+.sc-plan {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 18px;
+  padding: 1.4rem;
+}
+.sc-plan[data-featured="true"] {
+  border-color: var(--coral);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--coral) 16%, transparent);
+}
+.sc-plan-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+.sc-plan-name {
+  font-weight: 700;
+  color: var(--ink);
+}
+.sc-plan-badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.2rem 0.65rem;
+  border-radius: 9999px;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+.sc-plan[data-featured="true"] .sc-plan-badge {
+  background: var(--pandan);
+  color: var(--sand);
+  border-color: transparent;
+}
+.sc-plan-price {
+  font-family: var(--font-space), var(--font-jakarta), sans-serif;
+  font-weight: 700;
+  font-size: 2.1rem;
+  color: var(--pandan);
+  letter-spacing: -0.02em;
+}
+.sc-plan-unit {
+  font-size: 0.86rem;
+  color: var(--text-secondary);
+}
+.sc-plan-blurb {
+  margin-top: 0.7rem;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+/* ------------------------------------------------------------ final cta ---- */
+.sc-cta {
+  margin: 0 auto;
+  max-width: 44rem;
+  text-align: center;
+  border-radius: 24px;
+  padding: clamp(2.5rem, 6vw, 4rem) clamp(1.5rem, 5vw, 3rem);
+  background: linear-gradient(165deg, var(--stage-1), var(--pandan-deep));
+  color: var(--sand);
+}
+.sc-cta h2 {
+  font-family: var(--font-space), var(--font-jakarta), sans-serif;
+  font-weight: 700;
+  font-size: clamp(1.9rem, 5vw, 3rem);
+  letter-spacing: -0.02em;
+  line-height: 1.03;
+  color: #fffdf7;
+}
+.sc-cta p {
+  margin: 1.1rem auto 0;
+  max-width: 30rem;
+  color: rgba(246, 241, 227, 0.82);
+  line-height: 1.6;
+}
+/* Inverted action on the dark panel: cream fill, pandan text. Keeps pandan as
+   the action colour (coral stays reserved for earned rewards). */
+.sc-cta .sc-btn-primary {
+  background: var(--sand);
+  color: var(--pandan);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2), 0 12px 26px rgba(0, 0, 0, 0.3);
+}
+.sc-cta .sc-btn-primary:hover {
+  background: #fffdf7;
+}
+.sc-cta .reassure {
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  color: rgba(246, 241, 227, 0.7);
+}
+
+/* ================================================================= MOTION ==
+ * Everything below only ADDS motion. Nothing here hides content unless the
+ * browser also renders the scroll timeline (or, for the hero, honours the
+ * on-load entrance). Reduced-motion users skip all of it. */
+
+@keyframes sc-rise {
+  from {
+    opacity: 0;
+    transform: translateY(38px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes sc-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+/* sticky-stage crossfade, driven by each chapter's view timeline */
+@keyframes sc-scene {
+  0% {
+    opacity: 0;
+    transform: translateY(26px) scale(0.965);
+  }
+  18%,
+  82% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-26px) scale(0.965);
+  }
+}
+/* decorative in-scene loops */
+@keyframes sc-scan {
+  0% {
+    top: 24%;
+  }
+  50% {
+    top: 70%;
+  }
+  100% {
+    top: 24%;
+  }
+}
+@keyframes sc-pop {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.12) rotate(-5deg);
+  }
+}
+@keyframes sc-fill {
+  0% {
+    transform: scaleX(0.35);
+  }
+  60%,
+  100% {
+    transform: scaleX(1);
+  }
+}
+@keyframes sc-cue {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translateY(5px);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* hero entrance - staggered kinetic rise */
+  .sc-anim {
+    opacity: 0;
+    animation: sc-rise 720ms var(--ease-out-strong, cubic-bezier(0.23, 1, 0.32, 1))
+      both;
+  }
+  .sc-anim-d1 {
+    animation-delay: 80ms;
+  }
+  .sc-anim-d2 {
+    animation-delay: 170ms;
+  }
+  .sc-anim-d3 {
+    animation-delay: 280ms;
+  }
+  .sc-anim-d4 {
+    animation-delay: 400ms;
+  }
+  .sc-anim-d5 {
+    animation-delay: 520ms;
+  }
+  .sc-cue span {
+    animation: sc-cue 1.8s var(--ease-in-out-strong, cubic-bezier(0.77, 0, 0.175, 1))
+      infinite;
+  }
+
+  /* in-scene decorative loops (also run in the static figures) */
+  .sc-scanline {
+    animation: sc-scan 2.6s var(--ease-in-out-strong, cubic-bezier(0.77, 0, 0.175, 1))
+      infinite;
+  }
+  .sc-loop-pop {
+    animation: sc-pop 2.4s var(--ease-out-strong, cubic-bezier(0.23, 1, 0.32, 1))
+      infinite;
+  }
+  .sc-progress > i {
+    animation: sc-fill 3s var(--ease-in-out-strong, cubic-bezier(0.77, 0, 0.175, 1))
+      infinite;
+  }
+}
+
+/* scroll-driven reveals (any viewport that supports it + allows motion) */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .sc-reveal {
+      opacity: 0;
+      animation: sc-reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 8% cover 32%;
+    }
+
+    /* ---- enhanced desktop: the sticky scrollytelling stage ---- */
+    @media (min-width: 64rem) {
+      .sc-journey-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+        gap: clamp(2rem, 5vw, 4rem);
+        align-items: start;
+        timeline-scope: --beat1, --beat2, --beat3, --beat4;
+      }
+      .sc-stage {
+        display: grid;
+      }
+      /* the sticky stage now carries the visuals, so hide the inline figures */
+      .sc-chapter-figure {
+        display: none;
+      }
+      .sc-chapter {
+        grid-template-columns: minmax(0, 1fr);
+        min-height: 100vh;
+        justify-items: start;
+        align-content: center;
+      }
+      .sc-chapter:nth-of-type(1) {
+        view-timeline-name: --beat1;
+      }
+      .sc-chapter:nth-of-type(2) {
+        view-timeline-name: --beat2;
+      }
+      .sc-chapter:nth-of-type(3) {
+        view-timeline-name: --beat3;
+      }
+      .sc-chapter:nth-of-type(4) {
+        view-timeline-name: --beat4;
+      }
+
+      .sc-stage .sc-scene {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        justify-content: center;
+        opacity: 0;
+        animation: sc-scene linear both;
+        animation-range: cover;
+      }
+      .sc-stage .sc-scene[data-beat="1"] {
+        animation-timeline: --beat1;
+      }
+      .sc-stage .sc-scene[data-beat="2"] {
+        animation-timeline: --beat2;
+      }
+      .sc-stage .sc-scene[data-beat="3"] {
+        animation-timeline: --beat3;
+      }
+      .sc-stage .sc-scene[data-beat="4"] {
+        animation-timeline: --beat4;
+      }
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sc-btn,
+  .sc-progress > i {
+    transition: none;
+  }
+}

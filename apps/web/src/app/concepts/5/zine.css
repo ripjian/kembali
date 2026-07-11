@@ -1,0 +1,870 @@
+/* Concept 5 - Editorial zine.
+ * A beautifully set newspaper feature about Kembali. Fraunces leads: masthead,
+ * headlines, big figures. Multi-column body, thin rules, a drop cap, and
+ * halftone imagery built entirely from CSS radial-gradient dot patterns (no
+ * images). Kopitiam-ad nostalgia in the print styling; copy stays English and
+ * factual. Palette is Kembali, stretched to warm newsprint: coral = earned
+ * stamps (coral-deep where it must be text), pandan = actions, leaf = progress,
+ * warm paper canvas. Light-locked, immune to OS dark mode. */
+
+[data-concept="5"] {
+  color-scheme: light;
+
+  --paper: #f4eedd; /* warm newsprint, a hair deeper than sand */
+  --paper-2: #efe7d1; /* subtle panels */
+  --paper-3: #faf5e7; /* lifted card stock */
+  --ink: #1b2a22; /* body ink, AA on paper */
+  --ink-2: #545e4d; /* secondary */
+  --ink-3: #5e6857; /* muted captions, AA on paper (5.04:1) */
+  --pandan: #0f3d32; /* actions */
+  --pandan-deep: #0a2c24;
+  --coral: #e0684b; /* earned stamps, ink halftone */
+  --coral-deep: #a93e24; /* coral where it becomes text */
+  --leaf: #5f8f48; /* progress fills + dots (decorative) */
+  --leaf-ink: #487036; /* leaf where it becomes text, AA on paper (4.97:1) */
+  --rule: #cabf9f; /* hairline */
+  --rule-2: #ddd3b6; /* faint hairline */
+  --heavy: #23332a; /* masthead heavy rules */
+
+  color: var(--ink);
+  font-family: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+  background-color: var(--paper);
+}
+
+.z-page {
+  position: relative;
+  min-height: 100dvh;
+  isolation: isolate;
+  background-color: var(--paper);
+  /* faint press-grain so the paper is not a dead flat fill */
+  background-image:
+    radial-gradient(rgba(90, 78, 44, 0.05) 0.5px, transparent 0.6px);
+  background-size: 4px 4px;
+}
+
+.z-wrap {
+  position: relative;
+  z-index: 1;
+  max-width: 74rem;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+
+/* ---------- shared type ---------- */
+.z-serif {
+  font-family: var(--font-fraunces), Georgia, "Times New Roman", serif;
+  font-weight: 600;
+  letter-spacing: -0.012em;
+  color: var(--pandan);
+}
+.z-mono {
+  font-family: var(--font-space), ui-monospace, monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+.z-kicker {
+  font-family: var(--font-jakarta), sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--coral-deep);
+}
+.z-label {
+  font-family: var(--font-jakarta), sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+/* ---------- masthead ---------- */
+.z-masthead {
+  padding-top: 1.6rem;
+}
+.z-masthead-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid var(--rule);
+}
+.z-wordmark {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-weight: 600;
+  color: var(--pandan);
+  font-size: clamp(3.2rem, 12vw, 7rem);
+  line-height: 0.92;
+  letter-spacing: -0.03em;
+  text-align: center;
+  margin: 0.7rem 0 0.55rem;
+  font-variation-settings: "opsz" 144, "SOFT" 40;
+}
+/* the final stamp: coral dot after the wordmark, echoing the logo's coral i */
+.z-wordmark .z-dot {
+  color: var(--coral);
+}
+.z-dateline {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding-top: 0.5rem;
+  /* the classic double rule under a masthead */
+  border-top: 3px double var(--heavy);
+}
+.z-dateline .z-dateline-mid {
+  flex: 1;
+  text-align: center;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-weight: 500;
+  font-size: 0.98rem;
+  color: var(--ink-2);
+}
+
+/* ---------- hero / lead ---------- */
+.z-hero {
+  padding: 2.2rem 0 2.6rem;
+}
+.z-headline {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-weight: 600;
+  color: var(--pandan);
+  font-size: clamp(2.5rem, 7.2vw, 5.4rem);
+  line-height: 0.98;
+  letter-spacing: -0.025em;
+  max-width: 15ch;
+  margin: 0.7rem auto 0;
+  text-align: center;
+  text-wrap: balance;
+  font-variation-settings: "opsz" 120, "SOFT" 30;
+}
+
+.z-hero-body {
+  margin-top: 2rem;
+  display: grid;
+  gap: 1.8rem;
+}
+@media (min-width: 900px) {
+  .z-hero-body {
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 2.6rem;
+    align-items: start;
+  }
+}
+
+/* the lead standfirst, set in real columns with a drop cap */
+.z-standfirst {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-weight: 420;
+  font-size: 1.16rem;
+  line-height: 1.5;
+  color: var(--ink);
+  column-gap: 2rem;
+}
+@media (min-width: 620px) {
+  .z-standfirst {
+    columns: 2;
+  }
+}
+.z-standfirst::first-letter {
+  float: left;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-weight: 600;
+  color: var(--coral-deep);
+  font-size: 3.5em;
+  line-height: 0.72;
+  padding: 0.06em 0.09em 0 0;
+  font-variation-settings: "opsz" 144;
+}
+
+.z-actions {
+  margin-top: 1.4rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+}
+.z-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.72rem 1.2rem;
+  border-radius: 4px;
+  font-family: var(--font-jakarta), sans-serif;
+  font-weight: 600;
+  font-size: 0.94rem;
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1),
+    background-color 160ms ease;
+}
+.z-btn-primary {
+  background: var(--pandan);
+  color: var(--paper-3);
+  border-color: var(--pandan-deep);
+  box-shadow: 3px 3px 0 var(--pandan-deep);
+}
+.z-btn-primary:hover {
+  background: var(--pandan-deep);
+}
+.z-btn-ghost {
+  background: transparent;
+  color: var(--pandan);
+  border-color: var(--pandan);
+}
+.z-btn-ghost:hover {
+  background: color-mix(in srgb, var(--pandan) 8%, transparent);
+}
+.z-btn:active {
+  transform: translate(1px, 1px);
+}
+.z-btn-primary:active {
+  box-shadow: 1px 1px 0 var(--pandan-deep);
+}
+
+/* ---------- halftone plate (printed photograph of a coffee) ---------- */
+.z-plate {
+  margin: 0;
+  border: 1px solid var(--heavy);
+  background: var(--paper-3);
+  padding: 0.55rem 0.55rem 0.7rem;
+  box-shadow: 5px 6px 0 rgba(35, 51, 42, 0.12);
+}
+.z-plate-frame {
+  position: relative;
+  aspect-ratio: 4 / 3.4;
+  overflow: hidden;
+  background: var(--paper-2);
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--rule);
+}
+/* the coffee: a disc filled with a coral halftone dot pattern, masked into a
+ * tonal ramp so it reads as a printed newsprint photograph. Pure CSS. */
+.z-cup {
+  position: relative;
+  width: 70%;
+  aspect-ratio: 1;
+  border-radius: 9999px;
+  background-color: var(--paper-2);
+  background-image: radial-gradient(
+    circle at center,
+    var(--coral) 0 42%,
+    transparent 44%
+  );
+  background-size: 8px 8px;
+  -webkit-mask-image: radial-gradient(
+    circle at 50% 40%,
+    #000 26%,
+    rgba(0, 0, 0, 0.5) 58%,
+    transparent 80%
+  );
+  mask-image: radial-gradient(
+    circle at 50% 40%,
+    #000 26%,
+    rgba(0, 0, 0, 0.5) 58%,
+    transparent 80%
+  );
+}
+/* cup rim + crema rings, in pandan, drawn over the halftone */
+.z-cup::before {
+  content: "";
+  position: absolute;
+  inset: 6%;
+  border-radius: 9999px;
+  border: 2px solid color-mix(in srgb, var(--pandan) 45%, transparent);
+}
+.z-cup::after {
+  content: "";
+  position: absolute;
+  inset: 30%;
+  border-radius: 9999px;
+  border: 1.5px solid color-mix(in srgb, var(--pandan) 30%, transparent);
+}
+/* rising-steam hairlines, faint */
+.z-steam {
+  position: absolute;
+  top: 6%;
+  left: 50%;
+  width: 34%;
+  height: 26%;
+  transform: translateX(-50%);
+  opacity: 0.5;
+  background-image:
+    radial-gradient(circle at center, var(--pandan) 0 30%, transparent 32%);
+  background-size: 5px 5px;
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 70%);
+  mask-image: linear-gradient(180deg, transparent, #000 70%);
+}
+.z-plate-caption {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-top: 0.55rem;
+}
+.z-plate-caption .z-fig {
+  color: var(--coral-deep);
+}
+.z-plate-caption .z-cap-text {
+  font-size: 0.82rem;
+  line-height: 1.35;
+  color: var(--ink-2);
+}
+
+/* ---------- printed stamp-card strip ---------- */
+.z-cardstrip {
+  margin-top: 2.4rem;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  padding: 1.2rem 0;
+  display: grid;
+  gap: 1rem;
+}
+@media (min-width: 720px) {
+  .z-cardstrip {
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 1.6rem;
+  }
+}
+.z-stamps {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 0.5rem;
+  max-width: 100%;
+}
+@media (max-width: 460px) {
+  .z-stamps {
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.6rem;
+  }
+}
+.z-slot {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 9999px;
+  border: 1.5px dashed color-mix(in srgb, var(--rule) 80%, var(--ink));
+  display: grid;
+  place-items: center;
+}
+.z-slot .z-slot-num {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 0.8rem;
+  color: color-mix(in srgb, var(--ink-3) 90%, transparent);
+}
+/* an earned stamp: coral disc with an inked halftone texture */
+.z-slot[data-filled="true"] {
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--coral) 55%, var(--rule));
+  background-color: var(--coral);
+  background-image: radial-gradient(
+    circle at 34% 30%,
+    rgba(255, 255, 255, 0.32) 0 22%,
+    transparent 24%
+  );
+  background-size: 6px 6px;
+}
+.z-slot[data-filled="true"] .z-slot-num {
+  opacity: 0;
+}
+/* the reward slot (10th): coral outline even when empty, so the goal reads */
+.z-slot[data-reward="true"] {
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--coral) 55%, var(--rule));
+}
+.z-slot[data-reward="true"] .z-slot-num {
+  color: var(--coral-deep);
+  opacity: 0.9;
+}
+.z-cardstrip-label .h {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: var(--ink);
+}
+.z-cardstrip-label .s {
+  font-size: 0.8rem;
+  color: var(--ink-2);
+  margin-top: 0.1rem;
+}
+.z-cardstrip-prog {
+  font-family: var(--font-fraunces), Georgia, serif;
+  white-space: nowrap;
+}
+.z-cardstrip-prog b {
+  color: var(--leaf-ink);
+  font-weight: 600;
+  font-size: 1.5rem;
+}
+.z-cardstrip-prog span {
+  color: var(--ink-2);
+  font-size: 0.86rem;
+}
+
+/* ---------- fast-facts stat strip ---------- */
+.z-facts {
+  margin-top: 2.4rem;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  border-top: 3px double var(--heavy);
+  border-bottom: 1px solid var(--rule);
+}
+@media (min-width: 720px) {
+  .z-facts {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+.z-fact {
+  padding: 1.1rem 1.1rem;
+  border-bottom: 1px solid var(--rule-2);
+}
+.z-fact:nth-child(odd) {
+  border-right: 1px solid var(--rule-2);
+}
+@media (min-width: 720px) {
+  .z-fact {
+    border-bottom: 0;
+    border-right: 1px solid var(--rule-2);
+  }
+  .z-fact:last-child {
+    border-right: 0;
+  }
+}
+.z-fact-num {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-weight: 600;
+  color: var(--pandan);
+  font-size: 2.1rem;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+.z-fact-label {
+  margin-top: 0.35rem;
+  font-size: 0.8rem;
+  color: var(--ink-2);
+  line-height: 1.3;
+}
+
+/* ---------- section headers ---------- */
+.z-section {
+  padding: 2.6rem 0;
+  border-top: 1px solid var(--rule);
+}
+.z-section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.z-section-title {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-weight: 600;
+  color: var(--pandan);
+  font-size: clamp(1.9rem, 4vw, 2.9rem);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+}
+
+/* ---------- how it works ---------- */
+.z-how {
+  margin-top: 1.8rem;
+  display: grid;
+  gap: 1.8rem;
+}
+@media (min-width: 860px) {
+  .z-how {
+    grid-template-columns: 1.4fr 1fr;
+    gap: 2.6rem;
+  }
+}
+.z-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  counter-reset: z-step;
+}
+.z-step {
+  counter-increment: z-step;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: baseline;
+  gap: 0.9rem;
+  padding: 0.95rem 0;
+  border-bottom: 1px solid var(--rule-2);
+}
+.z-step:last-child {
+  border-bottom: 0;
+}
+.z-step::before {
+  content: counter(z-step, decimal-leading-zero);
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-weight: 600;
+  font-size: 1.5rem;
+  color: var(--coral-deep);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.z-step .z-step-text {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 1.12rem;
+  color: var(--ink);
+  line-height: 1.3;
+}
+.z-step .z-step-meta {
+  font-family: var(--font-space), ui-monospace, monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--leaf-ink);
+  white-space: nowrap;
+}
+
+/* the staff box = a boxed newspaper sidebar */
+.z-sidebar {
+  border: 1px solid var(--heavy);
+  background: var(--paper-3);
+  padding: 1.3rem 1.35rem 1.45rem;
+  box-shadow: 5px 6px 0 rgba(35, 51, 42, 0.1);
+}
+.z-sidebar-kicker {
+  display: inline-block;
+  background: var(--pandan);
+  color: var(--paper-3);
+  font-family: var(--font-jakarta), sans-serif;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 0.25rem 0.55rem;
+  border-radius: 3px;
+}
+.z-sidebar h3 {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-weight: 600;
+  color: var(--pandan);
+  font-size: 1.35rem;
+  line-height: 1.1;
+  margin: 0.7rem 0 0.2rem;
+}
+.z-sidebar-sub {
+  font-size: 0.84rem;
+  color: var(--ink-2);
+}
+.z-sidebar ol {
+  list-style: none;
+  margin: 0.9rem 0 0;
+  padding: 0;
+  counter-reset: z-staff;
+}
+.z-sidebar li {
+  counter-increment: z-staff;
+  display: flex;
+  gap: 0.7rem;
+  align-items: baseline;
+  padding: 0.55rem 0;
+  border-top: 1px dotted var(--rule);
+  font-size: 0.95rem;
+  color: var(--ink);
+}
+.z-sidebar li::before {
+  content: counter(z-staff);
+  font-family: var(--font-space), monospace;
+  font-size: 0.72rem;
+  color: var(--coral-deep);
+  font-weight: 700;
+}
+.z-sidebar li .m {
+  margin-left: auto;
+  font-family: var(--font-space), monospace;
+  font-size: 0.66rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+
+/* ---------- proof ---------- */
+.z-proof-caption {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  color: var(--ink-2);
+  font-size: 1.05rem;
+  margin-top: 0.4rem;
+}
+.z-figures {
+  margin-top: 1.8rem;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0;
+  border: 1px solid var(--rule);
+}
+@media (min-width: 720px) {
+  .z-figures {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+.z-figure {
+  padding: 1.4rem 1.2rem;
+  border-bottom: 1px solid var(--rule);
+  border-right: 1px solid var(--rule);
+}
+.z-figure:nth-child(even) {
+  border-right: 0;
+}
+@media (min-width: 720px) {
+  .z-figure {
+    border-bottom: 0;
+    border-right: 1px solid var(--rule);
+  }
+  .z-figure:last-child {
+    border-right: 0;
+  }
+}
+.z-figure-num {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-weight: 600;
+  color: var(--pandan);
+  font-size: clamp(2.6rem, 6vw, 3.6rem);
+  line-height: 0.92;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+.z-figure[data-earn="true"] .z-figure-num {
+  color: var(--coral-deep);
+}
+.z-figure-label {
+  margin-top: 0.4rem;
+  font-family: var(--font-jakarta), sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+.z-activity {
+  margin: 1.6rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0;
+}
+.z-activity li {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid var(--rule-2);
+  font-size: 0.95rem;
+}
+.z-activity li:last-child {
+  border-bottom: 0;
+}
+.z-activity .dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 9999px;
+  flex: none;
+}
+.z-activity .who {
+  font-weight: 700;
+  color: var(--ink);
+}
+.z-activity .what {
+  color: var(--ink-2);
+}
+
+/* ---------- pricing rate card ---------- */
+.z-ratecard {
+  margin-top: 1.8rem;
+  border: 1px solid var(--heavy);
+  background: var(--paper-3);
+}
+.z-rate {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.6rem 1rem;
+  align-items: baseline;
+  padding: 1.3rem 1.4rem;
+  border-bottom: 1px solid var(--rule);
+}
+.z-rate:last-child {
+  border-bottom: 0;
+}
+@media (min-width: 720px) {
+  .z-rate {
+    grid-template-columns: 12rem 1fr auto;
+    align-items: center;
+  }
+}
+.z-rate[data-featured="true"] {
+  background: color-mix(in srgb, var(--coral) 8%, var(--paper-3));
+  box-shadow: inset 4px 0 0 var(--coral);
+}
+.z-rate-name {
+  display: flex;
+  align-items: baseline;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+}
+.z-rate-name .n {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-weight: 600;
+  font-size: 1.2rem;
+  color: var(--pandan);
+}
+.z-rate-badge {
+  font-family: var(--font-jakarta), sans-serif;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.16rem 0.45rem;
+  border-radius: 3px;
+  border: 1px solid var(--rule);
+  color: var(--ink-2);
+}
+.z-rate[data-featured="true"] .z-rate-badge {
+  background: var(--coral);
+  border-color: var(--coral-deep);
+  color: #fff;
+}
+.z-rate-blurb {
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: var(--ink-2);
+  grid-column: 1 / -1;
+}
+@media (min-width: 720px) {
+  .z-rate-blurb {
+    grid-column: auto;
+    max-width: 34ch;
+  }
+}
+.z-rate-price {
+  text-align: left;
+  white-space: nowrap;
+}
+@media (min-width: 720px) {
+  .z-rate-price {
+    text-align: right;
+  }
+}
+.z-rate-price b {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-weight: 600;
+  font-size: 1.9rem;
+  color: var(--pandan);
+  letter-spacing: -0.02em;
+}
+.z-rate[data-featured="true"] .z-rate-price b {
+  color: var(--coral-deep);
+}
+.z-rate-price .u {
+  display: block;
+  font-family: var(--font-space), monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-top: 0.1rem;
+}
+.z-teaser {
+  margin-top: 0.7rem;
+  max-width: 46ch;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 1.06rem;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+/* ---------- closing notice ---------- */
+.z-notice {
+  margin: 2.6rem 0 3rem;
+  border: 2px solid var(--heavy);
+  background: var(--paper-3);
+  padding: 2.4rem 1.6rem 2.6rem;
+  text-align: center;
+  position: relative;
+}
+/* a coral halftone band across the top of the notice, like a printed banner */
+.z-notice::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 0.5rem;
+  background-color: var(--coral);
+  background-image: radial-gradient(
+    circle at center,
+    rgba(255, 255, 255, 0.4) 0 30%,
+    transparent 32%
+  );
+  background-size: 6px 6px;
+}
+.z-notice .z-mono {
+  color: var(--coral-deep);
+}
+.z-notice h2 {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-weight: 600;
+  color: var(--pandan);
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  max-width: 18ch;
+  margin: 0.7rem auto 0;
+  text-wrap: balance;
+}
+.z-notice p {
+  max-width: 40ch;
+  margin: 0.9rem auto 0;
+  font-size: 1rem;
+  line-height: 1.55;
+  color: var(--ink-2);
+}
+.z-notice .z-actions {
+  justify-content: center;
+}
+.z-reassure {
+  margin-top: 1.1rem !important;
+  font-family: var(--font-space), monospace !important;
+  font-size: 0.72rem !important;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3) !important;
+}
+
+.z-colophon {
+  text-align: center;
+  padding: 0 0 6rem;
+  color: var(--ink-3);
+}
+
+/* ---------- subtle reveal on load (a zine is mostly static) ---------- */
+.z-rise {
+  animation: z-rise 620ms cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+@keyframes z-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .z-rise {
+    animation: none;
+  }
+  .z-btn {
+    transition: none;
+  }
+}

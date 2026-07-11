@@ -1,0 +1,463 @@
+/* Concept 10 - Conversational landing.
+ * The page opens as a short chat: shop type, outlets, goal. The answers
+ * personalize the headline, an example card and the pricing math. It is
+ * progressive enhancement: the server renders a complete, sensible default
+ * page (cafe, 1 outlet, bring regulars back), so with no JavaScript the
+ * visitor still gets a full, correct landing page and the chips simply reflect
+ * the defaults. Kembali palette: pandan actions, coral earned, leaf progress,
+ * warm cream canvas. */
+
+[data-concept="10"] {
+  color-scheme: light;
+  --bg: #f4efe1;
+  --surface: #fffdf7;
+  --surface-alt: #efe8d6;
+  --ink: #17281f;
+  --ink-soft: #566056;
+  --muted: #5c6b60; /* AA on the cream canvas + tile surfaces (>=4.5:1) */
+  --pandan: #0f3d32;
+  --pandan-ink: #0a2c24;
+  --on-primary: #f6f1e3;
+  --coral: #e0684b;
+  --coral-deep: #a93e24;
+  --leaf: #7fb069;
+  --leaf-deep: #42702f;
+  --hair: #ddd3bc;
+
+  color: var(--ink);
+  font-family: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+}
+
+.c10-page {
+  min-height: 100dvh;
+  background-color: var(--bg);
+  overflow-x: clip;
+}
+.c10-wrap {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+.c10-kicker {
+  font-family: var(--font-space), ui-monospace, monospace;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--coral-deep);
+}
+.c10-h2 {
+  font-family: var(--font-jakarta);
+  font-weight: 700;
+  font-size: clamp(1.7rem, 3.6vw, 2.5rem);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--pandan);
+}
+.c10-lede {
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: var(--ink-soft);
+}
+
+/* ---- hero: chat + live preview ---- */
+.c10-hero {
+  display: grid;
+  gap: 1.5rem;
+  padding: 2.5rem 0 3.5rem;
+}
+@media (min-width: 900px) {
+  .c10-hero {
+    grid-template-columns: 0.92fr 1.08fr;
+    gap: 2.5rem;
+    padding: 4rem 0 5rem;
+    align-items: start;
+  }
+}
+
+/* chat panel */
+.c10-chat {
+  background: var(--surface);
+  border: 1px solid var(--hair);
+  border-radius: 20px;
+  padding: 1.35rem;
+  box-shadow: 0 1px 2px rgba(20, 40, 24, 0.05),
+    0 20px 40px -26px rgba(20, 40, 24, 0.4);
+}
+.c10-chat-top {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding-bottom: 0.9rem;
+  border-bottom: 1px solid var(--hair);
+}
+.c10-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 9999px;
+  background: var(--pandan);
+  display: grid;
+  place-items: center;
+  flex: none;
+}
+.c10-avatar svg {
+  width: 20px;
+  height: 20px;
+}
+.c10-chat-name {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--ink);
+}
+.c10-chat-status {
+  font-size: 0.74rem;
+  color: var(--leaf-deep);
+}
+.c10-q {
+  margin-top: 1.1rem;
+}
+.c10-prompt {
+  display: inline-block;
+  background: var(--surface-alt);
+  border-radius: 14px 14px 14px 4px;
+  padding: 0.6rem 0.85rem;
+  font-size: 0.92rem;
+  color: var(--ink);
+  max-width: 90%;
+}
+.c10-opts {
+  margin-top: 0.7rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.c10-chip {
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.5rem 0.9rem;
+  border-radius: 9999px;
+  border: 1px solid var(--hair);
+  background: var(--surface);
+  color: var(--ink);
+  transition: transform 140ms cubic-bezier(0.23, 1, 0.32, 1),
+    background-color 140ms ease, border-color 140ms ease;
+}
+.c10-chip:hover {
+  border-color: var(--pandan);
+}
+.c10-chip:active {
+  transform: translateY(1px);
+}
+.c10-chip[data-selected="true"] {
+  background: var(--pandan);
+  border-color: var(--pandan);
+  color: var(--on-primary);
+}
+.c10-summary {
+  margin-top: 1.2rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--hair);
+  font-size: 0.86rem;
+  color: var(--ink-soft);
+}
+.c10-summary b {
+  color: var(--ink);
+}
+
+/* live preview */
+.c10-eyebrow {
+  font-family: var(--font-space), ui-monospace, monospace;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--coral-deep);
+}
+.c10-headline {
+  font-family: var(--font-jakarta);
+  font-weight: 700;
+  font-size: clamp(2rem, 5vw, 3.3rem);
+  line-height: 1.03;
+  letter-spacing: -0.03em;
+  color: var(--pandan);
+  margin-top: 0.7rem;
+}
+.c10-subline {
+  margin-top: 1rem;
+  font-size: 1.02rem;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  max-width: 40ch;
+}
+
+/* example card */
+.c10-card {
+  margin-top: 1.4rem;
+  max-width: 22rem;
+  background: linear-gradient(180deg, #fbf6ea, var(--surface) 40%, #f3ecd9 100%);
+  border: 1px solid var(--hair);
+  border-radius: 16px;
+  padding: 1.15rem 1.2rem;
+  box-shadow: 0 20px 40px -24px rgba(20, 40, 24, 0.45);
+}
+.c10-card-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+.c10-card-shop {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--ink);
+}
+.c10-card-type {
+  font-size: 0.74rem;
+  color: var(--coral-deep);
+  font-weight: 600;
+}
+.c10-slots {
+  margin-top: 0.85rem;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.4rem;
+}
+.c10-slot {
+  aspect-ratio: 1;
+  border-radius: 9999px;
+  border: 1.5px dashed color-mix(in srgb, var(--hair) 72%, var(--muted));
+  display: grid;
+  place-items: center;
+}
+.c10-slot[data-filled="true"] {
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--coral) 45%, var(--hair));
+  background: rgba(224, 104, 75, 0.08);
+}
+.c10-slot svg {
+  width: 70%;
+  height: 70%;
+  color: var(--coral);
+}
+.c10-slot[data-reward="true"] {
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--coral) 55%, var(--hair));
+  color: var(--coral-deep);
+  font-size: 0.8rem;
+}
+.c10-reward {
+  margin-top: 0.85rem;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+}
+.c10-reward b {
+  color: var(--coral-deep);
+}
+.c10-price {
+  margin-top: 0.9rem;
+  padding-top: 0.85rem;
+  border-top: 1px dashed var(--hair);
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.c10-price-math {
+  font-size: 0.9rem;
+  color: var(--ink);
+  font-weight: 600;
+}
+.c10-price-note {
+  font-size: 0.74rem;
+  color: var(--muted);
+}
+
+.c10-cta-row {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+/* ---- buttons ---- */
+.c10-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.82rem 1.35rem;
+  border-radius: 9999px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: none;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1),
+    background-color 160ms ease;
+}
+.c10-btn-primary {
+  background: var(--pandan);
+  color: var(--on-primary);
+}
+.c10-btn-primary:hover {
+  background: var(--pandan-ink);
+}
+.c10-btn-ghost {
+  color: var(--pandan);
+  border-color: var(--hair);
+  background: var(--surface);
+}
+.c10-btn:active {
+  transform: translateY(1px) scale(0.99);
+}
+
+/* ---- sections ---- */
+.c10-section {
+  padding: 3.5rem 0;
+  border-top: 1px solid var(--hair);
+}
+.c10-facts {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.2rem;
+}
+@media (min-width: 640px) {
+  .c10-facts {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+.c10-fact-num {
+  font-family: var(--font-space), ui-monospace, monospace;
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: var(--pandan);
+}
+.c10-fact-label {
+  margin-top: 0.2rem;
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+}
+
+.c10-step {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 0.7rem;
+  align-items: baseline;
+  padding: 0.7rem 0;
+  border-top: 1px solid var(--hair);
+  font-size: 0.95rem;
+}
+.c10-step:first-of-type {
+  border-top: 0;
+}
+.c10-step-n {
+  font-family: var(--font-space), ui-monospace, monospace;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+.c10-step-tag {
+  font-family: var(--font-space), ui-monospace, monospace;
+  font-size: 0.76rem;
+  color: var(--leaf-deep);
+  white-space: nowrap;
+}
+
+.c10-stat-num {
+  font-family: var(--font-space), ui-monospace, monospace;
+  font-weight: 700;
+  font-size: 1.85rem;
+  color: var(--pandan);
+  font-variant-numeric: tabular-nums;
+}
+.c10-stat-num[data-earn="true"] {
+  color: var(--coral-deep);
+}
+.c10-stat-label {
+  margin-top: 0.3rem;
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+}
+.c10-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 9999px;
+  flex: none;
+}
+
+/* ---- trust / pricing ---- */
+.c10-plan {
+  border: 1px solid var(--hair);
+  border-radius: 16px;
+  background: var(--surface);
+  padding: 1.3rem;
+}
+.c10-plan[data-featured="true"] {
+  border-color: var(--coral);
+  box-shadow: 0 0 0 3px rgba(224, 104, 75, 0.14);
+}
+.c10-plan-price {
+  font-family: var(--font-space), ui-monospace, monospace;
+  font-weight: 700;
+  font-size: 1.9rem;
+  color: var(--pandan);
+}
+.c10-badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  padding: 0.15rem 0.6rem;
+  border: 1px solid var(--hair);
+  color: var(--muted);
+}
+.c10-plan[data-featured="true"] .c10-badge {
+  background: var(--pandan);
+  color: var(--on-primary);
+  border-color: transparent;
+}
+.c10-trust {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  margin-top: 1.5rem;
+  font-size: 0.88rem;
+  color: var(--ink-soft);
+}
+.c10-trust span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+.c10-trust svg {
+  width: 1rem;
+  height: 1rem;
+  color: var(--leaf-deep);
+  flex: none;
+}
+
+.c10-cta {
+  margin: 3.5rem 0 5rem;
+  border-radius: 22px;
+  background: linear-gradient(160deg, #16513f, var(--pandan) 75%);
+  color: var(--on-primary);
+  padding: 3rem 1.5rem;
+  text-align: center;
+}
+.c10-cta h2 {
+  font-weight: 700;
+  font-size: clamp(1.7rem, 4vw, 2.4rem);
+  letter-spacing: -0.02em;
+}
+.c10-cta p {
+  margin: 1rem auto 0;
+  max-width: 34rem;
+  color: rgba(246, 241, 227, 0.85);
+  line-height: 1.6;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .c10-chip,
+  .c10-btn {
+    transition: none;
+  }
+}

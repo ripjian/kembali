@@ -45,28 +45,29 @@ logs to console instead of freezing the page.
 
 ## Photography
 
-Wikimedia Commons, graded in-house into a pandan duotone / warm filmic pair
-(pipeline: scratchpad `grade.py`, Pillow):
+Sourced through Openverse (CC0 unless noted), graded in-house into the pandan
+duotone / warm filmic pair (`grade.py` pipeline, Pillow):
 
-| Asset | Source | Author | License |
+| Asset | Subject | Source | License |
 |---|---|---|---|
-| hero-pull.jpg | "Teh tarik man pulling tea" | Cheng (Austin, US) | CC BY-SA 2.0 |
-| scene-interior.jpg | "Kopitiam by Wilai, Phuket" (cropped) | Thanakrit Gu | CC BY 2.0 |
-| scene-shophouse.jpg | "Lu San Coffee Shop 1" (Muar) | Slleong | CC0 |
-| food-kaya.jpg | "Kaya toast, Yinzo Kopi, Ipoh" | Sharon Hahn Darlin | CC BY 2.0 |
-| food-kopi.jpg | "Kopi Rasa" | さえぼー | CC0 |
-| food-teh.jpg | "Teh tarik 2" | Alpha (Melbourne) | CC BY-SA 2.0 |
-| food-egg.jpg | "Kaya toast dip into soft boiled egg" | Pinklily08 | CC BY-SA 4.0 |
-| ind-gym-*.jpg | "Bench Press" | Aditya Oberai | CC BY-SA 4.0 |
-| ind-carwash-*.jpg | "Car wash in Jln Yahya Awal Johor Bahru" | Paul Ng | CC BY-SA 3.0 |
-| ind-dessert-*.jpg | "Cendol in Penang" | Xlr8ion | CC BY-SA 4.0 |
-| ind-wellness-*.jpg | "Foot massage at a spa" | Kolobetsoo | CC BY-SA 4.0 |
-| ind-salon-*.jpg | "Beauty salon 20211024 171434" | Ka23 13 | CC BY-SA 4.0 |
-| ind-restaurant-*.jpg | "Curry Laksa Chicken, Old Town Kopitiam Mamak" | Alpha (Melbourne) | CC BY-SA 2.0 |
-| ind-cafe-*.jpg | "Kopi Rasa" | さえぼー | CC0 |
+| hero-pour.jpg | Barista pouring latte art | StockSnap (Burst) | CC0 |
+| scene-cafe.jpg | Cafe interior, tall windows | Rawpixel | CC0 |
+| scene-corner.jpg | Cafe corner, marble tables | Rawpixel | CC0 |
+| scene-shophouse.jpg | Lu San Coffee Shop, Muar | Wikimedia (Slleong) | CC0 |
+| food-coffee.jpg | Flat white on dark wood | Rawpixel | CC0 |
+| food-breakfast.jpg | Breakfast spread from above | StockSnap | CC0 |
+| food-tea.jpg | Teapot and glasses | Rawpixel | CC0 |
+| food-croissant.jpg | Filled croissant | StockSnap (Kristin Hardwick) | CC0 |
+| ind-cafe-*.jpg | Latte art paper cup | Rawpixel | CC0 |
+| ind-restaurant-*.jpg | Chopsticks lifting noodles | StockSnap (Artur Rutkowski) | CC0 |
+| ind-dessert-*.jpg | Cream dessert bowl | Rawpixel | CC0 |
+| ind-gym-*.jpg | Dumbbell rack | StockSnap (Skitter Photo) | CC0 |
+| ind-salon-*.jpg | Stylist blow-drying | Rawpixel | CC0 |
+| ind-carwash-*.jpg | Car wash tunnel, Gorinchem | Wikimedia (FaceMePLS) | CC BY 2.0 |
+| ind-wellness-*.jpg | Spa massage | StockSnap (Authentic Stock) | CC0 |
 
-Attribution also appears in the site footer. Full source URLs: see
-`credits.json` from the sourcing run (scratchpad) or the Commons file pages by title.
+Attribution also appears in the site footers. Full source URLs: `manifest.json`
+from the sourcing run (scratchpad) or the source pages by title.
 
 ## Known placeholders
 

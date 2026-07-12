@@ -366,7 +366,8 @@ function burst() {
 }
 function drawBurst(now) {
   if (!bursting || !inkCtx) return;
-  const t = (now - burstStart) / 1000;
+  // rAF timestamps can lag performance.now() from the same frame
+  const t = Math.max(0, (now - burstStart) / 1000);
   inkCtx.clearRect(0, 0, inkCv.width, inkCv.height);
   if (t > 2.6) { bursting = false; return; }
   const fade = clamp(1 - t / 2.6, 0, 1);

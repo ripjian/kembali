@@ -54,7 +54,7 @@ premium, presentable, no duotone overlay on photos). Sourced through Openverse:
 | Asset | Subject | Source | License |
 |---|---|---|---|
 | hero-serve.jpg | Barista serving a customer at the counter | Wikimedia (Shixart1985) | CC BY 2.0 |
-| story-eat.jpg | Customer enjoying a bowl in a cafe chair | Wikimedia (Shixart1985) | CC BY 2.0 |
+| story-serve.jpg | A regular handed their cup at the counter | Wikimedia (Artaxerxes) | CC BY 4.0 |
 | scene-corner.jpg | Cafe corner, marble tables | Rawpixel | CC0 |
 | scene-shophouse.jpg | Lu San Coffee Shop, Muar | Wikimedia (Slleong) | CC0 |
 | food-coffee.jpg | Flat white on dark wood | Rawpixel | CC0 |

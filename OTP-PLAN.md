@@ -33,7 +33,16 @@ Batch A (half day): WhatsAppSender against the Cloud API test number — auth te
 Batch B: SmsSender + fallback chain (WA failure webhook → SMS), provider TBD by founder.
 Swap to production: env change only.
 
-## 5. Risks
+## 5. Architecture (decided 2026-07-11, founder)
+
+- **Platform-level, single Kembali WABA** sends all OTPs for all merchants (Model B). No per-merchant WhatsApp settings anywhere; credentials are platform env secrets, same treatment as future Apple certs. Bring-your-own-number for chains = Phase 6 enterprise feature.
+- **Attribution at request time, not after:** every OTP request originates from a tenant-scoped page, so sends are written to the `messages` table with `tenant_id` as a proper FK. No string identifiers needed.
+- **`messages` ledger columns:** tenant_id, customer_id, channel (whatsapp|sms), type (otp; marketing joins in Phase 4), delivery status (sent → delivered | failed → fallback_sms), provider_message_id, cost, created_at. **Never log the OTP code itself.**
+- **Platform-admin Messages report:** merchant filter (shop-name dropdown via tenant_id), recipient (masked), type, status, time, cost; per-merchant monthly totals for COGS; per-tenant volume-spike alert (abuse signal).
+- **Merchants see no OTP log** — auth plumbing is platform infrastructure, not loyalty data.
+- **Billing:** OTP cost absorbed into subscriptions (≈ RM6–10/outlet/mo COGS; PRICING hard rule #2 "no hidden fees" holds — say "logins included" on the pricing page). Usage-based credits remain reserved for Phase 4 marketing messages only.
+
+## 6. Risks
 
 - Verification rejection → resubmit with exact SSM name match; start early.
 - Template rejection → keep the auth template to Meta's standard OTP format (code + expiry line, no marketing).

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Roadmap · Kembali</title>
-<meta name="description" content="What is live in Kembali today, what is next, and what is still being sketched.">
+<meta name="description" content="The seven stops on Kembali's roadmap: what is live, what just landed, and what comes next.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='none' stroke='%230F3D32' stroke-width='5'/%3E%3Ccircle cx='16' cy='16' r='5' fill='%23E0684B'/%3E%3C/svg%3E">
 <meta name="theme-color" content="#071E18">
 <link rel="stylesheet" href="css/main.css">
@@ -46,109 +46,144 @@
         <span class="line"><span class="w">Built</span> <span class="w">in</span></span>
         <span class="line"><span class="w">the</span> <span class="w accent-w">open.</span></span>
       </h1>
-      <p class="hero-sub">A stamped row is live in the product today.
-      A dashed row is where we are headed, in order.</p>
+      <p class="hero-sub">Every stop is a station on the same journey. A stamped
+      station is live in the product today. A dashed one is where we are headed, in order.</p>
     </div>
   </section>
 
-  <!-- ================= LIVE ================= -->
+  <!-- ================= STOPS ================= -->
   <section class="roadlist paper" data-theme="light">
     <div class="wrap">
-      <div class="rl-group">
-        <p class="rl-head mono reveal">Live today <span class="rl-chip rl-chip-live">stamped</span></p>
-        <ol class="rl-rows">
-          <li class="rl-row" data-state="live">
-            <span class="rl-stamp" aria-hidden="true"><svg viewBox="0 0 96 96"><circle cx="48" cy="48" r="34" fill="none" stroke="currentColor" stroke-width="11"/><circle cx="48" cy="48" r="13" fill="currentColor"/></svg></span>
-            <div class="rl-body"><b>Digital stamp cards</b><p>Scan to stamp in seconds, card in the phone's browser.</p></div>
-            <span class="rl-status mono">Live</span>
-          </li>
-          <li class="rl-row" data-state="live">
-            <span class="rl-stamp" aria-hidden="true"><svg viewBox="0 0 96 96"><circle cx="48" cy="48" r="34" fill="none" stroke="currentColor" stroke-width="11"/><circle cx="48" cy="48" r="13" fill="currentColor"/></svg></span>
-            <div class="rl-body"><b>Points and rewards</b><p>Spending becomes points, points become a rewards catalog you control.</p></div>
-            <span class="rl-status mono">Live</span>
-          </li>
-          <li class="rl-row" data-state="live">
-            <span class="rl-stamp" aria-hidden="true"><svg viewBox="0 0 96 96"><circle cx="48" cy="48" r="34" fill="none" stroke="currentColor" stroke-width="11"/><circle cx="48" cy="48" r="13" fill="currentColor"/></svg></span>
-            <div class="rl-body"><b>Single-use reward coupons</b><p>Unique codes confirmed by staff at the counter, expiring in 15 minutes.</p></div>
-            <span class="rl-status mono">Live</span>
-          </li>
-          <li class="rl-row" data-state="live">
-            <span class="rl-stamp" aria-hidden="true"><svg viewBox="0 0 96 96"><circle cx="48" cy="48" r="34" fill="none" stroke="currentColor" stroke-width="11"/><circle cx="48" cy="48" r="13" fill="currentColor"/></svg></span>
-            <div class="rl-body"><b>QR kit posters</b><p>Print-ready posters in your colours, one per outlet.</p></div>
-            <span class="rl-status mono">Live</span>
-          </li>
-          <li class="rl-row" data-state="live">
-            <span class="rl-stamp" aria-hidden="true"><svg viewBox="0 0 96 96"><circle cx="48" cy="48" r="34" fill="none" stroke="currentColor" stroke-width="11"/><circle cx="48" cy="48" r="13" fill="currentColor"/></svg></span>
-            <div class="rl-body"><b>Multiple outlets</b><p>Every stamp records its till, so reports split cleanly by branch.</p></div>
-            <span class="rl-status mono">Live</span>
-          </li>
-          <li class="rl-row" data-state="live">
-            <span class="rl-stamp" aria-hidden="true"><svg viewBox="0 0 96 96"><circle cx="48" cy="48" r="34" fill="none" stroke="currentColor" stroke-width="11"/><circle cx="48" cy="48" r="13" fill="currentColor"/></svg></span>
-            <div class="rl-body"><b>Team roles</b><p>Cashiers stamp, owners see money. Checked on the server every time.</p></div>
-            <span class="rl-status mono">Live</span>
-          </li>
-          <li class="rl-row" data-state="live">
-            <span class="rl-stamp" aria-hidden="true"><svg viewBox="0 0 96 96"><circle cx="48" cy="48" r="34" fill="none" stroke="currentColor" stroke-width="11"/><circle cx="48" cy="48" r="13" fill="currentColor"/></svg></span>
-            <div class="rl-body"><b>Reports with CSV export</b><p>Customers, transactions, and rewards, filtered by date and outlet.</p></div>
-            <span class="rl-status mono">Live</span>
-          </li>
-          <li class="rl-row" data-state="live">
-            <span class="rl-stamp" aria-hidden="true"><svg viewBox="0 0 96 96"><circle cx="48" cy="48" r="34" fill="none" stroke="currentColor" stroke-width="11"/><circle cx="48" cy="48" r="13" fill="currentColor"/></svg></span>
-            <div class="rl-body"><b>Your colours on the card</b><p>Customer pages take your brand colours, checked for readable contrast.</p></div>
-            <span class="rl-status mono">Live</span>
-          </li>
-        </ol>
-      </div>
+      <ol class="rl-timeline" id="rlTimeline">
 
-      <div class="rl-group">
-        <p class="rl-head mono reveal">Up next <span class="rl-chip">in progress</span></p>
-        <ol class="rl-rows">
-          <li class="rl-row" data-state="next">
-            <span class="rl-stamp" aria-hidden="true"><svg viewBox="0 0 96 96"><circle cx="48" cy="48" r="34" fill="none" stroke="currentColor" stroke-width="8" stroke-dasharray="10 12" stroke-linecap="round"/></svg></span>
-            <div class="rl-body"><b>Sign-in codes over WhatsApp</b><p>The six digit code arrives where Malaysians already are.</p></div>
-            <span class="rl-status mono">Up next</span>
-          </li>
-          <li class="rl-row" data-state="next">
-            <span class="rl-stamp" aria-hidden="true"><svg viewBox="0 0 96 96"><circle cx="48" cy="48" r="34" fill="none" stroke="currentColor" stroke-width="8" stroke-dasharray="10 12" stroke-linecap="round"/></svg></span>
-            <div class="rl-body"><b>Cards in Apple and Google Wallet</b><p>The stamp card joins the boarding passes, one swipe from the lock screen.</p></div>
-            <span class="rl-status mono">Up next</span>
-          </li>
-          <li class="rl-row" data-state="next">
-            <span class="rl-stamp" aria-hidden="true"><svg viewBox="0 0 96 96"><circle cx="48" cy="48" r="34" fill="none" stroke="currentColor" stroke-width="8" stroke-dasharray="10 12" stroke-linecap="round"/></svg></span>
-            <div class="rl-body"><b>VIP member tags</b><p>Mark your best regulars and treat them accordingly.</p></div>
-            <span class="rl-status mono">Up next</span>
-          </li>
-        </ol>
-      </div>
+        <li class="rl-stop" data-state="live" data-anim="foundations">
+          <span class="rl-station" aria-hidden="true"></span>
+          <article class="rl-card">
+            <div class="rl-card-head">
+              <span class="rl-chip rl-chip-live">Live</span>
+              <span class="rl-num mono">stop 00</span>
+            </div>
+            <h2 class="rl-title">Foundations</h2>
+            <p class="rl-lead">The groundwork is done: a platform where each shop's data is isolated at the database layer, and a stamp history that cannot be edited.</p>
+            <ul class="rl-points">
+              <li>Isolated data per shop</li>
+              <li>Tamper-proof stamp history</li>
+              <li>Brand and theming engine, with your colours checked for readable contrast</li>
+            </ul>
+          </article>
+        </li>
 
-      <div class="rl-group">
-        <p class="rl-head mono reveal">Planned <span class="rl-chip">sketched</span></p>
-        <ol class="rl-rows">
-          <li class="rl-row" data-state="plan">
-            <span class="rl-stamp" aria-hidden="true"><svg viewBox="0 0 96 96"><circle cx="48" cy="48" r="34" fill="none" stroke="currentColor" stroke-width="6" stroke-dasharray="4 14" stroke-linecap="round"/></svg></span>
-            <div class="rl-body"><b>WhatsApp reminders and campaigns</b><p>Bring lapsed customers back, in Malay, English, or Chinese.</p></div>
-            <span class="rl-status mono">Planned</span>
-          </li>
-          <li class="rl-row" data-state="plan">
-            <span class="rl-stamp" aria-hidden="true"><svg viewBox="0 0 96 96"><circle cx="48" cy="48" r="34" fill="none" stroke="currentColor" stroke-width="6" stroke-dasharray="4 14" stroke-linecap="round"/></svg></span>
-            <div class="rl-body"><b>Referral rewards</b><p>Regulars bring friends, both sides earn a stamp.</p></div>
-            <span class="rl-status mono">Planned</span>
-          </li>
-          <li class="rl-row" data-state="plan">
-            <span class="rl-stamp" aria-hidden="true"><svg viewBox="0 0 96 96"><circle cx="48" cy="48" r="34" fill="none" stroke="currentColor" stroke-width="6" stroke-dasharray="4 14" stroke-linecap="round"/></svg></span>
-            <div class="rl-body"><b>POS connections and an API</b><p>Stamps straight from the till, no second device.</p></div>
-            <span class="rl-status mono">Planned</span>
-          </li>
-          <li class="rl-row" data-state="plan">
-            <span class="rl-stamp" aria-hidden="true"><svg viewBox="0 0 96 96"><circle cx="48" cy="48" r="34" fill="none" stroke="currentColor" stroke-width="6" stroke-dasharray="4 14" stroke-linecap="round"/></svg></span>
-            <div class="rl-body"><b>Deeper analytics</b><p>Cohorts, retention curves, and cross-outlet comparisons.</p></div>
-            <span class="rl-status mono">Planned</span>
-          </li>
-        </ol>
-      </div>
+        <li class="rl-stop" data-state="live" data-anim="stamps">
+          <span class="rl-station" aria-hidden="true"></span>
+          <article class="rl-card">
+            <div class="rl-card-head">
+              <span class="rl-chip rl-chip-live">Live</span>
+              <span class="rl-num mono">stop 01</span>
+            </div>
+            <h2 class="rl-title">The stamp card, done right</h2>
+            <p class="rl-lead">Customers get a card from a QR in under 30 seconds, staff stamp it with any phone, and simple reports show it working.</p>
+            <ul class="rl-points">
+              <li>Customer card with a live stamp animation</li>
+              <li>Three-second stamping with fraud-proof QR codes</li>
+              <li>Print-ready QR kit for the counter</li>
+              <li>Every stamp tagged to the serving outlet</li>
+              <li>Program set up with you during your pilot</li>
+              <li>Simple reports: stamps, sales and repeat visits</li>
+            </ul>
+          </article>
+        </li>
+
+        <li class="rl-stop" data-state="new" data-anim="points">
+          <span class="rl-station" aria-hidden="true"></span>
+          <article class="rl-card">
+            <div class="rl-card-head">
+              <span class="rl-chip rl-chip-live">New</span>
+              <span class="rl-num mono">stop 02</span>
+            </div>
+            <h2 class="rl-title">Points and rewards</h2>
+            <p class="rl-lead">Every visit earns points, and customers spend them on rewards you choose, redeemed with a single-use code at your counter.</p>
+            <ul class="rl-points">
+              <li>Points from each visit, at a rate you set</li>
+              <li>A rewards catalog you control</li>
+              <li>One-tap redeem with a single-use coupon</li>
+              <li>Point adjustments your customers can see</li>
+              <li>Points earned and spent, in your reports</li>
+            </ul>
+          </article>
+        </li>
+
+        <li class="rl-stop" data-state="next" data-anim="wallet">
+          <span class="rl-station" aria-hidden="true"></span>
+          <article class="rl-card">
+            <div class="rl-card-head">
+              <span class="rl-chip">Up next</span>
+              <span class="rl-num mono">stop 03</span>
+            </div>
+            <h2 class="rl-title">Wallet cards and VIP tags</h2>
+            <p class="rl-lead">Cards that live in the phone's own wallet and update the moment a stamp lands. VIP and staff tags earn points faster.</p>
+            <ul class="rl-points">
+              <li>Apple Wallet pass with live updates</li>
+              <li>Google Wallet loyalty cards</li>
+              <li>VIP and staff tags with bonus points</li>
+            </ul>
+          </article>
+        </li>
+
+        <li class="rl-stop" data-state="plan" data-anim="messages">
+          <span class="rl-station" aria-hidden="true"></span>
+          <article class="rl-card">
+            <div class="rl-card-head">
+              <span class="rl-chip">Planned</span>
+              <span class="rl-num mono">stop 04</span>
+            </div>
+            <h2 class="rl-title">Bring them back on WhatsApp</h2>
+            <p class="rl-lead">Warm messages that invite customers back, on the channel they actually read. Every message is opt-in, as PDPA requires.</p>
+            <ul class="rl-points">
+              <li>Welcome, birthday and milestone rewards</li>
+              <li>Reward-expiry reminders and win-back offers</li>
+              <li>Templates in English, Bahasa Melayu and Chinese</li>
+            </ul>
+          </article>
+        </li>
+
+        <li class="rl-stop" data-state="plan" data-anim="referral">
+          <span class="rl-station" aria-hidden="true"></span>
+          <article class="rl-card">
+            <div class="rl-card-head">
+              <span class="rl-chip">Planned</span>
+              <span class="rl-num mono">stop 05</span>
+            </div>
+            <h2 class="rl-title">Referral rewards</h2>
+            <p class="rl-lead">Your regulars bring their friends. Everyone shares a personal link. When a friend joins and visits, both sides get a treat.</p>
+            <ul class="rl-points">
+              <li>Personal referral links and QR codes</li>
+              <li>Rewards for the sender and the friend</li>
+              <li>Referral numbers in your reports</li>
+            </ul>
+          </article>
+        </li>
+
+        <li class="rl-stop" data-state="plan" data-anim="platform">
+          <span class="rl-station" aria-hidden="true"></span>
+          <article class="rl-card">
+            <div class="rl-card-head">
+              <span class="rl-chip">Planned</span>
+              <span class="rl-num mono">stop 06</span>
+            </div>
+            <h2 class="rl-title">Connect your POS and deeper reports</h2>
+            <p class="rl-lead">Kembali opens up: an API and webhooks for POS integrations, plus the deeper numbers for growing chains, across every branch.</p>
+            <ul class="rl-points">
+              <li>Public API and webhooks, POS integrations</li>
+              <li>Repeat-visit rate, member share, redemptions</li>
+              <li>Cross-outlet stamping and per-branch reports</li>
+            </ul>
+          </article>
+        </li>
+
+      </ol>
 
       <div class="rl-cta reveal">
-        <p>Founding merchants get everything above as it ships, at the same RM99.</p>
+        <p>Founding merchants get every stop as it ships, at the same RM99.</p>
         <a class="btn btn-solid" href="pricing.html">See the founding price</a>
       </div>
     </div>

@@ -465,15 +465,15 @@ if (dash) {
   }, { threshold: 0.25 }).observe(dash);
 }
 
-/* ============================== roadmap ledger rows ============================== */
-const rlRows = [...document.querySelectorAll('.rl-row')];
+/* ============================== roadmap reveals (rows + stops) ============================== */
+const rlRows = [...document.querySelectorAll('.rl-row, .rl-stop')];
 if (rlRows.length) {
   rlRows.forEach((row, i) => { row.style.transitionDelay = `${(i % 6) * 70}ms`; });
   const rlIO = new IntersectionObserver((entries) => {
     for (const e of entries) {
       if (e.isIntersecting) { e.target.classList.add('in'); rlIO.unobserve(e.target); }
     }
-  }, { threshold: 0.3 });
+  }, { threshold: 0.25 });
   rlRows.forEach((el) => rlIO.observe(el));
 }
 

@@ -1197,6 +1197,131 @@ body.has-cursor .cursor-dot { opacity: 1; }
   .rl-status { display: none; }
 }
 
+/* ---------- roadmap timeline (seven stops) ---------- */
+.rl-timeline { list-style: none; position: relative; }
+.rl-stop {
+  position: relative;
+  padding-left: clamp(44px, 5vw, 64px);
+  padding-bottom: clamp(20px, 3vh, 34px);
+}
+.rl-stop:last-child { padding-bottom: 0; }
+/* track segment down to the next station: dashed by default, solid between reached stops */
+.rl-stop::before {
+  content: '';
+  position: absolute;
+  left: 15px; top: 30px; bottom: -2px;
+  border-left: 2px dashed color-mix(in srgb, var(--ink) 20%, transparent);
+}
+.rl-stop:last-child::before { display: none; }
+.rl-stop:has(+ .rl-stop[data-state="live"])::before,
+.rl-stop:has(+ .rl-stop[data-state="new"])::before {
+  border-left: 2px solid var(--coral);
+}
+/* station marker */
+.rl-station {
+  position: absolute; left: 0; top: 4px;
+  width: 32px; height: 32px;
+  display: grid; place-items: center;
+}
+.rl-station::after {
+  content: '';
+  width: 20px; height: 20px; border-radius: 50%;
+  box-sizing: border-box;
+}
+.rl-stop[data-state="live"] .rl-station::after,
+.rl-stop[data-state="new"] .rl-station::after {
+  background: radial-gradient(circle at 40% 36%, color-mix(in srgb, var(--coral) 92%, #fff 8%), var(--coral-deep));
+}
+.rl-stop[data-state="next"] .rl-station::after {
+  border: 2px dashed color-mix(in srgb, var(--pandan) 60%, var(--sand) 40%);
+}
+.rl-stop[data-state="plan"] .rl-station::after {
+  border: 2px dashed color-mix(in srgb, var(--ink) 26%, var(--sand) 74%);
+}
+/* the "New" stop pings */
+.rl-stop[data-state="new"] .rl-station::before {
+  content: '';
+  position: absolute; inset: 6px;
+  border-radius: 50%;
+  border: 2px solid var(--coral);
+  animation: rlPing 2.6s var(--ease-out) infinite;
+}
+@keyframes rlPing {
+  0% { opacity: .55; transform: scale(.6); }
+  70% { opacity: 0; transform: scale(1.9); }
+  100% { opacity: 0; transform: scale(1.9); }
+}
+.rl-stop.in[data-state="live"] .rl-station::after,
+.rl-stop.in[data-state="new"] .rl-station::after { animation: hudPop .5s var(--ease-out); }
+
+.rl-card {
+  background: #fff;
+  border: 1px solid var(--hairline-light);
+  border-radius: 16px;
+  padding: clamp(20px, 2.4vw, 30px);
+  box-shadow: 0 24px 60px -40px color-mix(in srgb, var(--pandan) 42%, transparent);
+  opacity: 0; transform: translateY(16px);
+  transition: opacity .7s var(--ease-out), transform .7s var(--ease-out), border-color .35s, box-shadow .35s;
+}
+.rl-stop.in .rl-card { opacity: 1; transform: none; }
+.rl-card-head { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.rl-num { font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: color-mix(in srgb, var(--ink) 45%, transparent); }
+.rl-title {
+  font-family: var(--serif);
+  font-variation-settings: 'opsz' 60;
+  font-weight: 540;
+  font-size: clamp(21px, 2.2vw, 30px);
+  color: var(--pandan);
+  line-height: 1.08;
+  margin-bottom: 10px;
+}
+.rl-lead {
+  font-size: clamp(15px, 1.4vw, 17px);
+  color: color-mix(in srgb, var(--ink) 74%, var(--sand) 26%);
+  max-width: 62ch;
+  margin-bottom: 16px;
+}
+.rl-points {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 26px;
+}
+.rl-points li {
+  position: relative;
+  padding-left: 20px;
+  font-size: 14px;
+  color: color-mix(in srgb, var(--ink) 68%, var(--sand) 32%);
+  line-height: 1.4;
+}
+.rl-points li::before {
+  content: '';
+  position: absolute; left: 0; top: 7px;
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--coral);
+}
+.rl-stop[data-state="next"] .rl-points li::before,
+.rl-stop[data-state="plan"] .rl-points li::before {
+  background: color-mix(in srgb, var(--pandan) 45%, var(--sand) 55%);
+}
+/* desktop invites the hover preview */
+@media (pointer: fine) {
+  .rl-card { cursor: pointer; }
+  .rl-stop:hover .rl-card {
+    border-color: color-mix(in srgb, var(--coral) 55%, transparent);
+    box-shadow: 0 30px 70px -40px color-mix(in srgb, var(--pandan) 55%, transparent);
+    transform: translateY(-2px);
+  }
+}
+@media (max-width: 720px) {
+  .rl-points { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .rl-stop { padding-left: 38px; }
+  .rl-stop::before { left: 13px; }
+  .rl-station { width: 28px; height: 28px; }
+}
+
 /* ---------- pricing ---------- */
 .plans { background: var(--pandan-night); padding: 10px 0 clamp(80px, 12vh, 140px); }
 .plan-grid {

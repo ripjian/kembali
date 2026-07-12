@@ -1487,3 +1487,271 @@ body.has-cursor .cursor-dot { opacity: 1; }
   text-shadow: 0 1px 8px rgba(0,0,0,.6);
 }
 .about-principles .rl-body a { text-decoration: underline; text-underline-offset: 3px; }
+
+/* ============================================================
+   ROADMAP PREVIEWS · cursor-following floating card + per-stop
+   mini animations. transform/opacity only. rla-* loops run only
+   inside .rl-preview.playing; .rl-illus.play is the touch one-shot.
+   ============================================================ */
+
+/* floating preview (desktop pointer:fine) */
+.rl-preview {
+  position: fixed; left: 0; top: 0; z-index: 60;
+  width: 320px;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate3d(-9999px, -9999px, 0);
+  transition: opacity .24s var(--ease-out);
+  will-change: transform, opacity;
+}
+.rl-preview .rl-preview-card {
+  transform: scale(.94);
+  transform-origin: top left;
+  transition: transform .26s var(--ease-out);
+}
+.rl-preview.show { opacity: 1; }
+.rl-preview.show .rl-preview-card { transform: scale(1); }
+.rl-preview-card {
+  background: radial-gradient(120% 100% at 80% 0%, #fff 0%, var(--sand) 90%);
+  border: 1px solid var(--hairline-light);
+  border-radius: 16px;
+  box-shadow: 0 40px 90px -36px color-mix(in srgb, var(--pandan) 60%, transparent);
+  overflow: hidden;
+}
+/* the preview clone is always shown, whatever the source device */
+.rl-preview .rl-illus { display: block !important; }
+
+/* inline illustration: hidden on desktop, shown on touch */
+.rl-illus { display: none; margin-top: 18px; }
+@media (pointer: coarse) {
+  .rl-illus { display: block; }
+}
+.illus-scene {
+  position: relative;
+  min-height: 206px;
+  padding: 22px 20px 36px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+  border-radius: 14px;
+}
+@media (pointer: coarse) {
+  .illus-scene {
+    border: 1px solid var(--hairline-light);
+    background: radial-gradient(120% 100% at 80% 0%, #fff 0%, var(--sand) 90%);
+  }
+}
+.illus-label {
+  position: absolute; left: 0; right: 0; bottom: 12px;
+  text-align: center;
+  font-size: 10px; letter-spacing: .12em; text-transform: uppercase;
+  color: color-mix(in srgb, var(--ink) 48%, transparent);
+}
+
+/* ---- 00 foundations: isolated layers + a lock ---- */
+.sc-fnd { gap: 8px; }
+.fnd-slab {
+  display: flex; align-items: center; justify-content: center;
+  height: 26px; border-radius: 999px;
+  border: 1px solid var(--hairline-light);
+  background: #fff;
+  font-size: 10px; letter-spacing: .1em; text-transform: uppercase;
+  color: color-mix(in srgb, var(--ink) 60%, transparent);
+}
+.fnd-slab i { font-style: normal; }
+.fnd-slab:nth-child(1) { width: 190px; }
+.fnd-slab:nth-child(2) { width: 150px; }
+.fnd-slab:nth-child(3) { width: 110px; }
+.fnd-lock {
+  margin-top: 4px;
+  width: 34px; height: 34px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--pandan); color: var(--sand);
+}
+.fnd-lock svg { width: 17px; height: 17px; }
+.rl-preview.playing .fnd-slab { animation: rlaSlab 6.5s var(--ease-out) infinite; animation-delay: calc(var(--i) * 320ms); }
+.rl-preview.playing .fnd-lock { animation: rlaLock 6.5s var(--ease-out) infinite; }
+@keyframes rlaSlab {
+  0% { opacity: 0; transform: translateX(-16px); }
+  12% { opacity: 1; transform: none; }
+  60% { opacity: 1; transform: none; }
+  74% { opacity: 1; transform: translateX(14px); }
+  86%, 100% { opacity: 0; transform: translateX(-16px); }
+}
+@keyframes rlaLock {
+  0%, 40% { opacity: 0; transform: scale(.4); }
+  52% { opacity: 1; transform: scale(1.15); }
+  60% { transform: scale(1); }
+  84% { opacity: 1; transform: scale(1); }
+  92%, 100% { opacity: 0; transform: scale(.4); }
+}
+
+/* ---- 01 stamps: 10 dots filling to a free coffee ---- */
+.stamp-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+.st-dot {
+  width: 26px; height: 26px; border-radius: 50%;
+  border: 2px dashed color-mix(in srgb, var(--ink) 24%, transparent);
+  display: grid; place-items: center;
+  font-size: 12px; color: #fff;
+}
+.st-dot:not(.st-free) { background: color-mix(in srgb, var(--coral) 16%, transparent); border-color: transparent; }
+.st-free { background: var(--coral); border-color: transparent; }
+.rl-preview.playing .rla-stamp { animation: rlaStamp 8.5s var(--ease-out) infinite; animation-delay: calc(var(--i) * 480ms); }
+@keyframes rlaStamp {
+  0% { opacity: .18; transform: scale(.6); }
+  5% { opacity: 1; transform: scale(1.14); }
+  9% { transform: scale(1); }
+  84% { opacity: 1; transform: scale(1); }
+  93%, 100% { opacity: .18; transform: scale(.6); }
+}
+
+/* ---- 02 points: RM ticks to points, coupon reveals ---- */
+.sc-points { gap: 14px; }
+.pt-conv { display: flex; align-items: center; gap: 10px; font-size: 14px; }
+.pt-rm { color: color-mix(in srgb, var(--ink) 72%, transparent); }
+.pt-arw { color: var(--coral); }
+.pt-pts { color: var(--coral-deep); font-weight: 500; }
+.pt-bar { width: 180px; height: 8px; border-radius: 999px; background: color-mix(in srgb, var(--ink) 10%, transparent); overflow: hidden; }
+.rla-fill { display: block; height: 100%; width: 100%; border-radius: 999px; background: var(--leaf); transform-origin: left; transform: scaleX(.7); }
+.pt-coupon {
+  display: flex; align-items: center; justify-content: center;
+  padding: 7px 14px; border-radius: 8px;
+  border: 1.5px dashed var(--coral-deep);
+  color: var(--coral-deep); font-size: 12px; letter-spacing: .1em;
+}
+.rl-preview.playing .rla-tick { animation: rlaTick 5s var(--ease-out) infinite; }
+.rl-preview.playing .rla-fill { animation: rlaFill 5s var(--ease-in-out-strong, var(--ease-out)) infinite; }
+.rl-preview.playing .rla-reveal { animation: rlaReveal 5s var(--ease-out) infinite; display: inline-block; }
+.pt-coupon .rla-reveal { will-change: clip-path; }
+@keyframes rlaTick {
+  0%, 20% { opacity: .3; transform: translateY(4px); }
+  30% { opacity: 1; transform: translateY(0) scale(1.12); }
+  38% { transform: none; }
+  100% { opacity: 1; }
+}
+@keyframes rlaFill {
+  0% { transform: scaleX(.12); }
+  40% { transform: scaleX(.72); }
+  70% { transform: scaleX(.72); }
+  100% { transform: scaleX(.12); }
+}
+@keyframes rlaReveal {
+  0%, 44% { opacity: 0; transform: translateY(6px); }
+  56% { opacity: 1; transform: none; }
+  90% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* ---- 03 wallet: pass slides into phone, VIP doubles ---- */
+.sc-wallet { gap: 16px; }
+.wl-phone {
+  width: 118px; height: 102px; border-radius: 18px 18px 6px 6px;
+  border: 2px solid color-mix(in srgb, var(--ink) 22%, transparent);
+  background: color-mix(in srgb, var(--sand) 60%, #fff 40%);
+  overflow: hidden; position: relative; display: flex; align-items: flex-end; padding: 8px;
+}
+.wl-pass { width: 100%; border-radius: 10px; background: var(--pandan); color: var(--sand); padding: 9px 10px; }
+.wl-pass b { display: block; font-size: 10px; font-weight: 600; margin-bottom: 6px; }
+.wl-dots { display: flex; gap: 4px; }
+.wl-dots i { width: 9px; height: 9px; border-radius: 50%; background: var(--coral); }
+.wl-dots i.off { background: transparent; border: 1px solid color-mix(in srgb, var(--sand) 40%, transparent); }
+.wl-vip { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--coral-deep); }
+.wl-vip .mono { border: 1px solid var(--coral-deep); border-radius: 5px; padding: 1px 6px; font-size: 9px; letter-spacing: .12em; }
+.rl-preview.playing .rla-pass { animation: rlaPass 6.5s var(--ease-out) infinite; }
+.rl-preview.playing .rla-double { animation: rlaDouble 6.5s var(--ease-out) infinite; }
+@keyframes rlaPass {
+  0% { opacity: 0; transform: translateY(30px); }
+  18% { opacity: 1; transform: none; }
+  82% { opacity: 1; transform: none; }
+  92%, 100% { opacity: 0; transform: translateY(30px); }
+}
+@keyframes rlaDouble {
+  0%, 40% { opacity: .3; transform: scale(.9); }
+  52% { opacity: 1; transform: scale(1.18); }
+  60% { transform: scale(1); }
+  86% { opacity: 1; transform: scale(1); }
+  94%, 100% { opacity: .3; transform: scale(.9); }
+}
+
+/* ---- 04 messages: bubbles arrive ---- */
+.sc-msgs { align-items: stretch; gap: 9px; padding-left: 26px; padding-right: 26px; }
+.msg-b {
+  max-width: 78%; font-size: 11.5px; line-height: 1.35;
+  padding: 8px 12px; border-radius: 14px;
+}
+.b-in { align-self: flex-start; border-bottom-left-radius: 5px; background: #fff; border: 1px solid var(--hairline-light); color: color-mix(in srgb, var(--ink) 74%, transparent); }
+.b-out { align-self: flex-end; border-bottom-right-radius: 5px; background: var(--pandan); color: var(--sand); }
+.rl-preview.playing .rla-bubble { animation: rlaBubble 6.5s var(--ease-out) infinite; animation-delay: calc(var(--i) * 900ms); }
+@keyframes rlaBubble {
+  0% { opacity: 0; transform: translateY(10px); }
+  9% { opacity: 1; transform: none; }
+  82% { opacity: 1; }
+  92%, 100% { opacity: 0; transform: translateY(10px); }
+}
+
+/* ---- 05 referral: link travels A to B, both rewarded ---- */
+.sc-ref { flex-direction: row; gap: 0; }
+.ref-node {
+  position: relative;
+  width: 52px; height: 52px; border-radius: 50%;
+  display: grid; place-items: center;
+  font-family: var(--serif); font-weight: 560; font-size: 18px;
+  background: var(--pandan); color: var(--sand);
+}
+.ref-node:last-of-type { background: #fff; border: 1px solid var(--hairline-light); color: var(--pandan); }
+.ref-treat { position: absolute; right: -4px; top: -4px; width: 16px; height: 16px; border-radius: 50%; background: var(--coral); }
+.ref-line { position: relative; width: 84px; height: 2px; background: color-mix(in srgb, var(--ink) 16%, transparent); }
+.rla-travel { position: absolute; top: -4px; left: 0; width: 10px; height: 10px; border-radius: 50%; background: var(--leaf); }
+.rl-preview.playing .rla-travel { animation: rlaTravel 5s var(--ease-in-out-strong, var(--ease-out)) infinite; }
+.rl-preview.playing .rla-pop { animation: rlaPop 5s var(--ease-out) infinite; animation-delay: calc(var(--i) * 300ms); }
+@keyframes rlaTravel {
+  0% { opacity: 0; transform: translateX(0); }
+  16% { opacity: 1; }
+  52% { opacity: 1; transform: translateX(74px); }
+  64%, 100% { opacity: 0; transform: translateX(74px); }
+}
+@keyframes rlaPop {
+  0%, 30% { opacity: 0; transform: scale(.3); }
+  44% { opacity: 1; transform: scale(1.2); }
+  52% { transform: scale(1); }
+  86% { opacity: 1; transform: scale(1); }
+  94%, 100% { opacity: 0; transform: scale(.3); }
+}
+
+/* ---- 06 platform: POS + webhook nodes to the Kembali API mark ---- */
+.sc-plat { flex-direction: row; gap: 0; flex-wrap: nowrap; }
+.plat-node, .plat-hub {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 12px; border-radius: 999px;
+  border: 1px solid var(--hairline-light); background: #fff;
+  font-family: var(--mono); font-size: 11px; color: color-mix(in srgb, var(--ink) 72%, transparent);
+}
+.plat-hub { border-color: color-mix(in srgb, var(--coral) 45%, transparent); color: var(--pandan); font-weight: 500; }
+.plat-hub .kmark { width: 16px; height: 16px; color: var(--pandan); }
+.plat-hub b { font-weight: 600; }
+.plat-wire { width: 20px; height: 2px; background: color-mix(in srgb, var(--ink) 18%, transparent); }
+.rl-preview.playing .rla-node { animation: rlaNode 3.2s var(--ease-in-out-strong, var(--ease-out)) infinite; animation-delay: calc(var(--i) * 480ms); }
+@keyframes rlaNode {
+  0%, 100% { opacity: .5; transform: scale(.96); }
+  50% { opacity: 1; transform: scale(1.03); }
+}
+
+/* ---- touch one-shot: staggered build-in, settles at full ---- */
+.rl-illus.play .il { animation: rlEnter .55s var(--ease-out) both; animation-delay: calc(var(--i, 0) * 85ms); }
+@keyframes rlEnter {
+  0% { opacity: 0; transform: translateY(9px) scale(.94); }
+  100% { opacity: 1; transform: none; }
+}
+
+/* ---- reduced motion: no cursor follow, no loops, still frames ---- */
+@media (prefers-reduced-motion: reduce) {
+  .rl-preview { transition: opacity .01s; }
+  .rl-preview .rl-preview-card { transition: none; transform: none; }
+  .rl-preview.playing :is(.fnd-slab, .fnd-lock, .rla-stamp, .rla-tick, .rla-fill, .rla-reveal, .rla-pass, .rla-double, .rla-bubble, .rla-travel, .rla-pop, .rla-node),
+  .rl-illus.play .il { animation: none !important; opacity: 1 !important; transform: none !important; }
+  .rla-reveal { opacity: 1 !important; }
+}
+
+@media (max-width: 420px) {
+  .stamp-grid { gap: 8px; }
+  .st-dot { width: 22px; height: 22px; }
+  .ref-line { width: 60px; }
+}

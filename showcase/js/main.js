@@ -477,6 +477,92 @@ if (rlRows.length) {
   rlRows.forEach((el) => rlIO.observe(el));
 }
 
+/* ============================== roadmap hover previews ============================== */
+const rlTimeline = document.getElementById('rlTimeline');
+const rlPreview = document.getElementById('rlPreview');
+if (rlTimeline && rlPreview) {
+  const previewCard = rlPreview.querySelector('.rl-preview-card');
+
+  // touch devices: one preview plays once when its stop scrolls into view
+  if (matchMedia('(pointer: coarse)').matches) {
+    const illusIO = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (e.isIntersecting) {
+          const il = e.target.querySelector('.rl-illus');
+          if (il) il.classList.add('play');
+          illusIO.unobserve(e.target);
+        }
+      }
+    }, { threshold: 0.5 });
+    rlTimeline.querySelectorAll('.rl-stop').forEach((st) => illusIO.observe(st));
+  }
+
+  // desktop pointer: floating preview follows the cursor
+  if (matchMedia('(pointer: fine)').matches) {
+    let curStop = null, active = false, raf = 0, tx = 0, ty = 0, px = 0, py = 0;
+    const OFF = 22;
+
+    const dims = () => {
+      const r = previewCard.getBoundingClientRect();
+      return { w: r.width || 320, h: r.height || 236 };
+    };
+    const target = (cx, cy) => {
+      const { w, h } = dims();
+      let x = cx + OFF, y = cy + OFF;
+      if (x + w > innerWidth - 10) x = cx - OFF - w;   // flip to the left near the right edge
+      if (y + h > innerHeight - 10) y = cy - OFF - h;  // flip above near the bottom
+      tx = clamp(x, 10, Math.max(10, innerWidth - w - 10));
+      ty = clamp(y, 10, Math.max(10, innerHeight - h - 10));
+    };
+    const fill = (stop) => {
+      const il = stop.querySelector('.rl-illus');
+      if (!il) return;
+      previewCard.innerHTML = '';
+      const clone = il.cloneNode(true);
+      clone.classList.remove('play');
+      previewCard.appendChild(clone);
+      rlPreview.classList.toggle('playing', !reduceMotion); // loops only when motion is allowed
+    };
+    const follow = () => {
+      px = lerp(px, tx, 0.2); py = lerp(py, ty, 0.2);
+      rlPreview.style.transform = `translate3d(${px.toFixed(1)}px, ${py.toFixed(1)}px, 0)`;
+      if (active) raf = requestAnimationFrame(follow);
+    };
+    const show = (stop, cx, cy) => {
+      curStop = stop;
+      fill(stop);
+      if (reduceMotion) {
+        const { w } = dims();
+        tx = innerWidth - w - 24; ty = 100; px = tx; py = ty;
+        rlPreview.style.transform = `translate3d(${tx}px, ${ty}px, 0)`;
+        rlPreview.classList.add('show');
+        return;
+      }
+      target(cx, cy);
+      px = tx; py = ty; // appear at the cursor rather than sliding in from a corner
+      rlPreview.style.transform = `translate3d(${px}px, ${py}px, 0)`;
+      rlPreview.classList.add('show');
+      if (!active) { active = true; raf = requestAnimationFrame(follow); }
+    };
+    const hide = () => {
+      active = false; curStop = null;
+      cancelAnimationFrame(raf);
+      rlPreview.classList.remove('show', 'playing');
+      setTimeout(() => { if (!active) previewCard.innerHTML = ''; }, 260);
+    };
+
+    rlTimeline.addEventListener('pointermove', (e) => {
+      if (e.pointerType && e.pointerType !== 'mouse') return;
+      const stop = e.target.closest('.rl-stop');
+      if (!stop) return; // hovering the gap keeps the last preview; only leaving hides it
+      if (stop !== curStop) show(stop, e.clientX, e.clientY);
+      else if (!reduceMotion) target(e.clientX, e.clientY);
+    });
+    rlTimeline.addEventListener('pointerleave', hide);
+    addEventListener('scroll', () => { if (curStop) hide(); }, { passive: true });
+  }
+}
+
 /* ============================== ink stamps on click ============================== */
 const inkCanvas = document.getElementById('inkCanvas');
 const ictx = inkCanvas ? inkCanvas.getContext('2d') : null;

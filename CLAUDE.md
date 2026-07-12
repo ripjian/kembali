@@ -6,6 +6,7 @@ Multi-tenant SaaS digital stamp-card loyalty platform (Malaysia/SEA first). Cust
 
 ## Read first, in this order
 1. `ROADMAP.md` — requirements, architecture, phases, data model. **Source of truth.** Check the Decision Log (§13) before proposing anything — it may already be decided.
+1b. `DEVSPEC.md` — **how complete every module must be**: the Closure Rule, per-module invariants, edge cases, and ASK FOUNDER markers (open decisions — present options to the founder, never invent policy). Read before building or extending ANY module; update it when decisions land.
 2. `SECURITY.md` — hard rules, standards (OWASP ASVS 5.0 L2, ISO 27001 alignment, PDPA), pre-merge checklist. Read before touching auth, data, or tenant-facing code.
 3. `brand/BRAND.md` — Pandan palette tokens, logo rules, **voice & language rules (§5)**.
 4. `brand/DESIGN-dub.md` — marketing-site style reference (frosted SaaS: white canvas, ash hairlines, Inter, restrained glass). `DESIGN-Monad.md` is superseded.

@@ -14,6 +14,9 @@ engine (`js/main.js`, feature-guarded per page):
   rows dashed. Content mirrors ROADMAP.md in public language.
 - `pricing.html` — PRICING.md §8: Founding RM99 hero coupon (rubber-stamped),
   Starter RM149, Growth RM279, notes and FAQ.
+- Supporting pages, linked from the footer: `security.html` (SECURITY.md in
+  public language, aligned-not-certified), `privacy.html` (plain-language PDPA
+  summary), `contact.html` (mailto with a prefilled template), `about.html`.
 
 Not part of the production marketing surface (`apps/web`); it deliberately breaks
 the DESIGN-dub frosted-SaaS system as an art-directed piece while staying inside

@@ -45,29 +45,29 @@ logs to console instead of freezing the page.
 
 ## Photography
 
-Sourced through Openverse (CC0 unless noted), graded in-house into the pandan
-duotone / warm filmic pair (`grade.py` pipeline, Pillow):
+Natural colour with a light in-house grade (founder direction 2026-07-12:
+premium, presentable, no duotone overlay on photos). Sourced through Openverse:
 
 | Asset | Subject | Source | License |
 |---|---|---|---|
-| hero-pour.jpg | Barista pouring latte art | StockSnap (Burst) | CC0 |
-| scene-cafe.jpg | Cafe interior, tall windows | Rawpixel | CC0 |
+| hero-serve.jpg | Barista serving a customer at the counter | Wikimedia (Shixart1985) | CC BY 2.0 |
+| story-eat.jpg | Customer enjoying a bowl in a cafe chair | Wikimedia (Shixart1985) | CC BY 2.0 |
 | scene-corner.jpg | Cafe corner, marble tables | Rawpixel | CC0 |
 | scene-shophouse.jpg | Lu San Coffee Shop, Muar | Wikimedia (Slleong) | CC0 |
 | food-coffee.jpg | Flat white on dark wood | Rawpixel | CC0 |
 | food-breakfast.jpg | Breakfast spread from above | StockSnap | CC0 |
 | food-tea.jpg | Teapot and glasses | Rawpixel | CC0 |
 | food-croissant.jpg | Filled croissant | StockSnap (Kristin Hardwick) | CC0 |
-| ind-cafe-*.jpg | Latte art paper cup | Rawpixel | CC0 |
-| ind-restaurant-*.jpg | Chopsticks lifting noodles | StockSnap (Artur Rutkowski) | CC0 |
-| ind-dessert-*.jpg | Cream dessert bowl | Rawpixel | CC0 |
-| ind-gym-*.jpg | Dumbbell rack | StockSnap (Skitter Photo) | CC0 |
-| ind-salon-*.jpg | Stylist blow-drying | Rawpixel | CC0 |
-| ind-carwash-*.jpg | Car wash tunnel, Gorinchem | Wikimedia (FaceMePLS) | CC BY 2.0 |
-| ind-wellness-*.jpg | Spa massage | StockSnap (Authentic Stock) | CC0 |
+| ind-cafe.jpg | Warm cafe interior, wooden tables | Wordpress Photos (Nilo Velez) | CC0 |
+| ind-restaurant.jpg | Fine dining plate | Wikimedia (Jussi Ulkunniemi / ELO Foundation) | CC BY |
+| ind-dessert.jpg | Cream dessert bowl | Rawpixel | CC0 |
+| ind-gym.jpg | Gym interior | StockSnap (Humphrey Muleba) | CC0 |
+| ind-salon.jpg | Barber combing and trimming | Wikimedia (Nenad Stojkovic) | CC BY 2.0 |
+| ind-carwash.jpg | Drying a wet red car | Rawpixel | CC0 |
+| ind-wellness.jpg | Spa massage | StockSnap (Authentic Stock) | CC0 |
 
 Attribution also appears in the site footers. Full source URLs: `manifest.json`
-from the sourcing run (scratchpad) or the source pages by title.
+files from the sourcing runs (scratchpad) or the source pages by title.
 
 ## Known placeholders
 

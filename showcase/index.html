@@ -8,7 +8,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='none' stroke='%230F3D32' stroke-width='5'/%3E%3Ccircle cx='16' cy='16' r='5' fill='%23E0684B'/%3E%3C/svg%3E">
 <meta property="og:title" content="Kembali · Digital stamp cards">
 <meta property="og:description" content="A stamp card that lives in the phone. For cafes, gyms, salons, car washes, and any shop that runs on repeat visits.">
-<meta property="og:image" content="assets/hero-pour.jpg">
+<meta property="og:image" content="assets/hero-serve.jpg">
 <meta name="theme-color" content="#071E18">
 <link rel="stylesheet" href="css/main.css">
 </head>
@@ -42,7 +42,8 @@
 <main id="top">
 
   <!-- ================= HERO ================= -->
-  <section class="hero" id="hero" data-theme="dark">
+  <section class="hero hero-has-shell" id="hero" data-theme="dark">
+    <div class="hero-shell">
     <div class="hero-grid">
       <div class="hero-content">
         <p class="eyebrow hero-eyebrow"><span>Digital stamp cards</span><span class="dot-sep"></span><span>Built for Malaysian shops</span></p>
@@ -59,10 +60,11 @@
         </div>
       </div>
       <figure class="hero-panel">
-        <canvas class="hero-canvas" id="heroCanvas" data-tex="assets/hero-pour.jpg" aria-hidden="true"></canvas>
-        <img class="hero-fallback" src="assets/hero-pour.jpg" alt="A barista pours latte art at the espresso machine" loading="eager">
-        <figcaption class="hero-panel-cap mono">7:42 am · the first pour of the day</figcaption>
+        <canvas class="hero-canvas" id="heroCanvas" data-tex="assets/hero-serve.jpg" aria-hidden="true"></canvas>
+        <img class="hero-fallback" src="assets/hero-serve.jpg" alt="A barista places a cappuccino on the counter for a customer" loading="eager">
+        <figcaption class="hero-panel-cap mono">7:42 am · first order over the counter</figcaption>
       </figure>
+    </div>
     </div>
     <div class="hero-foot">
       <p class="scroll-hint mono">Scroll<span class="hint-arrow">&darr;</span> see how it works</p>
@@ -96,31 +98,31 @@
       <p class="ind-sub reveal">You set what a visit earns and what the reward is. Kembali does the counting, the coupons, and the reports.</p>
       <div class="ind-grid">
         <div class="ind-card reveal">
-          <div class="ic-photo"><img class="ic-duo" src="assets/ind-cafe-duo.jpg" alt="" loading="lazy"><img class="ic-col" src="assets/ind-cafe-col.jpg" alt="A paper cup of latte art on a wooden counter" loading="lazy"></div>
+          <div class="ic-photo"><img src="assets/ind-cafe.jpg" alt="A warm cafe interior with wooden tables by a big window" loading="lazy"></div>
           <div class="ic-meta"><b>Coffee shops</b><span class="mono">Buy 9, the 10th free</span></div>
         </div>
         <div class="ind-card reveal">
-          <div class="ic-photo"><img class="ic-duo" src="assets/ind-restaurant-duo.jpg" alt="" loading="lazy"><img class="ic-col" src="assets/ind-restaurant-col.jpg" alt="Chopsticks lifting noodles from a dark bowl" loading="lazy"></div>
+          <div class="ic-photo"><img src="assets/ind-restaurant.jpg" alt="A fine dining plate on a white tablecloth" loading="lazy"></div>
           <div class="ic-meta"><b>Restaurants</b><span class="mono">RM 1 spent = 1 point</span></div>
         </div>
         <div class="ind-card reveal">
-          <div class="ic-photo"><img class="ic-duo" src="assets/ind-dessert-duo.jpg" alt="" loading="lazy"><img class="ic-col" src="assets/ind-dessert-col.jpg" alt="A cream dessert bowl with a raspberry" loading="lazy"></div>
+          <div class="ic-photo"><img src="assets/ind-dessert.jpg" alt="A cream dessert bowl with a raspberry" loading="lazy"></div>
           <div class="ic-meta"><b>Dessert shops</b><span class="mono">10 visits, one free bowl</span></div>
         </div>
         <div class="ind-card reveal">
-          <div class="ic-photo"><img class="ic-duo" src="assets/ind-gym-duo.jpg" alt="" loading="lazy"><img class="ic-col" src="assets/ind-gym-col.jpg" alt="A rack of dumbbells in a gym" loading="lazy"></div>
+          <div class="ic-photo"><img src="assets/ind-gym.jpg" alt="A bright gym interior with racks and benches" loading="lazy"></div>
           <div class="ic-meta"><b>Gyms</b><span class="mono">12 check-ins, one guest pass</span></div>
         </div>
         <div class="ind-card reveal">
-          <div class="ic-photo"><img class="ic-duo" src="assets/ind-salon-duo.jpg" alt="" loading="lazy"><img class="ic-col" src="assets/ind-salon-col.jpg" alt="A stylist blow-drying a client's hair" loading="lazy"></div>
+          <div class="ic-photo"><img src="assets/ind-salon.jpg" alt="A barber combing and trimming a client's hair" loading="lazy"></div>
           <div class="ic-meta"><b>Salons</b><span class="mono">5 cuts, half off the 6th</span></div>
         </div>
         <div class="ind-card reveal">
-          <div class="ic-photo"><img class="ic-duo" src="assets/ind-carwash-duo.jpg" alt="" loading="lazy"><img class="ic-col" src="assets/ind-carwash-col.jpg" alt="A car inside a wash tunnel between brushes" loading="lazy"></div>
+          <div class="ic-photo"><img src="assets/ind-carwash.jpg" alt="A hand drying a wet red car with a cloth" loading="lazy"></div>
           <div class="ic-meta"><b>Car washes</b><span class="mono">Wash 9, the 10th free</span></div>
         </div>
         <div class="ind-card reveal">
-          <div class="ic-photo"><img class="ic-duo" src="assets/ind-wellness-duo.jpg" alt="" loading="lazy"><img class="ic-col" src="assets/ind-wellness-col.jpg" alt="A back massage at a spa" loading="lazy"></div>
+          <div class="ic-photo"><img src="assets/ind-wellness.jpg" alt="A back massage at a spa" loading="lazy"></div>
           <div class="ic-meta"><b>Wellness</b><span class="mono">10 sessions, 1 upgrade</span></div>
         </div>
         <a class="ind-card ind-yours reveal" href="pricing.html">
@@ -313,7 +315,7 @@
     <div class="footer-meta mono">
       <p>Built for Malaysian shops · Petaling Jaya</p>
       <p>Photography: Openverse sources, CC licensed.<br>
-      StockSnap and Rawpixel contributors, CC0 · FaceMePLS, CC BY · Slleong, CC0</p>
+      StockSnap, Rawpixel and Wordpress Photos, CC0 · Shixart1985, Nenad Stojkovic, Jussi Ulkunniemi, CC BY · Slleong, CC0</p>
       <p>&copy; 2026 Kembali</p>
     </div>
   </div>

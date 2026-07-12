@@ -332,6 +332,46 @@ body.no-webgl .hero-canvas { display: none; }
 .ticker:hover .ticker-track { animation-play-state: paused; }
 @media (prefers-reduced-motion: reduce) { .ticker-track { animation: none; } }
 
+/* ---------- hero shell (landing): floating off-white card ---------- */
+.hero-has-shell { padding: 92px clamp(10px, 1.8vw, 26px) 0; display: block; }
+.hero-shell {
+  background:
+    radial-gradient(120% 90% at 85% 0%, color-mix(in srgb, var(--sand) 92%, var(--coral) 8%) 0%, var(--sand) 45%);
+  border-radius: clamp(18px, 2.4vw, 30px);
+  max-width: 1360px;
+  margin-inline: auto;
+  padding: clamp(22px, 3.6vw, 58px);
+  box-shadow: 0 50px 120px -50px rgba(0, 0, 0, .75);
+  border: 1px solid color-mix(in srgb, var(--sand) 30%, transparent);
+}
+.hero-has-shell .hero-grid {
+  width: 100%;
+  padding-top: 0;
+  min-height: min(74vh, 760px);
+}
+.hero-shell .hero-eyebrow { color: color-mix(in srgb, var(--ink) 55%, var(--sand) 45%); }
+.hero-shell .hero-eyebrow span:first-child { color: var(--coral-deep); }
+.hero-shell .hero-title { color: var(--pandan); text-shadow: none; width: 100%; font-size: clamp(44px, 6.4vw, 104px); }
+.hero-shell .accent-w { color: var(--coral); }
+.hero-shell .hero-sub { color: color-mix(in srgb, var(--ink) 72%, var(--sand) 28%); }
+.hero-shell .btn-ghost { border-color: color-mix(in srgb, var(--ink) 22%, transparent); color: var(--pandan); }
+.hero-shell .btn-ghost:hover { border-color: var(--pandan); }
+.hero-shell .hero-panel {
+  margin-bottom: 0;
+  box-shadow: 0 34px 70px -38px color-mix(in srgb, var(--pandan) 55%, transparent);
+  border: none;
+}
+.hero-has-shell .hero-foot {
+  border-top: none;
+  padding-top: 26px;
+}
+@media (max-width: 900px) {
+  .hero-has-shell { padding-top: 84px; }
+  .hero-shell { padding: 20px 18px 22px; }
+  .hero-shell .hero-panel { min-height: 46vh; }
+  .hero-has-shell .hero-grid { min-height: 0; }
+}
+
 /* ============================================================
    PAPER sections (sand)
    ============================================================ */
@@ -1022,23 +1062,24 @@ body.has-cursor .cursor-dot { opacity: 1; }
   overflow: hidden;
   border: 1px solid var(--hairline-dark);
   isolation: isolate;
+  min-height: 340px;
 }
 .ic-photo {
   position: relative;
-  aspect-ratio: 1 / 0.85;
+  flex: 1 1 auto;
+  min-height: 220px;
   overflow: hidden;
 }
 .ind-card img {
   position: absolute; inset: 0;
   width: 100%; height: 100%;
   object-fit: cover;
-  transition: opacity .5s var(--ease-out), transform .8s var(--ease-out);
+  transition: transform .8s var(--ease-out), filter .5s var(--ease-out);
+  filter: saturate(.94);
 }
-.ic-col { opacity: 0; }
-.ind-card:hover .ic-col { opacity: 1; }
-.ind-card:hover img { transform: scale(1.04); }
+.ind-card:hover img { transform: scale(1.04); filter: saturate(1.05); }
 .ic-meta {
-  margin-top: auto;
+  flex: 0 0 auto;
   padding: 12px 14px 13px;
   display: flex; flex-direction: column; justify-content: center; gap: 4px;
   background: color-mix(in srgb, var(--pandan-deep) 78%, var(--pandan-night) 22%);
@@ -1047,19 +1088,18 @@ body.has-cursor .cursor-dot { opacity: 1; }
 }
 .ic-meta b { color: var(--sand); font-size: clamp(14px, 1.25vw, 16.5px); font-weight: 600; }
 .ic-meta .mono { color: var(--coral); font-size: 10.5px; letter-spacing: .08em; }
-.ind-yours { display: flex; background: color-mix(in srgb, var(--pandan-deep) 55%, var(--pandan-night) 45%); min-height: 100%; }
-.ind-yours::before { content: ''; display: block; aspect-ratio: 1 / 1.2; }
+.ind-yours { display: flex; background: color-mix(in srgb, var(--pandan-deep) 55%, var(--pandan-night) 45%); }
 .iy-inner {
-  position: absolute; inset: 0;
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px;
+  flex: 1;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px;
   color: var(--sand-muted);
   transition: color .3s;
 }
-.iy-inner svg { width: 64px; }
-.ind-yours .ic-meta { position: static; background: none; border: none; align-items: center; text-align: center; height: auto; padding: 0; }
+.iy-inner svg { width: 64px; animation: spinSlow 14s linear infinite; }
+.ind-yours .ic-meta { background: none; border: none; align-items: center; text-align: center; min-height: 0; padding: 0; margin: 0; }
 .ind-yours:hover .iy-inner { color: var(--sand); }
-.ind-yours:hover .iy-inner svg { animation: spinSlow 9s linear infinite; }
 @keyframes spinSlow { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .iy-inner svg { animation: none; } }
 
 /* ---------- story teaser ---------- */
 .teaser { padding: clamp(80px, 12vh, 150px) 0; }

@@ -1,45 +1,42 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
 
+import { ShowcaseShell } from "@/components/marketing/showcase-shell";
 import { SiteFooter } from "@/components/marketing/site-footer";
 import { SiteNav } from "@/components/marketing/site-nav";
 
-// Frosted-SaaS type system (brand/DESIGN-dub.md): Inter is the workhorse -
-// weight 500 with tight tracking plays the display role (Satoshi
-// substitute per the reference), 400 body at 16px. JetBrains Mono only for
-// technical micro-labels (the Geist Mono role). Scoped to marketing -
-// /app and /admin keep Plus Jakarta Sans.
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-});
-
-const jetbrains = JetBrains_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500"],
-  variable: "--font-jetbrains",
-});
+import "./showcase.css";
 
 export const metadata: Metadata = {
-  title: "Kembali: loyalty cards your customers never lose",
+  title: {
+    default: "Kembali: loyalty cards your customers never lose",
+    template: "%s · Kembali",
+  },
   description:
-    "Digital stamp cards for cafés, F&B, salons and gyms in Malaysia & SEA. Customers join from a QR in under 30 seconds. No app, no hardware. Loyalty your customers will love.",
+    "Digital stamp cards for cafes, restaurants, salons, gyms and car washes in Malaysia. Customers join from a QR in under 30 seconds. No app, no hardware.",
 };
 
 export default function MarketingLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <div
-      // data-theme pins the light Dub-style tokens for this subtree only
-      // (globals.css) - marketing is light-locked, the app/admin surfaces
-      // keep dark-mode support.
-      data-theme="marketing"
-      className={`${inter.variable} ${jetbrains.variable} min-h-dvh bg-bg font-body text-text`}
-    >
+    // .sc-root scopes the whole showcase design system: the reset, tokens
+    // and base element styles stop here, so /app and /admin keep their own
+    // theme (globals.css). Fonts are self-hosted via @font-face in
+    // showcase.css. data-loading is cleared by the engine on mount.
+    <div className="sc-root" data-loading="">
+      <div className="loader" id="loader" aria-hidden>
+        <div className="loader-stamp">
+          <svg viewBox="0 0 96 96" className="loader-mark">
+            <circle cx="48" cy="48" r="34" fill="none" stroke="currentColor" strokeWidth="10" />
+            <circle cx="48" cy="48" r="12" className="loader-dot" />
+          </svg>
+        </div>
+      </div>
+
       <SiteNav />
       {children}
       <SiteFooter />
+      <ShowcaseShell />
     </div>
   );
 }

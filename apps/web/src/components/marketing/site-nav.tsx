@@ -1,62 +1,50 @@
+"use client";
+
 import Link from "next/link";
-import { LogoLockup } from "@kembali/ui";
+import { usePathname } from "next/navigation";
 
-import { ActionLink } from "./pill";
-
-const links = [
-  { href: "/#showcase", label: "Product" },
-  { href: "/#how-it-works", label: "How it works" },
-  { href: "/pricing", label: "Pricing" },
+const LINKS = [
+  { href: "/story", label: "Story" },
   { href: "/roadmap", label: "Roadmap" },
+  { href: "/pricing", label: "Pricing" },
 ];
 
+/** The floating top bar. The engine re-themes it per section (dark, light
+ * or coral) and hides it on the way down, so the markup stays plain. */
 export function SiteNav() {
+  const pathname = usePathname();
+
   return (
-    <>
-      <div className="flex items-center justify-center gap-4 bg-primary px-4 py-2">
-        <p className="text-xs font-medium text-on-primary sm:text-sm">
-          Now welcoming pilot cafés &amp; shops in Malaysia
-        </p>
-        <Link
-          href="/#reach-out"
-          className="press hidden rounded-full border border-on-primary/50 px-3 py-0.5 text-xs font-medium text-on-primary hover:border-on-primary sm:inline-flex"
-        >
-          Join the pilot
-        </Link>
-      </div>
+    <header className="topbar" id="topbar">
+      <Link className="lockup" href="/" aria-label="Kembali home">
+        <svg viewBox="0 0 96 96" className="lockup-mark" aria-hidden>
+          <circle cx="48" cy="48" r="34" fill="none" stroke="currentColor" strokeWidth="10" />
+          <circle cx="48" cy="48" r="12" fill="var(--coral)" />
+        </svg>
+        <span className="lockup-word">
+          kembal<span className="lockup-i">i</span>
+        </span>
+      </Link>
 
-      {/* Frosted sticky nav - the one glass surface that follows you,
-          keeping the CTA in reach while you explore */}
-      <header className="glass backdrop-blur-md sticky top-0 z-40 border-x-0 border-t-0 border-b border-border">
-        <div className="mx-auto flex h-16 w-full max-w-[1200px] items-center justify-between gap-6 px-6">
-          <Link href="/" aria-label="Kembali home" className="shrink-0">
-            <LogoLockup size={30} />
+      <nav className="topnav" aria-label="Main">
+        {LINKS.map((l) => (
+          <Link
+            key={l.href}
+            className={`tn-link mono${pathname === l.href ? " tn-active" : ""}`}
+            href={l.href}
+          >
+            {l.label}
           </Link>
+        ))}
+        {/* staff and owners sign in here: the only way out of marketing */}
+        <Link className="tn-link mono tn-signin" href="/admin">
+          Sign in
+        </Link>
+      </nav>
 
-          <nav className="hidden items-center gap-1 md:flex">
-            {links.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="rounded-full px-4 py-1.5 text-sm font-medium text-text-secondary transition-colors hover:bg-surface-alt hover:text-text"
-              >
-                {link.label}
-              </Link>
-            ))}
-          </nav>
-
-          <div className="flex items-center gap-2">
-            <div className="hidden sm:block">
-              <ActionLink href="/admin" variant="outline" className="h-9 px-4 text-xs">
-                Merchant sign in
-              </ActionLink>
-            </div>
-            <ActionLink href="/#reach-out" className="h-9 px-4 text-xs">
-              Get started
-            </ActionLink>
-          </div>
-        </div>
-      </header>
-    </>
+      <Link className="chip-cta" href="/pricing">
+        Start your card
+      </Link>
+    </header>
   );
 }

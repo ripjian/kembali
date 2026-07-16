@@ -1,264 +1,267 @@
-import { DemoCard } from "@/components/marketing/demo-card";
-import { FeatureShowcase } from "@/components/marketing/feature-showcase";
-import { HeroFloats } from "@/components/marketing/hero-floats";
-import { ActionLink, Tag } from "@/components/marketing/pill";
-import { ReachOut } from "@/components/marketing/reach-out";
-import { ReceiptCard } from "@/components/marketing/receipt-card";
-import { Reveal } from "@/components/marketing/reveal";
+import type { Metadata } from "next";
+import Link from "next/link";
+import type { CSSProperties } from "react";
 
-const FEATURES = [
-  {
-    dot: "coral" as const,
-    title: "Points and rewards",
-    body: "Every ringgit spent earns points. Customers redeem them for rewards you choose, with a single-use code at your counter. Every point is logged to the cent.",
-    tag: "At launch",
-  },
-  {
-    dot: "leaf" as const,
-    title: "Simple reports, not homework",
-    body: "Today's stamps, signups and redemptions, plus who keeps coming back. Simple numbers to check over morning coffee. Deeper analytics comes later.",
-    tag: "At launch",
-  },
-  {
-    dot: "pandan" as const,
-    title: "WhatsApp campaigns",
-    body: "Birthday rewards, expiry reminders and friendly win-back offers on WhatsApp. Every message is opt-in, as PDPA requires.",
-    tag: "Planned",
-  },
-  {
-    dot: "coral" as const,
-    title: "Referral rewards",
-    body: "Customers share a personal link. When a friend joins, both of them get a treat.",
-    tag: "Planned",
-  },
-];
+export const metadata: Metadata = {
+  description:
+    "Kembali puts a stamp card in every customer's phone. Staff scan a code, the stamp lands in seconds, and you see it the moment it happens.",
+};
 
-export default function Home() {
+export default function HomePage() {
   return (
-    <main>
-      {/* Hero - thesis up top, product peeking past the fold below */}
-      <section className="relative overflow-hidden border-b border-border">
-        <div aria-hidden className="dot-grid absolute inset-0" />
-        <div className="relative mx-auto flex w-full max-w-[1200px] flex-col items-center px-6 pt-16 text-center sm:pt-20">
-          {/* floating feature pills - one accent each */}
-          <div className="flex flex-wrap items-center justify-center gap-2">
-            <Tag dot="coral">Stamp cards</Tag>
-            <Tag dot="pandan">Points &amp; rewards</Tag>
-            <Tag dot="leaf">Simple reports</Tag>
-          </div>
-
-          <h1 className="mt-8 max-w-3xl text-4xl font-medium leading-[1.05] tracking-[-0.02em] text-text sm:text-5xl lg:text-6xl">
-            Loyalty cards your customers never lose.
-          </h1>
-          <p className="mt-6 max-w-xl text-base leading-relaxed text-text-secondary sm:text-lg">
-            Kembali puts your stamp card on your customers&apos; phones. They
-            join in 30 seconds from a QR at your counter, and every visit
-            brings them closer to their next reward.
-          </p>
-
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <ActionLink href="/#reach-out">See how it fits your shop</ActionLink>
-            <ActionLink href="/#showcase" variant="outline">
-              Take a look inside
-            </ActionLink>
-          </div>
-
-          <p className="scroll-cue mt-10 text-sm text-text-muted" aria-hidden>
-            ↓
-          </p>
-
-          {/* Dashboard mockup, deliberately clipped by the fold - the rest
-              is one scroll away */}
-          <div className="relative mt-8 h-56 w-full max-w-4xl overflow-hidden sm:h-72">
-            <div className="panel-ring absolute inset-x-0 top-0 flex h-[420px] overflow-hidden rounded-t-2xl border border-border bg-surface text-left">
-              {/* sidebar */}
-              <div aria-hidden className="hidden w-44 shrink-0 flex-col gap-1 border-r border-border bg-surface-alt p-4 sm:flex">
-                <p className="mb-2 text-xs font-semibold text-text">Corner Coffee</p>
-                {["Overview", "Customers", "Programs", "Outlets", "Campaigns"].map((item, i) => (
-                  <span
-                    key={item}
-                    className={`rounded-lg px-2.5 py-1.5 text-xs ${
-                      i === 0 ? "bg-surface font-medium text-text" : "text-text-secondary"
-                    }`}
-                  >
-                    {item}
-                  </span>
-                ))}
-              </div>
-              {/* content */}
-              <div aria-hidden className="flex-1 p-4 sm:p-5">
-                <p className="text-xs font-medium text-text-muted">Today at your counter</p>
-                <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
-                  {[
-                    ["Stamps", "128"],
-                    ["Signups", "24"],
-                    ["Redemptions", "9"],
-                    ["Repeat visits", "41%"],
-                  ].map(([label, value]) => (
-                    <div key={label} className="rounded-xl border border-border bg-surface p-3">
-                      <p className="font-mono text-lg text-text" data-stat>
-                        {value}
-                      </p>
-                      <p className="mt-0.5 text-[11px] text-text-muted">{label}</p>
-                    </div>
-                  ))}
-                </div>
-                <div className="mt-3 flex flex-col">
-                  {["Aisyah, stamp 7 of 10", "Ming Wei, reward redeemed", "Priya joined your program"].map(
-                    (row, i) => (
-                      <div
-                        key={row}
-                        className="flex items-center gap-2 border-b border-border py-2.5 text-xs text-text-secondary"
-                      >
-                        <span
-                          className={`size-1.5 rounded-full ${i === 1 ? "bg-accent" : "bg-leaf"}`}
-                        />
-                        {row}
-                      </div>
-                    ),
-                  )}
-                </div>
+    <>
+        {/* ================= HERO ================= */}
+        <section className="hero hero-has-shell" id="hero" data-theme="dark">
+          <div className="hero-shell">
+          <div className="hero-grid">
+            <div className="hero-content">
+              <p className="eyebrow hero-eyebrow"><span>Digital stamp cards</span><span className="dot-sep"></span><span>Built for Malaysian shops</span></p>
+              <h1 className="hero-title" id="heroTitle">
+                <span className="line"><span className="w">Your</span> <span className="w accent-w">regulars</span></span>{" "}
+                <span className="line"><span className="w">are</span> <span className="w">the</span> <span className="w">whole</span></span>{" "}
+                <span className="line"><span className="w">business.</span></span>
+              </h1>
+              <p className="hero-sub">Kembali puts a stamp card in every customer's phone.
+              Staff scan a code and the stamp lands in seconds, at any kind of counter.</p>
+              <div className="hero-actions">
+                <Link className="btn btn-solid" href="/pricing">Start your card</Link>
+                <Link className="btn btn-ghost" href="/story">Watch a card fill</Link>
               </div>
             </div>
+            <figure className="hero-panel">
+              <canvas className="hero-canvas" id="heroCanvas" data-tex="/showcase/hero-serve.jpg" aria-hidden="true"></canvas>
+              <img className="hero-fallback" src="/showcase/hero-serve.jpg" alt="A barista places a cappuccino on the counter for a customer" loading="eager" />
+              <figcaption className="hero-panel-cap mono">7:42 am · first order over the counter</figcaption>
+            </figure>
+          </div>
+          </div>
+          <div className="hero-foot">
+            <p className="scroll-hint mono">Scroll<span className="hint-arrow">↓</span> see how it works</p>
+            <p className="click-hint mono">Click anywhere: leave a stamp</p>
+            <p className="hero-place mono">No app to build · no hardware to buy</p>
+          </div>
+        </section>
 
-            {/* glass activity cards floating over the panel - drift gently,
-                pause off-screen (see HeroFloats) */}
-            <HeroFloats />
+        {/* ================= LEDGER TICKER ================= */}
+        <div className="ticker" aria-hidden="true">
+          <div className="ticker-track" id="tickerTrack">
+            <span>7:48 am · white coffee · RM 4.00 · stamp 3 of 10</span>
+            <span>9:15 am · wash and vacuum · RM 28.00 · stamp 6 of 9</span>
+            <span>10:20 am · gym check-in · visit 11 · guest pass earned</span>
+            <span>12:05 pm · chicken rice set · RM 12.50 · 12 points</span>
+            <span>3:30 pm · iced dessert bowl · RM 7.00 · stamp 2 of 10</span>
+            <span>5:45 pm · haircut · RM 38.00 · stamp 4 of 6</span>
+            <span>7:12 pm · reward confirmed · free coffee</span>
+            <span>8:40 pm · foot massage · RM 68.00 · 68 points</span>
           </div>
         </div>
-      </section>
 
-      {/* Scroll showcase: sticky phone, scenes change per chapter */}
-      <section id="showcase" className="scroll-mt-20 border-b border-border">
-        <div className="mx-auto w-full max-w-[1200px] px-6 py-16">
-          <Reveal>
-            <p className="text-sm font-medium text-text-muted">The product</p>
-            <h2 className="mt-2 max-w-2xl text-3xl font-medium leading-tight tracking-[-0.02em] text-text sm:text-4xl">
-              What your customers see, from first scan to free coffee.
+        {/* ================= INDUSTRIES ================= */}
+        <section className="industries" id="industries" data-theme="dark">
+          <div className="wrap">
+            <p className="eyebrow reveal">One card, many counters</p>
+            <h2 className="section-title reveal-line-group">
+              <span className="reveal-line">Anywhere people</span>
+              <span className="reveal-line">come back.</span>
             </h2>
-          </Reveal>
-          <FeatureShowcase />
-        </div>
-      </section>
-
-      {/* How it works */}
-      <section id="how-it-works" className="scroll-mt-20 border-b border-border bg-surface-alt">
-        <div className="mx-auto w-full max-w-[1200px] px-6 py-16">
-          <Reveal>
-            <p className="text-sm font-medium text-text-muted">How it works</p>
-            <h2 className="mt-2 max-w-2xl text-3xl font-medium leading-tight tracking-[-0.02em] text-text sm:text-4xl">
-              Easy for customers. Even easier for your staff.
-            </h2>
-          </Reveal>
-
-          {/* Two receipts - the café's own paper, itemized */}
-          <div className="mt-10 grid items-start gap-8 lg:grid-cols-2">
-            <div className="flex flex-col items-center gap-10">
-              <Reveal delay={80} className="flex w-full justify-center">
-                <ReceiptCard
-                  title="For your customers"
-                  tilt="-rotate-1"
-                  lines={[
-                    { item: "Scan the QR at the counter", value: "5 sec" },
-                    { item: "Card appears on their phone", value: "instant" },
-                    { item: "Collect a stamp each visit", value: "+1" },
-                    { item: "Free coffee on visit ten", value: "earned" },
-                  ]}
-                  total="One happy regular"
-                />
-              </Reveal>
-
-              <Reveal delay={160} className="flex w-full justify-center">
-                <ReceiptCard
-                  title="For your staff"
-                  tilt="rotate-1"
-                  lines={[
-                    { item: "Open the camera", value: "any phone" },
-                    { item: "Scan the customer's QR", value: "3 sec" },
-                    { item: "Enter the amount, stamp", value: "done" },
-                  ]}
-                  total="No training needed"
-                />
-              </Reveal>
+            <p className="ind-sub reveal">You set what a visit earns and what the reward is. Kembali does the counting, the coupons, and the reports.</p>
+            <div className="ind-grid">
+              <div className="ind-card reveal">
+                <div className="ic-photo"><img src="/showcase/ind-cafe.jpg" alt="A warm cafe interior with wooden tables by a big window" loading="lazy" /></div>
+                <div className="ic-meta"><b>Coffee shops</b><span className="mono">Buy 9, the 10th free</span></div>
+              </div>
+              <div className="ind-card reveal">
+                <div className="ic-photo"><img src="/showcase/ind-restaurant.jpg" alt="A fine dining plate on a white tablecloth" loading="lazy" /></div>
+                <div className="ic-meta"><b>Restaurants</b><span className="mono">RM 1 spent = 1 point</span></div>
+              </div>
+              <div className="ind-card reveal">
+                <div className="ic-photo"><img src="/showcase/ind-dessert.jpg" alt="A cream dessert bowl with a raspberry" loading="lazy" /></div>
+                <div className="ic-meta"><b>Dessert shops</b><span className="mono">10 visits, one free bowl</span></div>
+              </div>
+              <div className="ind-card reveal">
+                <div className="ic-photo"><img src="/showcase/ind-gym.jpg" alt="A bright gym interior with racks and benches" loading="lazy" /></div>
+                <div className="ic-meta"><b>Gyms</b><span className="mono">12 check-ins, one guest pass</span></div>
+              </div>
+              <div className="ind-card reveal">
+                <div className="ic-photo"><img src="/showcase/ind-salon.jpg" alt="A barber combing and trimming a client's hair" loading="lazy" /></div>
+                <div className="ic-meta"><b>Salons</b><span className="mono">5 cuts, half off the 6th</span></div>
+              </div>
+              <div className="ind-card reveal">
+                <div className="ic-photo"><img src="/showcase/ind-carwash.jpg" alt="A hand drying a wet red car with a cloth" loading="lazy" /></div>
+                <div className="ic-meta"><b>Car washes</b><span className="mono">Wash 9, the 10th free</span></div>
+              </div>
+              <div className="ind-card reveal">
+                <div className="ic-photo"><img src="/showcase/ind-wellness.jpg" alt="A back massage at a spa" loading="lazy" /></div>
+                <div className="ic-meta"><b>Wellness</b><span className="mono">10 sessions, 1 upgrade</span></div>
+              </div>
+              <Link className="ind-card ind-yours reveal" href="/pricing">
+                <div className="iy-inner">
+                  <svg viewBox="0 0 96 96" aria-hidden="true">
+                    <circle cx="48" cy="48" r="34" fill="none" stroke="currentColor" strokeWidth="8" strokeDasharray="8 10" strokeLinecap="round"/>
+                    <circle cx="48" cy="48" r="12" fill="var(--coral)"/>
+                  </svg>
+                  <div className="ic-meta"><b>Your shop</b><span className="mono">Name the reward, we count</span></div>
+                </div>
+              </Link>
             </div>
-
-            <Reveal delay={240} className="flex justify-center lg:sticky lg:top-24">
-              <DemoCard />
-            </Reveal>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Features */}
-      <section id="features" className="scroll-mt-20 border-b border-border">
-        <div className="mx-auto w-full max-w-[1200px] px-6 py-16">
-          <Reveal>
-            <p className="text-sm font-medium text-text-muted">Features</p>
-            <h2 className="mt-2 max-w-2xl text-3xl font-medium leading-tight tracking-[-0.02em] text-text sm:text-4xl">
-              Everything a loyalty program needs, nothing that slows your
-              counter down.
+        {/* ================= JOIN ================= */}
+        <section className="visit-join" id="visit-1" data-theme="dark">
+          <div className="wrap">
+            <p className="ledger-tag mono reveal">For your customers</p>
+            <h2 className="section-title reveal-line-group">
+              <span className="reveal-line">Join at the counter</span>
+              <span className="reveal-line">in one scan.</span>
             </h2>
-          </Reveal>
-
-          <div className="mt-10 grid gap-4 sm:grid-cols-2">
-            {FEATURES.map((feature, i) => (
-              <Reveal key={feature.title} delay={(i % 2) * 70}>
-                <div className="flex h-full flex-col gap-3 rounded-2xl border border-border bg-surface p-6 sm:p-8">
-                  <div className="flex items-center justify-between">
-                    <span className={`size-2.5 rounded-full ${
-                      feature.dot === "coral" ? "bg-accent" : feature.dot === "leaf" ? "bg-leaf" : "bg-primary"
-                    }`} />
-                    <span className="rounded-full border border-border px-3 py-0.5 text-xs font-medium text-text-muted">
-                      {feature.tag}
-                    </span>
+            <div className="join-grid">
+              <figure className="join-poster reveal" data-parallax="0.05"><p className="col-label mono">At the till</p>
+                <div className="poster">
+                  <div className="poster-mark">
+                    <svg viewBox="0 0 96 96" aria-hidden="true">
+                      <circle cx="48" cy="48" r="34" fill="none" stroke="currentColor" strokeWidth="10"/>
+                      <circle cx="48" cy="48" r="12" fill="var(--coral)"/>
+                    </svg>
                   </div>
-                  <h3 className="text-xl font-medium tracking-[-0.01em] text-text">
-                    {feature.title}
-                  </h3>
-                  <p className="text-sm leading-relaxed text-text-secondary sm:text-base">
-                    {feature.body}
-                  </p>
+                  <p className="poster-title">Scan for your card</p>
+                  <div className="poster-qr" id="posterQr"></div>
+                  <p className="poster-foot mono">CORNER COFFEE · SS2 OUTLET</p>
                 </div>
-              </Reveal>
-            ))}
-
-            {/* the one tinted card */}
-            <Reveal delay={140}>
-              <div className="flex h-full flex-col gap-3 rounded-2xl bg-primary p-6 sm:p-8">
-                <span className="size-2.5 rounded-full bg-accent" />
-                <h3 className="text-xl font-medium tracking-[-0.01em] text-on-primary">
-                  Your brand, not ours
-                </h3>
-                <p className="text-sm leading-relaxed text-on-primary/80 sm:text-base">
-                  Your logo and your colors on every card. Customers see your
-                  brand. Kembali stays quietly in the background.
-                </p>
+                <figcaption className="mono">printed from the QR kit, one per outlet</figcaption>
+              </figure>
+              <div className="join-copy">
+                <p className="reveal">Your customer scans the poster beside the till. Their number is checked with a six digit code.</p>
+                <p className="reveal">The card opens in their browser, already in your colours. No app store, no password, no form longer than one screen.</p>
+                <ul className="join-facts">
+                  <li className="reveal"><span className="mono">01</span>Phone number is the account</li>
+                  <li className="reveal"><span className="mono">02</span>Works on any phone with a camera</li>
+                  <li className="reveal"><span className="mono">03</span>First stamp lands the same minute</li>
+                </ul>
               </div>
-            </Reveal>
+              <div className="join-phone reveal" id="joinPhone" data-parallax="-0.04"><p className="col-label mono">On their phone</p>
+                <div className="phone">
+                  <div className="phone-notch"></div>
+                  <div className="phone-screen" id="phoneScreen">
+                    {/* filled by JS: join -> code -> card */}
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Interactive reach-out */}
-      <section id="reach-out" className="scroll-mt-20 bg-surface-alt">
-        <div className="mx-auto w-full max-w-[1200px] px-6 py-16">
-          <Reveal className="mx-auto max-w-2xl text-center">
-            <p className="text-sm font-medium text-text-muted">Let&apos;s talk</p>
-            <h2 className="mt-2 text-3xl font-medium leading-tight tracking-[-0.02em] text-text sm:text-4xl">
-              See how it fits your shop.
+        {/* ================= STORY TEASER ================= */}
+        <section className="teaser paper" id="teaser" data-theme="light">
+          <div className="wrap teaser-grid">
+            <figure className="teaser-photo reveal" data-parallax="-0.03">
+              <img src="/showcase/scene-corner.jpg" alt="A quiet cafe corner with marble tables and iced drinks" loading="lazy" />
+              <figcaption className="mono">Corner Coffee, before the rush</figcaption>
+            </figure>
+            <div className="teaser-copy">
+              <p className="eyebrow reveal">One regular, ten visits</p>
+              <h2 className="section-title reveal-line-group">
+                <span className="reveal-line">See the card</span>
+                <span className="reveal-line">from her side.</span>
+              </h2>
+              <p className="reveal">We followed Aisyah through her card at Corner Coffee, stamp by stamp, to the free one.</p>
+              <p className="reveal">It is the quickest way to feel what your customers get.</p>
+              <Link className="btn btn-solid reveal" href="/story">Follow the story</Link>
+            </div>
+          </div>
+        </section>
+
+        {/* ================= MERCHANT ================= */}
+        <section className="merchant paper" id="merchant" data-theme="light">
+          <div className="wrap">
+            <p className="eyebrow reveal">Meanwhile, behind the counter</p>
+            <h2 className="section-title reveal-line-group">
+              <span className="reveal-line">You see every stamp</span>
+              <span className="reveal-line">the moment it lands.</span>
             </h2>
-            <p className="mt-4 text-base leading-relaxed text-text-secondary">
-              Answer three quick questions. We&apos;ll show you how Kembali
-              works for your kind of shop, then you can shape a card of your
-              own. No signup, no pressure.
-            </p>
-          </Reveal>
+            <div className="dash reveal" id="dash">
+              <div className="dash-chrome">
+                <span className="dc-dot"></span><span className="dc-dot"></span><span className="dc-dot"></span>
+                <span className="dc-url mono">kembali.app/admin/corner-coffee</span>
+              </div>
+              <div className="dash-body">
+                <aside className="dash-nav">
+                  <span className="dn-item active">Overview</span>
+                  <span className="dn-item">Customers</span>
+                  <span className="dn-item">Rewards</span>
+                  <span className="dn-item">Reports</span>
+                  <span className="dn-item">Team</span>
+                </aside>
+                <div className="dash-main">
+                  <p className="dash-greet">Selamat kembali ke Corner Coffee</p>
+                  <div className="dash-tiles">
+                    <div className="tile"><span className="tile-num" data-count="41">0</span><span className="tile-label">stamps today</span></div>
+                    <div className="tile"><span className="tile-num" data-count="6">0</span><span className="tile-label">rewards redeemed</span></div>
+                    <div className="tile"><span className="tile-num" data-count="512" data-prefix="RM ">0</span><span className="tile-label">recorded today</span></div>
+                    <div className="tile"><span className="tile-num" data-count="68" data-suffix="%">0</span><span className="tile-label">visits from regulars</span></div>
+                  </div>
+                  <div className="dash-week">
+                    <p className="mono dw-label">STAMPS THIS WEEK</p>
+                    <div className="dw-bars" id="dwBars">
+                      <div className="dw-bar" style={{ "--v": .45 } as CSSProperties}><i></i><b>M</b></div>
+                      <div className="dw-bar" style={{ "--v": .62 } as CSSProperties}><i></i><b>T</b></div>
+                      <div className="dw-bar" style={{ "--v": .55 } as CSSProperties}><i></i><b>W</b></div>
+                      <div className="dw-bar" style={{ "--v": .78 } as CSSProperties}><i></i><b>T</b></div>
+                      <div className="dw-bar" style={{ "--v": .92 } as CSSProperties}><i></i><b>F</b></div>
+                      <div className="dw-bar" style={{ "--v": .7 } as CSSProperties}><i></i><b>S</b></div>
+                      <div className="dw-bar" style={{ "--v": .3 } as CSSProperties}><i></i><b>S</b></div>
+                    </div>
+                  </div>
+                  <div className="dash-feed">
+                    <p className="mono dw-label">JUST NOW</p>
+                    <div className="df-row"><span className="df-dot"></span>Aisyah · stamp 10 of 10 · RM 0.00 · SS2 outlet</div>
+                    <div className="df-row"><span className="df-dot"></span>Ming Wei · stamp 4 of 10 · RM 12.00 · SS2 outlet</div>
+                    <div className="df-row"><span className="df-dot"></span>Priya · reward confirmed · latte · Damansara outlet</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <ul className="merchant-facts">
+              <li className="reveal"><strong>Roles that hold.</strong> Cashiers stamp. Owners see money. Permissions are checked on the server, not in the menu.</li>
+              <li className="reveal"><strong>Every outlet counted.</strong> Each stamp records which till it came from, so reports split cleanly by branch.</li>
+              <li className="reveal"><strong>Reports you can hand over.</strong> Customers, transactions, and rewards export to CSV with a date range.</li>
+            </ul>
+            <div className="proof" id="proof">
+              <p className="proof-label mono reveal">Screens below are the real product, photographed today</p>
+              <div className="proof-row">
+                <figure className="proof-shot proof-wide reveal"><img src="/showcase/real-admin.png" alt="The real Kembali merchant overview" loading="lazy" /><figcaption className="mono">merchant overview, signed in as the owner</figcaption></figure>
+                <figure className="proof-shot reveal"><img src="/showcase/real-card.png" alt="The real customer card in a phone browser" loading="lazy" /><figcaption className="mono">customer card, in the shop's colours</figcaption></figure>
+              </div>
+            </div>
+          </div>
+        </section>
 
-          <Reveal delay={120} className="mt-10">
-            <ReachOut />
-          </Reveal>
-        </div>
-      </section>
-    </main>
+        {/* ================= SETUP + CTA ================= */}
+        <section className="setup" id="start" data-theme="dark">
+          <img className="setup-bg" src="/showcase/scene-shophouse.jpg" alt="" loading="lazy" aria-hidden="true" />
+          <div className="setup-veil" aria-hidden="true"></div>
+          <div className="wrap setup-content">
+            <p className="eyebrow reveal">Your shop, next week</p>
+            <h2 className="section-title reveal-line-group">
+              <span className="reveal-line">Live before the</span>
+              <span className="reveal-line">morning rush.</span>
+            </h2>
+            <ol className="steps">
+              <li className="reveal"><span className="step-num mono">1</span><h3>Tell us your shop</h3><p>Name, outlets, and what the tenth visit earns.</p></li>
+              <li className="reveal"><span className="step-num mono">2</span><h3>Print the QR kit</h3><p>Posters arrive as PDFs in your colours, sized for the till.</p></li>
+              <li className="reveal"><span className="step-num mono">3</span><h3>Brief the staff</h3><p>Scan member, type amount. Most shops learn it in ten minutes.</p></li>
+            </ol>
+            <div className="pricing reveal">
+              <p className="price-line"><span className="price">RM99</span> per outlet, per month at the founding price.</p>
+              <p className="price-sub">No card reader, no contract, no charge until your card is live.</p>
+            </div>
+            <div className="hero-actions">
+              <a className="btn btn-solid btn-big reveal" href="mailto:hello@kembali.app">Start your card</a>
+              <Link className="btn btn-ghost btn-big reveal" href="/pricing">See pricing</Link>
+            </div>
+            <p className="cta-sub mono reveal">hello@kembali.app · reply within one working day</p>
+          </div>
+        </section>
+    </>
   );
 }

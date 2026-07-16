@@ -1,55 +1,64 @@
 import Link from "next/link";
-import { LogoMark } from "@kembali/ui";
+
+const PAGES = [
+  { href: "/", label: "Home" },
+  { href: "/story", label: "Story" },
+  { href: "/roadmap", label: "Roadmap" },
+  { href: "/pricing", label: "Pricing" },
+];
+
+const COMPANY = [
+  { href: "/about", label: "About" },
+  { href: "/security", label: "Security" },
+  { href: "/privacy", label: "Privacy" },
+  { href: "/contact", label: "Contact" },
+];
 
 export function SiteFooter() {
   return (
-    <footer className="border-t border-border bg-surface-alt">
-      <div className="mx-auto grid w-full max-w-[1200px] gap-10 px-6 py-14 md:grid-cols-3">
-        <div className="flex flex-col gap-3">
-          <LogoMark size={30} />
-          <p className="max-w-xs text-sm leading-relaxed text-text-secondary">
-            The stamp card that lives on your customers&apos; phones. Loyalty
-            your customers will love.
+    <footer className="footer" data-theme="dark">
+      <div className="wrap footer-grid">
+        <div className="footer-brand">
+          <svg className="footer-loop" viewBox="0 0 120 120" aria-hidden>
+            <path
+              id="loopPath"
+              d="M60 14 a46 46 0 1 1 -32.5 13.5"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="9"
+              strokeLinecap="round"
+            />
+            <circle cx="60" cy="60" r="13" fill="var(--coral)" />
+          </svg>
+          <p className="footer-word">
+            kembal<span className="lockup-i">i</span>
           </p>
+          <p className="footer-line">Loyalty your customers will love.</p>
         </div>
 
-        <nav className="flex flex-col gap-2.5 text-sm">
-          <p className="font-medium text-text-muted">Explore</p>
-          <Link href="/#showcase" className="text-text-secondary hover:text-text">
-            See the product
-          </Link>
-          <Link href="/#how-it-works" className="text-text-secondary hover:text-text">
-            How it works
-          </Link>
-          <Link href="/pricing" className="text-text-secondary hover:text-text">
-            Pricing
-          </Link>
-          <Link href="/roadmap" className="text-text-secondary hover:text-text">
-            What&apos;s coming next
-          </Link>
+        <nav className="footer-nav mono" aria-label="Footer">
+          <div className="fn-col">
+            {PAGES.map((l) => (
+              <Link key={l.href} href={l.href}>
+                {l.label}
+              </Link>
+            ))}
+          </div>
+          <div className="fn-col">
+            {COMPANY.map((l) => (
+              <Link key={l.href} href={l.href}>
+                {l.label}
+              </Link>
+            ))}
+            <Link href="/admin">Sign in</Link>
+          </div>
         </nav>
 
-        <div className="flex flex-col gap-2.5 text-sm">
-          <p className="font-medium text-text-muted">Talk to us</p>
-          <Link href="/#reach-out" className="text-text-secondary hover:text-text">
-            See how Kembali fits your shop
-          </Link>
-          <a
-            href="mailto:hello@kembali.app"
-            className="text-text-secondary hover:text-text"
-          >
-            hello@kembali.app
-          </a>
+        <div className="footer-meta mono">
+          <p>Built for Malaysian shops · Petaling Jaya</p>
+          <p>PDPA: marketing is opt-in · export or delete your data any time</p>
+          <p>&copy; 2026 Kembali</p>
         </div>
-      </div>
-
-      <div className="mx-auto flex w-full max-w-[1200px] flex-wrap items-center justify-between gap-3 border-t border-border px-6 py-5">
-        <p className="font-mono text-xs text-text-muted">
-          © 2026 Kembali · Malaysia &amp; SEA
-        </p>
-        <p className="font-mono text-xs text-text-muted">
-          PDPA: marketing is opt-in · export or delete your data anytime
-        </p>
       </div>
     </footer>
   );

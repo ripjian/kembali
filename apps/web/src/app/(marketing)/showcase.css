@@ -1754,3 +1754,133 @@
   .st-dot { width: 22px; height: 22px; }
   .ref-line { width: 60px; }
 }
+
+/* ============================================================
+   REACH OUT · three questions, a pitch, and a card you can touch
+   ============================================================ */
+.reachout { padding: clamp(80px, 12vh, 150px) 0; }
+.ro-card {
+  background: #fff;
+  border: 1px solid var(--hairline-light);
+  border-radius: 18px;
+  padding: clamp(22px, 3vw, 36px);
+  max-width: 760px;
+  box-shadow: 0 34px 80px -46px color-mix(in srgb, var(--pandan) 50%, transparent);
+  animation: roIn .4s var(--ease-out);
+}
+@keyframes roIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+.ro-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 14px; }
+.ro-eyebrow { font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--coral-deep); }
+.ro-dots { display: flex; gap: 6px; }
+.ro-dot { width: 7px; height: 7px; border-radius: 50%; border: 1px solid color-mix(in srgb, var(--ink) 30%, transparent); }
+.ro-dot.on { background: var(--coral); border-color: var(--coral); }
+.ro-prompt {
+  font-family: var(--serif);
+  font-variation-settings: 'opsz' 60;
+  font-weight: 540;
+  font-size: clamp(22px, 2.4vw, 31px);
+  color: var(--pandan);
+  line-height: 1.1;
+  margin-bottom: 22px;
+}
+.ro-options { display: grid; gap: 10px; }
+.ro-option {
+  text-align: left;
+  font: inherit;
+  font-size: 15.5px;
+  color: var(--pandan);
+  background: var(--sand);
+  border: 1px solid var(--hairline-light);
+  border-radius: 12px;
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: transform .2s var(--ease-out), border-color .2s, background .2s;
+}
+.ro-option:hover { transform: translateX(3px); border-color: var(--coral); background: #fff; }
+.ro-back {
+  margin-top: 16px;
+  font-size: 11px; letter-spacing: .14em; text-transform: uppercase;
+  color: color-mix(in srgb, var(--ink) 50%, transparent);
+  background: none; border: none; cursor: pointer;
+  justify-self: start;
+}
+.ro-back:hover { color: var(--pandan); }
+.ro-pitch { display: grid; gap: 12px; margin-bottom: 26px; }
+.ro-pitch p {
+  font-size: clamp(15px, 1.4vw, 17px);
+  line-height: 1.6;
+  color: color-mix(in srgb, var(--ink) 76%, var(--sand) 24%);
+  padding-left: 16px;
+  border-left: 2px solid var(--coral);
+}
+.ro-sketch {
+  display: grid;
+  grid-template-columns: 1fr minmax(240px, 300px);
+  gap: clamp(20px, 3vw, 36px);
+  align-items: start;
+  padding: 22px 0;
+  border-top: 1px solid var(--hairline-light);
+  margin-bottom: 22px;
+}
+@media (max-width: 720px) { .ro-sketch { grid-template-columns: 1fr; } }
+.ro-fields { display: grid; gap: 12px; align-content: start; }
+.ro-fields .col-label { justify-self: start; margin-bottom: 2px; color: var(--coral-deep); border-color: var(--hairline-light); }
+.ro-field { display: grid; gap: 5px; }
+.ro-field span { font-size: 12px; color: color-mix(in srgb, var(--ink) 60%, transparent); }
+.ro-field input[type="text"] {
+  font: inherit; font-size: 15px;
+  color: var(--pandan);
+  background: var(--sand);
+  border: 1px solid var(--hairline-light);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+.ro-field input[type="text"]:focus-visible { outline: 2px solid var(--coral); outline-offset: 1px; }
+.ro-field-color { grid-template-columns: 1fr auto; align-items: center; }
+.ro-field-color input[type="color"] {
+  width: 44px; height: 30px; padding: 0;
+  border: 1px solid var(--hairline-light); border-radius: 8px;
+  background: none; cursor: pointer;
+}
+.ro-send { justify-self: start; }
+.ro-note { display: block; margin-top: 12px; font-size: 11px; letter-spacing: .1em; color: color-mix(in srgb, var(--ink) 45%, transparent); }
+
+/* ---------- the card you can touch ---------- */
+.demo-card {
+  --demo-accent: var(--pandan);
+  background: var(--demo-accent);
+  border-radius: 18px;
+  padding: 20px;
+  box-shadow: 0 30px 70px -40px color-mix(in srgb, var(--pandan) 60%, transparent);
+}
+.dc-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 16px; }
+.dc-head b {
+  font-family: var(--serif); font-variation-settings: 'opsz' 40;
+  font-weight: 560; font-size: 17px; color: #fff;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.dc-head .mono { color: color-mix(in srgb, #fff 72%, transparent); font-size: 12px; }
+.dc-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 9px; margin-bottom: 14px; }
+.dc-dot {
+  aspect-ratio: 1; border-radius: 50%;
+  border: 2px dashed color-mix(in srgb, #fff 34%, transparent);
+}
+/* coral stays the earned colour whatever the shop's brand is (BRAND.md) */
+.dc-dot.on {
+  border: none;
+  background: radial-gradient(circle at 40% 36%, var(--coral), var(--coral-deep));
+  animation: hudPop .4s var(--ease-out);
+}
+.dc-note { font-size: 12.5px; color: color-mix(in srgb, #fff 82%, transparent); margin-bottom: 14px; min-height: 2.6em; }
+.dc-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.dc-btn { font-size: 13px; padding: 9px 16px; cursor: pointer; font-family: inherit; }
+.demo-card .btn-ghost { border-color: color-mix(in srgb, #fff 34%, transparent); color: #fff; }
+.demo-card .btn-ghost:hover { border-color: #fff; }
+.dc-btn:disabled { opacity: .45; cursor: default; transform: none; }
+
+/* a touchable card sits with the customer-side copy */
+.join-try { margin-top: 26px; display: grid; gap: 10px; justify-items: start; max-width: 300px; }
+.join-try .col-label { color: var(--sand-muted); border-color: var(--hairline-dark); justify-self: start; margin-bottom: 0; }

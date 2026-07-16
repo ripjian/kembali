@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+
+import { DemoCard } from "@/components/marketing/demo-card";
+import { ReachOut } from "@/components/marketing/reach-out";
 import type { CSSProperties } from "react";
 
 export const metadata: Metadata = {
@@ -138,6 +141,10 @@ export default function HomePage() {
                   <li className="reveal"><span className="mono">02</span>Works on any phone with a camera</li>
                   <li className="reveal"><span className="mono">03</span>First stamp lands the same minute</li>
                 </ul>
+                <div className="join-try reveal">
+                  <p className="col-label mono">Try it yourself</p>
+                  <DemoCard />
+                </div>
               </div>
               <div className="join-phone reveal" id="joinPhone" data-parallax="-0.04"><p className="col-label mono">On their phone</p>
                 <div className="phone">
@@ -233,6 +240,18 @@ export default function HomePage() {
                 <figure className="proof-shot reveal"><img src="/showcase/real-card.png" alt="The real customer card in a phone browser" loading="lazy" /><figcaption className="mono">customer card, in the shop's colours</figcaption></figure>
               </div>
             </div>
+          </div>
+        </section>
+
+        {/* ================= REACH OUT ================= */}
+        <section className="reachout paper" id="reach-out" data-theme="light">
+          <div className="wrap">
+            <p className="eyebrow reveal">See how it fits your shop</p>
+            <h2 className="section-title reveal-line-group">
+              <span className="reveal-line">Three questions,</span>{" "}
+              <span className="reveal-line">then a straight answer.</span>
+            </h2>
+            <ReachOut />
           </div>
         </section>
 

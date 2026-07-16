@@ -463,6 +463,8 @@ Super-admin (internal): /tenants, /usage, /billing-health, /feature-flags
 
 | 2026-07-12 | **Standalone showcase site shipped at `/showcase`** (static, dependency-free): an art-directed "Ten visits" narrative piece where scrolling fills a stamp card; WebGL hero, scroll-mapped ledger scene, canvas ink systems, CC-licensed photography graded to brand, real product screenshots as proof. Separate from `apps/web` marketing; deliberately outside DESIGN-dub but inside BRAND.md palette + copy rules | Founder asked for an award-calibre capability showcase; keeping it standalone avoids destabilising the shipped marketing surface |
 
+| 2026-07-12 | **The showcase becomes the marketing site.** The standalone `/showcase` piece was ported into `apps/web` as eight real routes under `(marketing)`, replacing the DESIGN-dub frosted-SaaS surface; `DESIGN-dub.md` superseded by `brand/DESIGN-marketing.md`. The reach-out qualifier and the interactive demo card were rebuilt in the new style rather than dropped. Ported (not split to a static host) so `/app/join/[slug]` and the printed QR posters keep working on one domain, per the Phase 0.5 one-server routing decision | Founder wanted the showcase to be the real site. Porting keeps one server, one deploy, per-route metadata and CI coverage; a static split would have changed the join URL and invalidated printed posters. Marketing CSS is scoped under `.sc-root` so /app and /admin are provably untouched |
+
 ## 14. References
 
 - Stampede features & blog: https://stampede.sg/features , https://stampede.sg/blog/stamp-card-for-cafe-in-kuala-lumpur

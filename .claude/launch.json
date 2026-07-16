@@ -4,14 +4,12 @@
     {
       "name": "web",
       "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["--filter", "@kembali/web", "dev"],
+      "runtimeArgs": [
+        "--filter",
+        "@kembali/web",
+        "dev"
+      ],
       "port": 3000
-    },
-    {
-      "name": "showcase",
-      "runtimeExecutable": "npx",
-      "runtimeArgs": ["--yes", "http-server", "showcase", "-p", "4173", "-c-1", "--silent"],
-      "port": 4173
     }
   ]
 }

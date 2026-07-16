@@ -1,3 +1,9 @@
+> **SUPERSEDED 2026-07-12 — historical reference only.**
+> The marketing surface now runs the showcase design system:
+> see `brand/DESIGN-marketing.md`. This file records the frosted-SaaS
+> direction the site launched with (Phase 0.5 to Phase 2) and is kept for
+> context. Do not build against it.
+
 # Dub — Style Reference
 > frosted link dashboard on rice paper
 

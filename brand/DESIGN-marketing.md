@@ -112,7 +112,7 @@ image is CC0 or CC BY with attribution in the footer.
 | ind-salon.jpg | Barber combing and trimming | Wikimedia (Nenad Stojkovic) | CC BY 2.0 |
 | ind-carwash.jpg | Drying a wet red car | Rawpixel | CC0 |
 | ind-wellness.jpg | Spa massage | StockSnap (Authentic Stock) | CC0 |
-| real-admin.png · real-card.png | The actual product, captured from the seeded dev app | in-house | — |
+| real-admin.png · real-admin-mobile.png · real-card.png | The actual product, captured from the seeded dev app (the mobile admin capture serves phones via `<picture>`) | in-house | — |
 
 New photography: grade it to match (light desaturation, gentle contrast, a warm
 lift) or it will read as a different shoot. Add the credit here and in the footer.

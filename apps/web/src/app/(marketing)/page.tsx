@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { DemoCard } from "@/components/marketing/demo-card";
 import { ReachOut } from "@/components/marketing/reach-out";
 import type { CSSProperties } from "react";
 
@@ -141,10 +140,6 @@ export default function HomePage() {
                   <li className="reveal"><span className="mono">02</span>Works on any phone with a camera</li>
                   <li className="reveal"><span className="mono">03</span>First stamp lands the same minute</li>
                 </ul>
-                <div className="join-try reveal">
-                  <p className="col-label mono">Try it yourself</p>
-                  <DemoCard />
-                </div>
               </div>
               <div className="join-phone reveal" id="joinPhone" data-parallax="-0.04"><p className="col-label mono">On their phone</p>
                 <div className="phone">
@@ -236,7 +231,14 @@ export default function HomePage() {
             <div className="proof" id="proof">
               <p className="proof-label mono reveal">Screens below are the real product, photographed today</p>
               <div className="proof-row">
-                <figure className="proof-shot proof-wide reveal"><img src="/showcase/real-admin.png" alt="The real Kembali merchant overview" loading="lazy" /><figcaption className="mono">merchant overview, signed in as the owner</figcaption></figure>
+                <figure className="proof-shot proof-wide reveal">
+                  {/* phones get the admin as it looks on a phone, not a shrunken desktop */}
+                  <picture>
+                    <source media="(max-width: 760px)" srcSet="/showcase/real-admin-mobile.png" />
+                    <img src="/showcase/real-admin.png" alt="The real Kembali merchant overview" loading="lazy" />
+                  </picture>
+                  <figcaption className="mono">merchant overview, signed in as the owner</figcaption>
+                </figure>
                 <figure className="proof-shot reveal"><img src="/showcase/real-card.png" alt="The real customer card in a phone browser" loading="lazy" /><figcaption className="mono">customer card, in the shop's colours</figcaption></figure>
               </div>
             </div>

@@ -50,7 +50,7 @@ export function SiteFooter() {
                 {l.label}
               </Link>
             ))}
-            <Link href="/admin">Sign in</Link>
+            <Link href="/admin">Merchant login</Link>
           </div>
         </nav>
 

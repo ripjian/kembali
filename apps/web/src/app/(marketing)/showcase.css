@@ -827,7 +827,10 @@
   gap: clamp(16px, 2.5vw, 34px);
   align-items: start;
 }
-@media (max-width: 760px) { .proof-row { grid-template-columns: 1fr; } .proof-shot img { max-width: 440px; } }
+@media (max-width: 760px) {
+  .proof-row { grid-template-columns: 1fr; justify-items: center; }
+  .proof-shot img { max-width: min(360px, 100%); }
+}
 .proof-shot { display: grid; gap: 10px; }
 .proof-shot img {
   border-radius: 12px;
@@ -1029,11 +1032,72 @@
 .topbar.t-light .tn-link:hover, .topbar.t-light .tn-link.tn-active { color: var(--pandan); }
 .topbar.t-coral .tn-link { color: color-mix(in srgb, var(--sand) 80%, var(--coral) 20%); }
 .topbar.t-coral .tn-link:hover, .topbar.t-coral .tn-link.tn-active { color: #fff; }
-@media (max-width: 560px) {
-  .topnav { gap: 12px; }
-  .tn-link { font-size: 10.5px; letter-spacing: .1em; }
-  .chip-cta { display: none; }
+
+/* ---------- mobile drawer nav ---------- */
+.nav-burger {
+  display: none;
+  width: 42px; height: 40px;
+  border: 0; background: none; cursor: pointer;
+  padding: 10px 9px;
+  flex-direction: column; justify-content: space-between;
 }
+.nav-burger span {
+  display: block; height: 2px; width: 100%;
+  border-radius: 2px;
+  background: var(--sand);
+  transition: background .35s;
+}
+.topbar.t-light .nav-burger span { background: var(--pandan); }
+.sc-root .nav-burger:focus-visible { outline: 2px solid var(--coral); outline-offset: 3px; border-radius: 8px; }
+@media (max-width: 640px) {
+  .topnav { display: none; }
+  .topbar .chip-cta { display: none; }
+  .nav-burger { display: flex; }
+}
+
+.nav-scrim {
+  position: fixed; inset: 0; z-index: 50;
+  background: color-mix(in srgb, var(--pandan-night) 45%, transparent);
+  opacity: 0; pointer-events: none;
+  transition: opacity .3s var(--ease-out);
+}
+.nav-scrim.open { opacity: 1; pointer-events: auto; }
+
+/* 80% of the screen: the sliver of page left visible is the way out */
+.nav-drawer {
+  position: fixed; top: 0; right: 0; bottom: 0; z-index: 60;
+  width: 80vw;
+  background: var(--pandan-night);
+  border-left: 1px solid color-mix(in srgb, var(--sand) 12%, transparent);
+  box-shadow: -40px 0 90px -50px rgba(0,0,0,.8);
+  transform: translateX(105%);
+  visibility: hidden;
+  transition: transform .32s var(--ease-out), visibility 0s linear .32s;
+  display: flex; flex-direction: column;
+  padding: 22px 26px calc(26px + env(safe-area-inset-bottom));
+}
+.nav-drawer.open { transform: none; visibility: visible; transition: transform .32s var(--ease-out); }
+.nd-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 26px; }
+.nd-eyebrow { font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--sand-muted); }
+.nd-close { border: 0; background: none; color: var(--sand); cursor: pointer; padding: 8px; margin-right: -8px; }
+.nd-close svg { width: 18px; display: block; }
+.nd-links { display: grid; }
+.nd-links a {
+  font-family: var(--serif); font-weight: 540;
+  font-size: 28px; color: var(--sand);
+  padding: 12px 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--sand) 10%, transparent);
+  opacity: 0; transform: translateX(14px);
+  transition: opacity .3s var(--ease-out), transform .3s var(--ease-out);
+}
+.nav-drawer.open .nd-links a { opacity: 1; transform: none; }
+.nav-drawer.open .nd-links a:nth-child(2) { transition-delay: .04s; }
+.nav-drawer.open .nd-links a:nth-child(3) { transition-delay: .08s; }
+.nav-drawer.open .nd-links a:nth-child(4) { transition-delay: .12s; }
+.nd-links a.nd-active { color: var(--coral); }
+.nd-foot { margin-top: auto; display: grid; gap: 14px; justify-items: start; }
+.nd-foot .chip-cta { background: var(--sand); color: var(--pandan-deep); }
+.nd-note { font-size: 11px; letter-spacing: .12em; color: var(--sand-muted); }
 
 /* ---------- page hero (roadmap / pricing) ---------- */
 .page-hero {
@@ -1848,39 +1912,42 @@
 .ro-send { justify-self: start; }
 .ro-note { display: block; margin-top: 12px; font-size: 11px; letter-spacing: .1em; color: color-mix(in srgb, var(--ink) 45%, transparent); }
 
-/* ---------- the card you can touch ---------- */
+/* ---------- the card you can touch ----------
+   Mirrors .big-card (the story card): the merchant colour only tints the
+   card face; the stamps stay coral because coral is earned (BRAND.md). */
 .demo-card {
   --demo-accent: var(--pandan);
-  background: var(--demo-accent);
-  border-radius: 18px;
-  padding: 20px;
-  box-shadow: 0 30px 70px -40px color-mix(in srgb, var(--pandan) 60%, transparent);
+  background: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--demo-accent) 88%, var(--sand) 12%),
+    color-mix(in srgb, var(--demo-accent) 66%, black)
+  );
+  border: 1px solid color-mix(in srgb, var(--sand) 18%, transparent);
+  border-radius: 22px;
+  padding: clamp(20px, 2.4vw, 28px);
+  box-shadow: 0 50px 110px -50px rgba(0,0,0,.9);
 }
-.dc-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 16px; }
-.dc-head b {
-  font-family: var(--serif); font-variation-settings: 'opsz' 40;
-  font-weight: 560; font-size: 17px; color: #fff;
+.dc-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 18px; }
+.dc-name {
+  font-family: var(--serif); font-weight: 540; font-size: clamp(19px, 2vw, 24px);
+  color: var(--sand);
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
-.dc-head .mono { color: color-mix(in srgb, #fff 72%, transparent); font-size: 12px; }
-.dc-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 9px; margin-bottom: 14px; }
-.dc-dot {
+.dc-shop { font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--sand-muted); flex-shrink: 0; }
+.dc-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: clamp(9px, 1.1vw, 14px); margin-bottom: 18px; }
+.dc-stamp {
   aspect-ratio: 1; border-radius: 50%;
-  border: 2px dashed color-mix(in srgb, #fff 34%, transparent);
+  border: 2px dashed color-mix(in srgb, var(--sand) 30%, transparent);
+  display: grid; place-items: center;
 }
-/* coral stays the earned colour whatever the shop's brand is (BRAND.md) */
-.dc-dot.on {
-  border: none;
-  background: radial-gradient(circle at 40% 36%, var(--coral), var(--coral-deep));
-  animation: hudPop .4s var(--ease-out);
-}
-.dc-note { font-size: 12.5px; color: color-mix(in srgb, #fff 82%, transparent); margin-bottom: 14px; min-height: 2.6em; }
+.dc-stamp svg { width: 56%; opacity: 0; transform: scale(1.8) rotate(-10deg); }
+.dc-stamp.on { border-color: transparent; background: color-mix(in srgb, var(--coral) 18%, transparent); animation: hudPop .45s var(--ease-out); }
+.dc-stamp.on svg { opacity: 1; transform: none; transition: opacity .35s var(--ease-out), transform .45s var(--ease-out); }
+.dc-foot { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 16px; min-height: 2.4em; }
+.dc-foot .mono { color: var(--coral); font-size: 13px; flex-shrink: 0; }
+.dc-hint { font-size: 13px; color: var(--sand-muted); text-align: right; }
 .dc-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 .dc-btn { font-size: 13px; padding: 9px 16px; cursor: pointer; font-family: inherit; }
-.demo-card .btn-ghost { border-color: color-mix(in srgb, #fff 34%, transparent); color: #fff; }
-.demo-card .btn-ghost:hover { border-color: #fff; }
+.demo-card .btn-ghost { border-color: color-mix(in srgb, var(--sand) 34%, transparent); color: var(--sand); }
+.demo-card .btn-ghost:hover { border-color: var(--sand); }
 .dc-btn:disabled { opacity: .45; cursor: default; transform: none; }
-
-/* a touchable card sits with the customer-side copy */
-.join-try { margin-top: 26px; display: grid; gap: 10px; justify-items: start; max-width: 300px; }
-.join-try .col-label { color: var(--sand-muted); border-color: var(--hairline-dark); justify-self: start; margin-bottom: 0; }

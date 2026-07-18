@@ -104,3 +104,61 @@ Style: `brand/DESIGN-dub.md`. Copy: SOP 3 / ux-writing — sentence case, no jar
 - CTA (secondary): "Join as a founding merchant instead"
 
 Below cards: annual note ("Pay for 10 months, get 12"), chains note ("5+ outlets: 20% off — talk to us"), FAQ (Do customers download an app? Do I need new hardware? What happens to my data if I leave? — free export, always). Prices in RM, per outlet, per month. No card required anywhere; payment is by invoice after the pilot.
+
+## 9. PROPOSAL — module pricing, custom plan builder, branded app (2026-07-19, PENDING FOUNDER APPROVAL)
+
+> Drafted at the founder's request ("relook pricing and modules, separate them out, add a custom selection that calculates a price; branded app only at the top"). Nothing here is final until the founder signs off; the site's plan builder shows these numbers as **estimates confirmed on a call**, never as quotes. The three public tiers are unchanged.
+
+### 9.1 Cost basis (MYR, FX ≈ 4.1)
+
+**Fixed platform costs — do NOT scale per outlet:**
+
+| | RM/month |
+|---|---|
+| Hosting (Vercel Pro; AWS Lightsail would be RM41–82) | ~82 |
+| Database (Neon Launch tier) | ~78 |
+| Monitoring, domain, email | ~55 |
+| **Total** | **~215** |
+
+Server cost is flat: at 10 outlets it is ~RM22/outlet, at 50 outlets ~RM4. Moving to AWS saves nothing material at this scale and costs migration time — revisit only past ~200 outlets.
+
+**Per-outlet variable costs (the ones that matter):**
+
+| | RM/outlet/month |
+|---|---|
+| OTP logins — WhatsApp auth rate, ~300 logins | ~18 |
+| OTP via SMS instead (avoid: 4×) | ~75 |
+| WhatsApp marketing credits (Growth includes RM30 face value) | ~21 cost |
+| Wallet passes (Apple + Google APIs) | 0 — free APIs |
+| Push notifications (APNs/FCM) | 0 |
+
+**Per-brand costs (branded app only):** Apple Developer USD99/yr ≈ RM34/mo; Google Play USD25 once ≈ RM103; build tooling (e.g. Expo EAS) ~RM406/mo platform-wide across all brands; the real cost is maintenance engineering per store-review cycle.
+
+**Margin rule:** the founder floated "each outlet covers costs +15%". 15% gross margin is far too thin for SaaS (no room for support, refunds, failed pilots, or the founder's time). Rule adopted in this proposal: **variable cost per outlet stays under 30% of that outlet's price** (≥70% gross margin), the market norm and what §4 already achieves. Every priced module below clears it.
+
+### 9.2 Module prices (à la carte, per outlet/month)
+
+| Module | Price | Variable cost | Status |
+|---|---|---|---|
+| Core stamp cards (QR kit, team roles, reports, free export, OTP logins) | RM99 | ~RM18 | Live |
+| Points and rewards | +RM59 | ~0 | Live |
+| Apple and Google Wallet cards | +RM29 | ~0 | Phase 3 |
+| VIP member tags | +RM29 | ~0 | Phase 3 |
+| WhatsApp automations (incl. RM30 message credits) | +RM79 | ~RM21 | Phase 4 |
+| Referral rewards | +RM39 | ~0 | Phase 5 |
+| Your own domain | +RM49 | ~0 | Phase 6 |
+
+Everything à la carte = RM383 vs Growth RM279 (bundle saves ~27%); Core+Points+Wallet = RM187 vs Starter RM149 (~20%). Tiers stay the obvious buy; the builder exists for odd combos and as a lead qualifier. Chain discount (−20% at 5+) applies in the builder too.
+
+### 9.3 Branded app (chains only, gated to the top)
+
+- **Gate:** Growth plan, 6+ outlets. Never sold below the top tier.
+- **Proposed commercials:** one-time setup RM12,000–18,000; platform fee RM800–1,200/brand/month on top of Growth per-outlet pricing.
+- **The client owns their store accounts:** Apple's review guideline 4.2.6 forces white-label apps to ship under the client's own developer account (USD99/yr) — this is a hard Apple rule, not our choice, and it conveniently keeps store fees off our books. Google Play likewise under the brand's account (USD25 once).
+- The app-free promise stays intact for everyone else: the web card remains the default; the app is a brand-presence add-on for chains.
+- Site treatment: never a listed price — "priced on a call" from the builder + a quiet FAQ/contact hook + the interactive demo page (`/your-app`).
+
+### 9.4 Open (founder)
+- [ ] Approve/adjust §9.2 numbers and §9.3 ranges → then a Decision Log row in ROADMAP §13
+- [ ] Decide the branded-app minimum (6 outlets? 8?) and whether Founding merchants can ever buy it at Growth-equivalent terms
+- [ ] SST treatment applies here too (§7)

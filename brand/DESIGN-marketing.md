@@ -1,7 +1,9 @@
 # Kembali — Marketing design system
 
 > The public surface: `/`, `/story`, `/roadmap`, `/pricing`, `/security`,
-> `/privacy`, `/contact`, `/about`.
+> `/privacy`, `/contact`, `/about`, plus the quiet `/your-app` (branded-app
+> demo for chains, linked only from the pricing FAQ, the plan builder and
+> the contact page, never from nav or footer).
 > **Supersedes `DESIGN-dub.md`** (founder, 2026-07-12). Companion to `BRAND.md`
 > (tokens, voice) and `CLAUDE.md` (SOP).
 
@@ -25,6 +27,8 @@ apps/web/src/components/marketing/
   showcase-engine.ts   all motion; init returns a teardown
   showcase-shell.tsx   runs the engine, keyed to the pathname
   site-nav.tsx  site-footer.tsx  reach-out.tsx  demo-card.tsx
+  plan-builder.tsx     build-your-own estimator on /pricing (PRICING.md §9 numbers)
+  brand-app-demo.tsx   the interactive phone on /your-app (design only, no app code)
 apps/web/public/showcase/   photography, fonts, the stamp-dot QR
 ```
 

@@ -1,4 +1,7 @@
 import type { Metadata } from "next";
+import Link from "next/link";
+
+import { PlanBuilder } from "@/components/marketing/plan-builder";
 
 export const metadata: Metadata = {
   title: "Pricing",
@@ -80,6 +83,20 @@ export default function PricingPage() {
           </div>
         </section>
 
+        {/* ================= BUILD YOUR OWN ================= */}
+        <section className="custom-plan paper" id="custom" data-theme="light">
+          <div className="wrap">
+            <p className="eyebrow reveal">Or build your own</p>
+            <h2 className="section-title reveal-line-group">
+              <span className="reveal-line">Pay for the modules</span>
+              <span className="reveal-line">you actually use.</span>
+            </h2>
+            <p className="custom-sub reveal">Pick what your counters need and see a monthly
+            estimate. Most shops do better on a plan above.</p>
+            <PlanBuilder />
+          </div>
+        </section>
+
         {/* ================= FAQ ================= */}
         <section className="faq paper" data-theme="light">
           <div className="wrap">
@@ -104,6 +121,10 @@ export default function PricingPage() {
               <div className="faq-row reveal">
                 <dt>How do I pay?</dt>
                 <dd>By invoice, monthly, after your free pilot. Bank transfer or DuitNow, no card required.</dd>
+              </div>
+              <div className="faq-row reveal">
+                <dt>Thinking about an app for your brand?</dt>
+                <dd>For chains, we build the loyalty app under your name and icon. <Link href="/your-app">See what it could look like</Link>, then write to us.</dd>
               </div>
             </dl>
             <div className="rl-cta reveal">

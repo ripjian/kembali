@@ -42,7 +42,7 @@ system admin).
 | Customer join (tenant-scoped) | customer · `/app/join/[slug]` | customer | A merchant's QR opens their branded join page; the slug decides which tenant a customer joins, independent of any session. OTP request/verify create the customer under the scanned tenant | — | All | 1 | Live |
 | Customer registration | customer · `/app/register` | customer | After OTP verify, a nameless customer completes a one-screen profile (full name required, phone verified/read-only, email optional, birthday skippable, marketing opt-in unchecked per PDPA), themed in the tenant's colours. Returning named customers skip it. `completeCustomerProfile` action: zod, `withTenant`, audit-logged | — | All | 1 | Live |
 | Audit log | system · written by privileged actions | platform + merchant admin | Append-only record of privileged actions (staff, points, redemptions, tenant changes) | — (write); viewer UI planned | All | 1 | Live (viewer UI planned) |
-| Marketing site | public · `/`, `/roadmap`, `/pricing` | prospect | Landing (reach-out quiz → tailored pitch → live card simulator), public roadmap, pricing | — | n/a | 0.5–2 | Live |
+| Marketing site | public · `/`, `/story`, `/roadmap`, `/pricing`, `/security`, `/privacy`, `/contact`, `/about`, quiet `/your-app` | prospect | Editorial showcase surface (`.sc-root` scoped): landing (reach-out quiz → tailored pitch → card simulator), story, roadmap, pricing incl. build-your-own estimator (PRICING.md §9 proposal), branded-app demo page for chains | — | n/a | 0.5–2 | Live |
 
 ## Planned modules (not built — do not build ahead of phase)
 

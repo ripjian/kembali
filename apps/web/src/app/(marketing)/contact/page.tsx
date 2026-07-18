@@ -44,6 +44,10 @@ export default function ContactPage() {
                   <p className="mono">FOUNDING RATE</p>
                   <p>The first 20 shops get everything Kembali ships at RM99 per outlet, locked for a year. <Link href="/pricing">See pricing</Link>.</p>
                 </div>
+                <div className="contact-note">
+                  <p className="mono">FOR CHAINS</p>
+                  <p>Looking to develop an app for your brand? <Link href="/your-app">See what it could look like</Link>.</p>
+                </div>
               </aside>
             </div>
             <div className="rl-cta reveal">

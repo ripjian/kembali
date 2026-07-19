@@ -74,6 +74,10 @@ export function BrandAppDemo() {
   return (
     <div className="bapp-phone" role="group" aria-label="A demo of a branded loyalty app">
       <div className="bapp-island" aria-hidden />
+      {/* one rounded, clipping container for the whole screen stack: per-piece
+          corner radii get clamped on short elements (the homebar is ~19px, so a
+          36px radius distorts) and the screen never hugs the frame corner */}
+      <div className="bapp-inner">
       <div className="bapp-status mono" aria-hidden>
         <span>9:41</span>
         <span className="bapp-status-icons">
@@ -220,9 +224,10 @@ export function BrandAppDemo() {
       </nav>
       <div className="bapp-homebar" aria-hidden />
 
-      {/* sheets sit at phone level so they cover the tab bar, like a real app */}
+      {/* sheets cover the tab bar too, like a real app; the inner clips them */}
       {qrOpen && <QrSheet onClose={() => setQrOpen(false)} />}
       {couponFor && <CouponSheet onClose={() => setCouponFor(null)} />}
+      </div>
     </div>
   );
 }

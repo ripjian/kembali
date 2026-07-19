@@ -1957,17 +1957,10 @@
 .dc-btn:disabled { opacity: .45; cursor: default; transform: none; }
 
 /* ============================================================
-   BUILD-YOUR-OWN PLAN (pricing)
+   BUILD-YOUR-OWN PLAN (pricing) — tap chips, watch the receipt
    ============================================================ */
 .custom-plan { padding: clamp(80px, 12vh, 150px) 0; }
 .custom-sub { color: color-mix(in srgb, var(--ink) 70%, transparent); max-width: 52ch; margin-bottom: 44px; font-size: clamp(15px, 1.3vw, 18px); }
-.builder {
-  display: grid; grid-template-columns: 1.5fr 1fr;
-  gap: clamp(24px, 3.5vw, 56px);
-  align-items: start;
-}
-@media (max-width: 880px) { .builder { grid-template-columns: 1fr; } }
-.builder-outlets { margin-bottom: 30px; }
 .bo-stepper { display: flex; align-items: center; gap: 18px; }
 .bo-btn {
   width: 44px; height: 44px; border-radius: 50%;
@@ -1979,52 +1972,60 @@
 .bo-btn:hover { border-color: var(--pandan); transform: translateY(-1px); }
 .bo-count { font-size: 24px; min-width: 2ch; text-align: center; color: var(--pandan); }
 .bo-note { margin-top: 10px; font-size: 11.5px; letter-spacing: .08em; color: var(--coral-deep); }
-.builder-modules { display: grid; gap: 10px; }
-.bm-row {
-  display: flex; align-items: center; gap: 14px;
-  width: 100%; text-align: left;
+.bvr { display: grid; grid-template-columns: 1.2fr 1fr; gap: clamp(24px, 3.5vw, 56px); align-items: start; }
+@media (max-width: 880px) { .bvr { grid-template-columns: 1fr; } }
+/* labels sit flush left with the controls they name (founder, 2026-07-19) */
+.bvr .col-label { justify-self: start; width: fit-content; margin-bottom: 14px; }
+.bvr-chips-label { margin-top: 30px; }
+.bvr-chips { display: flex; flex-wrap: wrap; gap: 10px; }
+.bvr-chip {
+  display: inline-flex; align-items: center; gap: 8px;
+  border: 1px solid var(--hairline-light);
+  background: #fff; color: var(--ink);
+  border-radius: 999px;
+  padding: 10px 16px;
+  font-size: 14px; font-family: inherit; font-style: normal;
+  cursor: pointer;
+  transition: border-color .2s, background .2s, color .2s;
+}
+.bvr-chip:hover { border-color: color-mix(in srgb, var(--pandan) 45%, transparent); }
+.bvr-chip.on { background: var(--pandan); border-color: var(--pandan); color: var(--sand); }
+.bvr-chip b { font-weight: 400; font-size: 12px; opacity: .75; }
+.bvr-chip i { font-style: normal; font-size: 9px; letter-spacing: .12em; text-transform: uppercase; opacity: .6; }
+.bvr-chip-core { background: color-mix(in srgb, var(--pandan) 9%, #fff); border-color: color-mix(in srgb, var(--pandan) 32%, transparent); cursor: default; }
+.bvr-chip-app b { color: var(--coral-deep); opacity: 1; }
+.bvr-chip-app.on b { color: var(--sand); }
+.bvr-applink { margin-top: 14px; font-size: 13px; }
+.bvr-applink a { color: var(--coral-deep); text-decoration: underline; text-underline-offset: 3px; }
+.bvr-receipt {
   background: #fff;
   border: 1px solid var(--hairline-light);
-  border-radius: 14px;
-  padding: 14px 16px;
-  cursor: pointer; font-family: inherit;
-  transition: border-color .2s, background .2s;
+  border-radius: 6px 6px 0 0;
+  padding: 22px 20px 26px;
+  transform: rotate(-.6deg);
+  box-shadow: 0 30px 60px -35px color-mix(in srgb, var(--pandan) 45%, transparent);
+  display: grid; gap: 14px; justify-items: start;
+  position: relative;
 }
-.bm-row:hover { border-color: color-mix(in srgb, var(--pandan) 45%, transparent); }
-.bm-row.on { border-color: var(--pandan); background: color-mix(in srgb, var(--pandan) 6%, #fff); }
-.bm-core { cursor: default; background: color-mix(in srgb, var(--pandan) 9%, #fff); border-color: color-mix(in srgb, var(--pandan) 32%, transparent); }
-.bm-check {
-  width: 22px; height: 22px; border-radius: 50%;
-  border: 2px dashed color-mix(in srgb, var(--ink) 30%, transparent);
-  flex-shrink: 0; display: grid; place-items: center;
-  transition: background .2s, border-color .2s;
+.bvr-receipt::after {
+  content: '';
+  position: absolute; left: 0; right: 0; bottom: -7px; height: 8px;
+  background:
+    linear-gradient(-45deg, #fff 5px, transparent 0),
+    linear-gradient(45deg, #fff 5px, transparent 0);
+  background-size: 14px 8px;
+  background-position: 0 0;
+  background-repeat: repeat-x;
 }
-.bm-check.on { border: none; background: var(--pandan); }
-.bm-check.on::after {
-  content: ''; width: 10px; height: 6px;
-  border-left: 2px solid #fff; border-bottom: 2px solid #fff;
-  transform: rotate(-45deg) translate(1px, -1px);
-}
-.bm-text { flex: 1; display: grid; gap: 2px; }
-.bm-text b { font-size: 15px; font-weight: 600; color: var(--ink); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.bm-text small { font-size: 12.5px; color: color-mix(in srgb, var(--ink) 55%, transparent); }
-.bm-price { font-size: 13px; color: var(--pandan); flex-shrink: 0; }
-.bm-app .bm-price { color: var(--coral-deep); }
-.bm-applink { font-size: 13px; padding-left: 52px; }
-.bm-applink a { color: var(--coral-deep); text-decoration: underline; text-underline-offset: 3px; }
-.builder-total {
-  position: sticky; top: 90px;
-  background: var(--pandan-night); color: var(--sand);
-  border-radius: 18px;
-  padding: 26px;
-  display: grid; gap: 12px; justify-items: start;
-}
-.builder-total .col-label { color: var(--sand-muted); border-color: var(--hairline-dark); }
-.bt-per { display: flex; align-items: baseline; gap: 8px; font-size: 30px; }
-.bt-line { font-size: 11px; letter-spacing: .1em; color: var(--leaf); }
-.bt-monthly { font-size: 15px; color: var(--sand-text); }
-.bt-hint { font-size: 13px; color: var(--sand-muted); border-top: 1px solid var(--hairline-dark); padding-top: 12px; }
-.bt-note { font-size: 11px; letter-spacing: .08em; color: var(--sand-muted); }
+.bvr-rhead { font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: color-mix(in srgb, var(--ink) 55%, transparent); border-bottom: 1px dashed var(--hairline-light); padding-bottom: 10px; width: 100%; }
+.bvr-lines { width: 100%; display: grid; gap: 7px; }
+.bvr-line { display: flex; justify-content: space-between; gap: 14px; font-size: 12.5px; color: var(--ink); }
+.bvr-line-sub { color: color-mix(in srgb, var(--ink) 55%, transparent); }
+.bvr-line-sub:first-of-type { border-top: 1px dashed var(--hairline-light); padding-top: 8px; }
+.bvr-total { border-top: 1px dashed var(--hairline-light); padding-top: 10px; font-size: 15px; font-weight: 600; color: var(--coral-deep); }
+.bvr-line-app { color: var(--coral-deep); }
+.bvr-hint { font-size: 13px; color: color-mix(in srgb, var(--ink) 62%, transparent); }
+.bvr-note { font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: color-mix(in srgb, var(--ink) 45%, transparent); }
 
 /* ============================================================
    BRANDED APP DEMO (/your-app)
@@ -2068,17 +2069,25 @@
   width: 92px; height: 26px; border-radius: 14px;
   background: var(--ink); z-index: 5;
 }
+/* one rounded container clips the whole stack, so the screen's corner
+   curve always matches the frame (per-piece radii clamp on short bits) */
+.bapp-inner {
+  position: relative;
+  flex: 1;
+  display: flex; flex-direction: column;
+  background: var(--bapp-screen);
+  border-radius: 36px;
+  overflow: hidden;
+}
 .bapp-status {
   display: flex; justify-content: space-between; align-items: center;
-  background: var(--bapp-screen); color: var(--ink);
-  border-radius: 36px 36px 0 0;
+  color: var(--ink);
   padding: 16px 24px 6px;
   font-size: 12px;
 }
 .bapp-status-icons { display: flex; gap: 6px; align-items: center; }
 .bapp-screen {
   position: relative;
-  background: var(--bapp-screen);
   height: 512px;
   padding: 8px 16px 14px;
   overflow: hidden;
@@ -2162,12 +2171,9 @@
 .bapp-toggle.on::after { transform: translateX(16px); }
 .bapp-msg b { display: block; font-size: 13px; font-weight: 600; }
 .bapp-msg small { font-size: 11.5px; color: color-mix(in srgb, var(--ink) 55%, transparent); }
-/* sheets cover the tab bar like a native app: they overlay the whole
-   inner screen (inset matches the frame padding), not just the view */
+/* sheets cover the tab bar like a native app; .bapp-inner clips them */
 .bapp-sheetwrap {
-  position: absolute; inset: 10px; z-index: 8;
-  border-radius: 36px;
-  overflow: hidden;
+  position: absolute; inset: 0; z-index: 8;
   background: color-mix(in srgb, var(--ink) 40%, transparent);
   display: flex; align-items: flex-end;
   animation: bappFade .2s var(--ease-out);
@@ -2176,7 +2182,7 @@
 .bapp-sheet {
   background: var(--bapp-screen);
   width: 100%;
-  border-radius: 18px 18px 36px 36px;
+  border-radius: 18px 18px 0 0;
   padding: 18px 16px 26px;
   text-align: center;
   animation: bappUp .28s var(--ease-out);
@@ -2187,7 +2193,7 @@
 .bapp-timer { font-size: 11px; color: color-mix(in srgb, var(--ink) 55%, transparent); margin-bottom: 10px; }
 .bapp-sheet-note { font-size: 12px; color: color-mix(in srgb, var(--ink) 72%, transparent); max-width: 32ch; margin-inline: auto; }
 .bapp-qr { width: 140px; margin: 0 auto 10px; }
-.bapp-tabs { display: flex; background: var(--bapp-screen); border-top: 1px solid var(--hairline-light); }
+.bapp-tabs { display: flex; border-top: 1px solid var(--hairline-light); }
 .bapp-tabs button {
   flex: 1; display: grid; justify-items: center; gap: 3px;
   padding: 9px 0 4px;
@@ -2196,94 +2202,5 @@
 }
 .bapp-tabs svg { width: 22px; }
 .bapp-tabs button.on { color: var(--bapp-accent); }
-.bapp-homebar { background: var(--bapp-screen); border-radius: 0 0 36px 36px; padding: 6px 0 9px; }
+.bapp-homebar { padding: 6px 0 9px; }
 .bapp-homebar::after { content: ''; display: block; width: 110px; height: 4px; border-radius: 2px; background: color-mix(in srgb, var(--ink) 30%, transparent); margin: 0 auto; }
-
-/* ============================================================
-   TEMPORARY: /design-variants (dv, bvr, bvs, pv blocks).
-   Delete the unpicked blocks together with the page.
-   ============================================================ */
-.dv-section { padding: clamp(70px, 10vh, 120px) 0; }
-.dv-dark { background: var(--pandan-night); }
-.dv-option { margin-bottom: clamp(60px, 9vh, 110px); }
-.dv-option:last-child { margin-bottom: 0; }
-.dv-label { font-family: var(--serif); font-weight: 540; font-size: clamp(22px, 2.4vw, 30px); color: var(--pandan); margin-bottom: 8px; }
-.dv-why { color: color-mix(in srgb, var(--ink) 62%, transparent); font-size: 15px; max-width: 56ch; margin-bottom: 26px; }
-.dv-phones { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(24px, 3vw, 48px); align-items: start; }
-@media (max-width: 1100px) { .dv-phones { grid-template-columns: 1fr; } }
-.dv-phone { display: grid; gap: 16px; }
-.dv-phone figcaption { text-align: center; font-size: 11px; letter-spacing: .12em; color: var(--sand-muted); text-transform: uppercase; }
-.dv-foot { margin-top: 44px; text-align: center; font-size: 11px; letter-spacing: .12em; color: var(--sand-muted); }
-
-/* A2: chips + receipt */
-.bvr { display: grid; grid-template-columns: 1.2fr 1fr; gap: clamp(24px, 3.5vw, 56px); align-items: start; }
-@media (max-width: 880px) { .bvr { grid-template-columns: 1fr; } }
-.bvr-chips-label { margin-top: 26px; }
-.bvr-chips { display: flex; flex-wrap: wrap; gap: 10px; }
-.bvr-chip {
-  display: inline-flex; align-items: center; gap: 8px;
-  border: 1px solid var(--hairline-light);
-  background: #fff; color: var(--ink);
-  border-radius: 999px;
-  padding: 10px 16px;
-  font-size: 14px; font-family: inherit; font-style: normal;
-  cursor: pointer;
-  transition: border-color .2s, background .2s, color .2s;
-}
-.bvr-chip:hover { border-color: color-mix(in srgb, var(--pandan) 45%, transparent); }
-.bvr-chip.on { background: var(--pandan); border-color: var(--pandan); color: var(--sand); }
-.bvr-chip b { font-weight: 400; font-size: 12px; opacity: .75; }
-.bvr-chip i { font-style: normal; font-size: 9px; letter-spacing: .12em; text-transform: uppercase; opacity: .6; }
-.bvr-chip-core { background: color-mix(in srgb, var(--pandan) 9%, #fff); border-color: color-mix(in srgb, var(--pandan) 32%, transparent); cursor: default; }
-.bvr-receipt {
-  background: #fff;
-  border: 1px solid var(--hairline-light);
-  border-radius: 6px 6px 0 0;
-  padding: 22px 20px 26px;
-  transform: rotate(-.6deg);
-  box-shadow: 0 30px 60px -35px color-mix(in srgb, var(--pandan) 45%, transparent);
-  display: grid; gap: 14px; justify-items: start;
-  position: relative;
-}
-.bvr-receipt::after {
-  content: '';
-  position: absolute; left: 0; right: 0; bottom: -7px; height: 8px;
-  background:
-    linear-gradient(-45deg, #fff 5px, transparent 0),
-    linear-gradient(45deg, #fff 5px, transparent 0);
-  background-size: 14px 8px;
-  background-position: 0 0;
-  background-repeat: repeat-x;
-}
-.bvr-rhead { font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: color-mix(in srgb, var(--ink) 55%, transparent); border-bottom: 1px dashed var(--hairline-light); padding-bottom: 10px; width: 100%; }
-.bvr-lines { width: 100%; display: grid; gap: 7px; }
-.bvr-line { display: flex; justify-content: space-between; gap: 14px; font-size: 12.5px; color: var(--ink); }
-.bvr-line-sub { color: color-mix(in srgb, var(--ink) 55%, transparent); }
-.bvr-line-sub:first-of-type { border-top: 1px dashed var(--hairline-light); padding-top: 8px; }
-.bvr-total { border-top: 1px dashed var(--hairline-light); padding-top: 10px; font-size: 15px; font-weight: 600; color: var(--coral-deep); }
-.bvr-hint { font-size: 13px; color: color-mix(in srgb, var(--ink) 62%, transparent); }
-.bvr-note { font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: color-mix(in srgb, var(--ink) 45%, transparent); }
-
-/* A3: quiz steps */
-.bvs { max-width: 640px; }
-.bvs-list { display: grid; gap: 8px; margin-bottom: 6px; }
-.bvs-list .bm-row { padding: 11px 14px; }
-.bvs-nav { display: flex; align-items: center; gap: 18px; margin-top: 20px; flex-wrap: wrap; }
-.bvs-btn { font-size: 14px; padding: 11px 22px; cursor: pointer; font-family: inherit; }
-.bvs-per { font-size: 30px; }
-.bvs-per .price { color: var(--coral-deep); }
-.bvs-line { font-size: 11px; letter-spacing: .1em; color: color-mix(in srgb, var(--leaf) 55%, var(--ink) 45%); margin-top: 6px; }
-.bvs-monthly { font-size: 15px; color: var(--ink); margin-top: 8px; }
-.bvs-hint { color: color-mix(in srgb, var(--ink) 62%, transparent); border-top-color: var(--hairline-light); margin-top: 10px; }
-
-/* B: phone presentation variants */
-.pv-light .bapp-phone {
-  background: color-mix(in srgb, var(--ink) 18%, var(--sand));
-  border-color: color-mix(in srgb, var(--ink) 35%, transparent);
-  box-shadow: 0 50px 100px -55px rgba(0,0,0,.65);
-}
-.pv-frameless .bapp-phone { background: transparent; border: none; padding: 0; box-shadow: none; filter: drop-shadow(0 40px 45px rgba(0,0,0,.35)); }
-.pv-frameless .bapp-island { display: none; }
-.pv-frameless .bapp-status { border-radius: 26px 26px 0 0; }
-.pv-frameless .bapp-homebar { border-radius: 0 0 26px 26px; }
-.pv-frameless .bapp-sheetwrap { inset: 0; border-radius: 26px; }

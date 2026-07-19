@@ -31,8 +31,10 @@ export default function YourAppPage() {
         <section className="ya-demo paper" data-theme="light">
           <div className="wrap ya-grid">
             <div className="ya-phone reveal">
-              <BrandAppDemo />
-              <p className="ya-hint mono">This demo works. Tap the tabs, show the QR, redeem a reward.</p>
+              <BrandAppDemo showStatePreviews />
+              <p className="ya-hint mono">
+                The demo starts like the real thing. Sign up, get stamped, redeem, edit your profile.
+              </p>
             </div>
             <div className="ya-copy">
               <p className="eyebrow reveal">A working sketch</p>

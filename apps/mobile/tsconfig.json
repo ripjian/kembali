@@ -1,0 +1,4 @@
+{
+  "extends": "@kembali/config/typescript/library.json",
+  "include": ["capacitor.config.ts"]
+}

@@ -1,0 +1,7 @@
+{
+  "appId": "app.kembali.demo.cornercoffee",
+  "appName": "Corner Coffee",
+  "tenant": "corner-coffee",
+  "devUrl": "http://localhost:3000/app",
+  "prodUrl": "https://kembali.app/app"
+}

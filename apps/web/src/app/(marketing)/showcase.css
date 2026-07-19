@@ -2333,3 +2333,72 @@
   font: inherit; letter-spacing: inherit; text-transform: inherit;
   color: var(--coral-deep);
 }
+
+/* ============================================================
+   TEMPORARY: /design-lab (dl-* block). The switcher re-themes real
+   components by overriding tokens inside .dl-scope. Derived tokens are
+   redeclared so they recompute against the overridden bases (custom
+   properties resolve where they are declared, not where they are used).
+   Delete this block with the page once the founder picks a combo.
+   ============================================================ */
+.dl-controls {
+  position: sticky; top: 0; z-index: 30;
+  background: var(--sand);
+  border-bottom: 1px solid var(--hairline-light);
+  padding: 14px 0;
+  color: var(--ink);
+}
+.dl-controls-inner { display: grid; gap: 10px; }
+.dl-group { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+.dl-group-label { font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: color-mix(in srgb, var(--ink) 55%, transparent); min-width: 64px; }
+.dl-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.dl-chip {
+  display: inline-flex; align-items: center; gap: 8px;
+  border: 1px solid var(--hairline-light);
+  background: #fff; color: var(--ink);
+  border-radius: 999px;
+  padding: 7px 14px;
+  font-size: 13px; font-family: inherit;
+  cursor: pointer;
+  transition: border-color .2s, background .2s, color .2s;
+}
+.dl-chip:hover { border-color: color-mix(in srgb, var(--pandan) 45%, transparent); }
+.dl-chip.on { background: var(--pandan); border-color: var(--pandan); color: var(--sand); }
+.dl-swatches { display: inline-flex; gap: 3px; }
+.dl-swatches i { width: 11px; height: 11px; border-radius: 50%; border: 1px solid color-mix(in srgb, var(--ink) 18%, transparent); }
+.dl-note { font-size: 11px; letter-spacing: .06em; color: color-mix(in srgb, var(--ink) 60%, transparent); }
+
+.dl-scope {
+  --sand-text: color-mix(in srgb, var(--sand) 88%, var(--pandan) 12%);
+  --sand-muted: color-mix(in srgb, var(--sand) 55%, var(--pandan) 45%);
+  --hairline-dark: color-mix(in srgb, var(--sand) 14%, transparent);
+  --hairline-light: color-mix(in srgb, var(--ink) 14%, transparent);
+  font-family: var(--sans);
+  color: var(--sand-text);
+}
+.dl-dark { background: var(--pandan-night); padding: clamp(60px, 8vh, 100px) 0; }
+.dl-paper { padding: clamp(60px, 8vh, 100px) 0; color: var(--ink); }
+.dl-label { display: block; font-size: 10px; letter-spacing: .18em; text-transform: uppercase; margin-bottom: 26px; }
+.dl-dark .dl-label { color: var(--sand-muted); }
+.dl-paper .dl-label { color: color-mix(in srgb, var(--ink) 55%, transparent); }
+.dl-title { color: var(--sand); max-width: 14ch; }
+.dl-accent { font-style: italic; color: var(--coral); font-variation-settings: 'opsz' 144; }
+.dl-title-ink { color: var(--pandan); max-width: 14ch; }
+.dl-sub { color: var(--sand-muted); max-width: 46ch; margin-bottom: 26px; font-size: clamp(15px, 1.3vw, 18px); }
+.dl-prose { color: color-mix(in srgb, var(--ink) 75%, transparent); max-width: 52ch; margin-bottom: 26px; }
+.dl-actions { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 30px; }
+.dl-chipcta { cursor: default; }
+.dl-ticker { color: var(--sand-muted); font-size: 12px; letter-spacing: .08em; border-top: 1px solid var(--hairline-dark); padding-top: 16px; }
+.dl-grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: clamp(28px, 4vw, 64px); align-items: center; }
+@media (max-width: 880px) { .dl-grid { grid-template-columns: 1fr; } }
+.dl-cardcol { max-width: 340px; width: 100%; margin-inline: auto; }
+.dl-faq { margin-bottom: 0; }
+.dl-dash { margin-top: 0; }
+.dl-dash .dw-bar i { transform: scaleY(1); }
+.dl-app .bapp-wrap { margin-top: 6px; }
+.dl-scope .bapp-phone { --bapp-accent: var(--pandan); }
+.dl-foot { text-align: center; font-size: 11px; letter-spacing: .12em; color: color-mix(in srgb, var(--ink) 50%, transparent); }
+
+/* per-pairing fixes: pixel mono runs small, Zain has no light weights */
+.dl-scope[data-font="crimson"] .mono { font-size: .92em; letter-spacing: .03em; }
+.dl-scope[data-font="zain"] .section-title { font-weight: 700; }

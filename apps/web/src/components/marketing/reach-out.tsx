@@ -118,7 +118,7 @@ export function ReachOut() {
   const [answers, setAnswers] = useState<Answers>({});
   const [shop, setShop] = useState("");
   const [reward, setReward] = useState("");
-  const [color, setColor] = useState("#101613");
+  const [color, setColor] = useState("#0F3D32");
 
   const question = QUESTIONS[step];
 
@@ -146,7 +146,7 @@ export function ReachOut() {
               className="ro-option"
               onClick={() => {
                 setAnswers((prev) => ({ ...prev, [question.id]: o }));
-                if (question.id === "business") setColor(DEFAULT_COLOR[o.id] ?? "#101613");
+                if (question.id === "business") setColor(DEFAULT_COLOR[o.id] ?? "#0F3D32");
                 setStep((s) => s + 1);
               }}
             >

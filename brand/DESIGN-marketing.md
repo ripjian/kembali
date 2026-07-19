@@ -41,40 +41,29 @@ element selector, wrap it in `:where()`.
 
 ## 2. Tokens
 
-**Sprout palette** (founder pick, 2026-07-19; supersedes Pandan on this surface
-only — the originals are kept as comments in `showcase.css`, and `/app` +
-`/admin` still wear Pandan). Never invent hex; derive with `color-mix`. Token
-NAMES keep their pandan/coral history; their ROLES are what they mean.
+Pandan palette only (BRAND.md §2). Never invent hex; derive with `color-mix`.
 
 | Token | Value | Role |
 |---|---|---|
-| `--pandan` / `--pandan-deep` / `--pandan-night` | `#101613` `#0B100D` `#070A08` | primary: near-black canvases, actions, the journey |
-| `--coral` / `--coral-deep` | `#58CC02` `#337A03` | **what you earn**: stamps, rewards, live status (deep is the AA text shade on paper, 5.1:1) |
-| `--leaf` | `#FFC800` | progress fills only |
-| `--sand` / `--sand-dim` | `#FAFAF2` `#EFEFE2` | paper sections, the floating hero shell |
-| `--ink` | `#141A16` | body text on paper |
+| `--pandan` / `--pandan-deep` / `--pandan-night` | `#0F3D32` `#0A2C24` `#071E18` | ink, dark canvases, the journey |
+| `--coral` / `--coral-deep` | `#E0684B` `#A93E24` | **what you earn**: stamps, rewards, live status |
+| `--leaf` | `#7FB069` | progress fills only |
+| `--sand` / `--sand-dim` | `#F6F1E3` `#EDE6D2` | paper sections, the floating hero shell |
+| `--ink` | `#16261E` | body text on sand |
 
-**Accent is earned, primary is action, progress fills. Never swap.** A merchant's
-brand colour may dress a card, but the stamps stay in the earned accent.
-
-**Dark-on-green is law:** white text on `#58CC02` is 2:1 and fails AA, so every
-bright-green surface (buttons, the story's accent flood, badges, selection)
-carries `--pandan-night` text at 9.5:1. Canvas 2D code cannot read CSS vars, so
-the ink-stamp engine hardcodes the Sprout literals; change them together.
+**Coral is earned, pandan is action, leaf is progress. Never swap.** A merchant's
+brand colour may dress a card, but the stamps stay coral.
 
 ## 3. Type
 
 | Role | Face | Notes |
 |---|---|---|
-| Display | **Zain** (300/400/700/800, no optical axis) | headlines at 700, the reward title at 400; italic accents are synthesised obliques |
-| Body | **Nunito** (variable) | 15 to 21px, `max-width` 40 to 62ch |
+| Display | **Fraunces** (variable, `opsz` 40 to 144) | headlines, card titles, the wordmark. Italic + coral for the one accent word per headline |
+| Body | **Plus Jakarta Sans** | 15 to 21px, `max-width` 40 to 62ch |
 | Technical | **IBM Plex Mono** | uppercase micro-labels, ledger rows, timestamps, captions |
 
-Zain + Nunito load through `next/font/google` in the marketing layout
-(self-hosted at build, CSP untouched); IBM Plex Mono stays as `@font-face` in
-`public/showcase/fonts`. The Fraunces/Jakarta faces remain on disk with their
-`@font-face` blocks for reference but nothing uses them. The mono voice is the
-product's voice: ledger lines, outlet names, code strings.
+Self-hosted `.woff2` in `public/showcase/fonts` via `@font-face`, `display: swap`.
+The mono voice is the product's voice: ledger lines, outlet names, code strings.
 
 ## 4. Sections
 

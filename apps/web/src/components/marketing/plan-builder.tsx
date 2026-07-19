@@ -11,11 +11,11 @@ import { useState } from "react";
  * and as a lead qualifier (the mailto carries the whole selection). */
 
 const CONTACT_EMAIL = "hello@kembali.app";
-const CORE_PRICE = 99;
-const CHAIN_DISCOUNT_AT = 5;
-const GROWTH_PRICE = 279;
+export const CORE_PRICE = 99;
+export const CHAIN_DISCOUNT_AT = 5;
+export const GROWTH_PRICE = 279;
 
-interface Module {
+export interface Module {
   id: string;
   label: string;
   note: string;
@@ -23,7 +23,7 @@ interface Module {
   live: boolean;
 }
 
-const MODULES: Module[] = [
+export const MODULES: Module[] = [
   {
     id: "points",
     label: "Points and rewards",
@@ -68,7 +68,16 @@ const MODULES: Module[] = [
   },
 ];
 
-function buildMailto(outlets: number, picked: Module[], app: boolean, monthly: number) {
+/** One source of truth for the estimate, shared with the design variants. */
+export function computeEstimate(outlets: number, pickedIds: Set<string>) {
+  const pickedModules = MODULES.filter((m) => pickedIds.has(m.id));
+  const perOutletFull = CORE_PRICE + pickedModules.reduce((sum, m) => sum + m.price, 0);
+  const discounted = outlets >= CHAIN_DISCOUNT_AT;
+  const perOutlet = discounted ? Math.round(perOutletFull * 0.8) : perOutletFull;
+  return { pickedModules, perOutletFull, discounted, perOutlet, monthly: perOutlet * outlets };
+}
+
+export function buildMailto(outlets: number, picked: Module[], app: boolean, monthly: number) {
   const body = [
     "Hi Kembali,",
     "",
@@ -98,11 +107,7 @@ export function PlanBuilder() {
       return next;
     });
 
-  const pickedModules = MODULES.filter((m) => picked.has(m.id));
-  const perOutletFull = CORE_PRICE + pickedModules.reduce((sum, m) => sum + m.price, 0);
-  const discounted = outlets >= CHAIN_DISCOUNT_AT;
-  const perOutlet = discounted ? Math.round(perOutletFull * 0.8) : perOutletFull;
-  const monthly = perOutlet * outlets;
+  const { pickedModules, discounted, perOutlet, monthly } = computeEstimate(outlets, picked);
   const growthCheaper = perOutlet >= GROWTH_PRICE;
 
   return (

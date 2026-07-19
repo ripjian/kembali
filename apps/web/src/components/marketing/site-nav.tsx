@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const LINKS = [
+  { href: "/", label: "Home" },
   { href: "/story", label: "Story" },
   { href: "/roadmap", label: "Roadmap" },
   { href: "/pricing", label: "Pricing" },
@@ -94,9 +95,6 @@ export function SiteNav() {
           </button>
         </div>
         <nav className="nd-links" aria-label="Menu">
-          <Link className={pathname === "/" ? "nd-active" : ""} href="/" onClick={close}>
-            Home
-          </Link>
           {LINKS.map((l) => (
             <Link
               key={l.href}

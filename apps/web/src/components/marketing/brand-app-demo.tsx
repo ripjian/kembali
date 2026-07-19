@@ -202,8 +202,6 @@ export function BrandAppDemo() {
           </div>
         )}
 
-        {qrOpen && <QrSheet onClose={() => setQrOpen(false)} />}
-        {couponFor && <CouponSheet onClose={() => setCouponFor(null)} />}
       </div>
 
       <nav className="bapp-tabs" aria-label="Demo app sections">
@@ -221,6 +219,10 @@ export function BrandAppDemo() {
         </button>
       </nav>
       <div className="bapp-homebar" aria-hidden />
+
+      {/* sheets sit at phone level so they cover the tab bar, like a real app */}
+      {qrOpen && <QrSheet onClose={() => setQrOpen(false)} />}
+      {couponFor && <CouponSheet onClose={() => setCouponFor(null)} />}
     </div>
   );
 }

@@ -2399,6 +2399,10 @@
 .dl-scope .bapp-phone { --bapp-accent: var(--pandan); }
 .dl-foot { text-align: center; font-size: 11px; letter-spacing: .12em; color: color-mix(in srgb, var(--ink) 50%, transparent); }
 
-/* per-pairing fixes: pixel mono runs small, Zain has no light weights */
+/* per-pairing fixes: pixel mono runs small, Zain has no light weights,
+   DM Serif Display ships a single 400, Space Mono runs wide */
 .dl-scope[data-font="crimson"] .mono { font-size: .92em; letter-spacing: .03em; }
 .dl-scope[data-font="zain"] .section-title { font-weight: 700; }
+.dl-scope[data-font="dmserif"] .section-title { font-weight: 400; }
+.dl-scope[data-font="dmserif"] .dc-name, .dl-scope[data-font="dmserif"] .bapp-greet { font-weight: 400; }
+.dl-scope[data-font="space"] .mono { letter-spacing: .04em; }

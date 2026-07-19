@@ -161,4 +161,5 @@ Everything à la carte = RM383 vs Growth RM279 (bundle saves ~27%); Core+Points+
 ### 9.4 Open (founder)
 - [ ] Approve/adjust §9.2 numbers and §9.3 ranges → then a Decision Log row in ROADMAP §13
 - [ ] Decide the branded-app minimum (6 outlets? 8?) and whether Founding merchants can ever buy it at Growth-equivalent terms
+- [x] App stack: **Capacitor** (founder, 2026-07-19; ROADMAP §13). Expo/RN is the fallback
 - [ ] SST treatment applies here too (§7)

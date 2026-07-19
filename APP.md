@@ -1,4 +1,11 @@
-# Kembali — Branded app plan (PROPOSAL, 2026-07-19, pending founder approval)
+# Kembali — Branded app plan (APPROVED by founder 2026-07-19; stack: Capacitor)
+
+> **Progress:** Stage 1 done 2026-07-19 (the /your-app demo now walks the whole
+> §2 journey, UAT'd; OTP uses the 888888 demo bypass until a provider exists).
+> Stage 2 scaffold done same day (`apps/mobile`: brand-driven Capacitor config,
+> check-brands gate, runbook). Native platforms + device run blocked on Xcode,
+> CocoaPods and Android Studio landing on the dev machine (founder, see
+> `apps/mobile/README.md`); production blocked on the OTP provider + domain.
 
 > The customer-side mobile app for chains (Growth + 6 outlets, PRICING.md §9.3).
 > Staff and owners stay on the web admin. The web PWA card remains the default
@@ -110,7 +117,8 @@ once, APNs/FCM free, local Xcode builds free (no EAS on the Capacitor path).
 No new per-outlet cost; long-lived sessions *reduce* OTP cost.
 
 ## 7. Open (founder)
-- [ ] Approve this plan and the stack (§3)
+- [x] Approve this plan and the stack (§3) — approved 2026-07-19, Capacitor; ROADMAP §13
 - [ ] OTP provider (blocks all real onboarding, app or web)
 - [ ] Apple Developer application for Kembali (weeks of lead time)
-- [ ] Confirm v1 scope: customer-only, no staff mode
+- [ ] Install Xcode + CocoaPods + Android Studio on the dev machine (unblocks `cap add ios/android`)
+- [ ] Confirm v1 scope: customer-only, no staff mode (assumed in Stages 1–2)

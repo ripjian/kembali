@@ -20,6 +20,17 @@ Logo colors: ink `#0F3D32` (deep pandan), stamp dot / final i `#E0684B` (coral).
 
 ## 2. Palette — Pandan (chosen)
 
+> **Marketing surface exception (founder, 2026-07-19):** the public site
+> (`(marketing)` routes) wears the **Sprout** palette — near-black canvas
+> `#101613`, cartoon-green earnings `#58CC02` (deep `#337A03` for small text,
+> AA-checked), sunny progress `#FFC800`, paper `#FAFAF2` — with **Zain +
+> Nunito** type (IBM Plex Mono stays the technical voice). Bright-green
+> surfaces always carry **dark** text (white fails contrast). The role grammar
+> below is unchanged: primary acts, accent is earned, progress fills. Tokens
+> and the kept Pandan originals live in `apps/web/src/app/(marketing)/showcase.css`;
+> see `brand/DESIGN-marketing.md`. Product surfaces (`/app`, `/admin`) and this
+> section's Pandan palette stay as-is pending a founder scope decision.
+
 Fresh, green, unmistakably SEA. Deep pandan ink + coral rewards + leaf progress on warm sand.
 
 ### Brand core

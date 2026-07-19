@@ -39,22 +39,34 @@
 }
 
 .sc-root {
-  --pandan: #0F3D32;
-  --pandan-deep: #0A2C24;
-  --pandan-night: #071E18;
-  --coral: #E0684B;
-  --coral-deep: #A93E24;
-  --leaf: #7FB069;
-  --sand: #F6F1E3;
-  --sand-dim: #EDE6D2;
-  --ink: #16261E;
+  /* Sprout palette (founder pick, 2026-07-19): near-black canvas, cartoon
+     green earnings, sunny progress. Token names keep their pandan/coral
+     history; the ROLES are what they mean (primary / earned / progress).
+     coral-deep is #337A03, darkened from the lab's #3E8F04 to clear AA
+     (5.1:1) as small text on paper.
+     Pandan originals, founder-kept for reference:
+       --pandan: #0F3D32;  --pandan-deep: #0A2C24;  --pandan-night: #071E18;
+       --coral: #E0684B;   --coral-deep: #A93E24;   --leaf: #7FB069;
+       --sand: #F6F1E3;    --sand-dim: #EDE6D2;     --ink: #16261E; */
+  --pandan: #101613;
+  --pandan-deep: #0B100D;
+  --pandan-night: #070A08;
+  --coral: #58CC02;
+  --coral-deep: #337A03;
+  --leaf: #FFC800;
+  --sand: #FAFAF2;
+  --sand-dim: #EFEFE2;
+  --ink: #141A16;
   --sand-text: color-mix(in srgb, var(--sand) 88%, var(--pandan) 12%);
   --sand-muted: color-mix(in srgb, var(--sand) 55%, var(--pandan) 45%);
   --hairline-dark: color-mix(in srgb, var(--sand) 14%, transparent);
   --hairline-light: color-mix(in srgb, var(--ink) 14%, transparent);
 
-  --serif: 'Fraunces', 'Iowan Old Style', serif;
-  --sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+  /* Zain + Nunito (founder pick, 2026-07-19), loaded via next/font in the
+     marketing layout; IBM Plex Mono stays the ledger voice.
+     Originals: --serif: 'Fraunces', ...; --sans: 'Plus Jakarta Sans', ... */
+  --serif: var(--font-zain), 'Zain', system-ui, sans-serif;
+  --sans: var(--font-nunito), 'Nunito', system-ui, sans-serif;
   --mono: 'IBM Plex Mono', ui-monospace, monospace;
 
   --ease-out: cubic-bezier(.16, 1, .3, 1);
@@ -77,7 +89,8 @@
 .wrap { width: var(--wrap); margin-inline: auto; }
 .mono { font-family: var(--mono); font-size: .72em; letter-spacing: .08em; }
 
-.sc-root ::selection { background: var(--coral); color: var(--sand); }
+/* dark text: sand on the bright green fails contrast (2:1) */
+.sc-root ::selection { background: var(--coral); color: var(--pandan-night); }
 
 /* ---------- loader ---------- */
 .loader {
@@ -148,7 +161,7 @@
 .topbar.hide { transform: translateY(-120%); }
 .topbar.t-light .lockup, .topbar.t-light .lockup-word { color: var(--pandan); }
 .topbar.t-light .chip-cta { background: var(--pandan); color: var(--sand); }
-.topbar.t-coral .lockup, .topbar.t-coral .lockup-word { color: var(--sand); }
+.topbar.t-coral .lockup, .topbar.t-coral .lockup-word { color: var(--pandan-night); }
 .topbar.t-coral .lockup-i { color: var(--pandan-deep); }
 .topbar.t-coral .lockup-mark circle[fill] { fill: var(--pandan-deep); }
 .topbar.t-coral .chip-cta { background: var(--pandan-deep); color: var(--sand); }
@@ -161,7 +174,9 @@
   padding: 14px 28px;
   transition: transform .25s var(--ease-out), background .25s, color .25s;
 }
-.btn-solid { background: var(--coral); color: #fff; }
+/* dark-on-green, the way the big green brands do it: white text on the
+   bright accent fails AA (2:1); night text clears 9:1 */
+.btn-solid { background: var(--coral); color: var(--pandan-night); }
 .btn-solid:hover { transform: translateY(-2px); background: color-mix(in srgb, var(--coral) 88%, #fff 12%); }
 .btn-ghost { border: 1px solid var(--hairline-dark); color: var(--sand-text); }
 .btn-ghost:hover { border-color: var(--sand-muted); transform: translateY(-2px); }
@@ -179,7 +194,8 @@
 .section-title {
   font-family: var(--serif);
   font-variation-settings: 'opsz' 130;
-  font-weight: 480;
+  /* Zain has no optical axis and no 480; 700 is its display weight */
+  font-weight: 700;
   font-size: clamp(38px, 6.2vw, 84px);
   line-height: 1.02;
   letter-spacing: -0.015em;
@@ -681,20 +697,23 @@
 .reward {
   position: relative;
   background: var(--coral);
-  color: var(--sand);
+  /* dark-on-green: sand text fails AA on the bright accent */
+  color: var(--pandan-night);
   padding: clamp(100px, 16vh, 190px) 0;
   overflow: clip;
 }
 .reward-ink { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 .reward-content { position: relative; z-index: 2; }
-.reward .ledger-tag { color: color-mix(in srgb, var(--sand) 80%, var(--coral) 20%); }
+.reward .ledger-tag { color: color-mix(in srgb, var(--pandan-night) 80%, var(--coral) 20%); }
 .reward-title {
   font-family: var(--serif);
   font-variation-settings: 'opsz' 144, 'wght' 340;
-  font-weight: 340;
+  /* Zain has no 340; 400 reads right at this size */
+  font-weight: 400;
   font-size: clamp(52px, 9vw, 140px);
   line-height: .96; letter-spacing: -0.02em;
-  color: #fff;
+  /* dark-on-green: white fails AA on the bright accent flood */
+  color: var(--pandan-night);
   margin-bottom: 50px;
 }
 .reward-grid {
@@ -723,8 +742,8 @@
 }
 .coupon-tear::before { left: -13px; }
 .coupon-tear::after { right: -13px; }
-.reward-copy p { max-width: 44ch; font-size: clamp(16px, 1.5vw, 20px); margin-bottom: 18px; color: color-mix(in srgb, #fff 88%, var(--coral) 12%); }
-.reward-fact { font-size: 12px; letter-spacing: .12em; color: color-mix(in srgb, var(--sand) 75%, var(--coral) 25%); }
+.reward-copy p { max-width: 44ch; font-size: clamp(16px, 1.5vw, 20px); margin-bottom: 18px; color: color-mix(in srgb, var(--pandan-night) 88%, var(--coral) 12%); }
+.reward-fact { font-size: 12px; letter-spacing: .12em; color: color-mix(in srgb, var(--pandan-night) 75%, var(--coral) 25%); }
 
 .redeemed-stamp {
   position: absolute; right: 18px; top: 12px;
@@ -1034,8 +1053,8 @@
 }
 .topbar.t-light .tn-link { color: color-mix(in srgb, var(--pandan) 62%, var(--sand) 38%); }
 .topbar.t-light .tn-link:hover, .topbar.t-light .tn-link.tn-active { color: var(--pandan); }
-.topbar.t-coral .tn-link { color: color-mix(in srgb, var(--sand) 80%, var(--coral) 20%); }
-.topbar.t-coral .tn-link:hover, .topbar.t-coral .tn-link.tn-active { color: #fff; }
+.topbar.t-coral .tn-link { color: color-mix(in srgb, var(--pandan-night) 75%, var(--coral) 25%); }
+.topbar.t-coral .tn-link:hover, .topbar.t-coral .tn-link.tn-active { color: var(--pandan-night); }
 
 /* ---------- mobile drawer nav ---------- */
 .nav-burger {
@@ -1229,7 +1248,7 @@
   padding: 3px 10px;
   color: color-mix(in srgb, var(--ink) 55%, transparent);
 }
-.rl-chip-live { background: var(--coral); border-color: var(--coral); color: #fff; }
+.rl-chip-live { background: var(--coral); border-color: var(--coral); color: var(--pandan-night); }
 .rl-rows { list-style: none; border-top: 1px solid var(--hairline-light); }
 .rl-row {
   display: grid;
@@ -1414,7 +1433,7 @@
 }
 .plan-flag {
   font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase;
-  color: #fff;
+  color: var(--pandan-night);
   background: var(--coral);
   border-radius: 999px;
   padding: 5px 12px;
@@ -1657,7 +1676,7 @@
   width: 26px; height: 26px; border-radius: 50%;
   border: 2px dashed color-mix(in srgb, var(--ink) 24%, transparent);
   display: grid; place-items: center;
-  font-size: 12px; color: #fff;
+  font-size: 12px; color: var(--pandan-night);
 }
 .st-dot:not(.st-free) { background: color-mix(in srgb, var(--coral) 16%, transparent); border-color: transparent; }
 .st-free { background: var(--coral); border-color: transparent; }
@@ -2334,75 +2353,3 @@
   color: var(--coral-deep);
 }
 
-/* ============================================================
-   TEMPORARY: /design-lab (dl-* block). The switcher re-themes real
-   components by overriding tokens inside .dl-scope. Derived tokens are
-   redeclared so they recompute against the overridden bases (custom
-   properties resolve where they are declared, not where they are used).
-   Delete this block with the page once the founder picks a combo.
-   ============================================================ */
-.dl-controls {
-  position: sticky; top: 0; z-index: 30;
-  background: var(--sand);
-  border-bottom: 1px solid var(--hairline-light);
-  padding: 14px 0;
-  color: var(--ink);
-}
-.dl-controls-inner { display: grid; gap: 10px; }
-.dl-group { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
-.dl-group-label { font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: color-mix(in srgb, var(--ink) 55%, transparent); min-width: 64px; }
-.dl-chips { display: flex; gap: 8px; flex-wrap: wrap; }
-.dl-chip {
-  display: inline-flex; align-items: center; gap: 8px;
-  border: 1px solid var(--hairline-light);
-  background: #fff; color: var(--ink);
-  border-radius: 999px;
-  padding: 7px 14px;
-  font-size: 13px; font-family: inherit;
-  cursor: pointer;
-  transition: border-color .2s, background .2s, color .2s;
-}
-.dl-chip:hover { border-color: color-mix(in srgb, var(--pandan) 45%, transparent); }
-.dl-chip.on { background: var(--pandan); border-color: var(--pandan); color: var(--sand); }
-.dl-swatches { display: inline-flex; gap: 3px; }
-.dl-swatches i { width: 11px; height: 11px; border-radius: 50%; border: 1px solid color-mix(in srgb, var(--ink) 18%, transparent); }
-.dl-note { font-size: 11px; letter-spacing: .06em; color: color-mix(in srgb, var(--ink) 60%, transparent); }
-
-.dl-scope {
-  --sand-text: color-mix(in srgb, var(--sand) 88%, var(--pandan) 12%);
-  --sand-muted: color-mix(in srgb, var(--sand) 55%, var(--pandan) 45%);
-  --hairline-dark: color-mix(in srgb, var(--sand) 14%, transparent);
-  --hairline-light: color-mix(in srgb, var(--ink) 14%, transparent);
-  font-family: var(--sans);
-  color: var(--sand-text);
-}
-.dl-dark { background: var(--pandan-night); padding: clamp(60px, 8vh, 100px) 0; }
-.dl-paper { padding: clamp(60px, 8vh, 100px) 0; color: var(--ink); }
-.dl-label { display: block; font-size: 10px; letter-spacing: .18em; text-transform: uppercase; margin-bottom: 26px; }
-.dl-dark .dl-label { color: var(--sand-muted); }
-.dl-paper .dl-label { color: color-mix(in srgb, var(--ink) 55%, transparent); }
-.dl-title { color: var(--sand); max-width: 14ch; }
-.dl-accent { font-style: italic; color: var(--coral); font-variation-settings: 'opsz' 144; }
-.dl-title-ink { color: var(--pandan); max-width: 14ch; }
-.dl-sub { color: var(--sand-muted); max-width: 46ch; margin-bottom: 26px; font-size: clamp(15px, 1.3vw, 18px); }
-.dl-prose { color: color-mix(in srgb, var(--ink) 75%, transparent); max-width: 52ch; margin-bottom: 26px; }
-.dl-actions { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 30px; }
-.dl-chipcta { cursor: default; }
-.dl-ticker { color: var(--sand-muted); font-size: 12px; letter-spacing: .08em; border-top: 1px solid var(--hairline-dark); padding-top: 16px; }
-.dl-grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: clamp(28px, 4vw, 64px); align-items: center; }
-@media (max-width: 880px) { .dl-grid { grid-template-columns: 1fr; } }
-.dl-cardcol { max-width: 340px; width: 100%; margin-inline: auto; }
-.dl-faq { margin-bottom: 0; }
-.dl-dash { margin-top: 0; }
-.dl-dash .dw-bar i { transform: scaleY(1); }
-.dl-app .bapp-wrap { margin-top: 6px; }
-.dl-scope .bapp-phone { --bapp-accent: var(--pandan); }
-.dl-foot { text-align: center; font-size: 11px; letter-spacing: .12em; color: color-mix(in srgb, var(--ink) 50%, transparent); }
-
-/* per-pairing fixes: pixel mono runs small, Zain has no light weights,
-   DM Serif Display ships a single 400, Space Mono runs wide */
-.dl-scope[data-font="crimson"] .mono { font-size: .92em; letter-spacing: .03em; }
-.dl-scope[data-font="zain"] .section-title { font-weight: 700; }
-.dl-scope[data-font="dmserif"] .section-title { font-weight: 400; }
-.dl-scope[data-font="dmserif"] .dc-name, .dl-scope[data-font="dmserif"] .bapp-greet { font-weight: 400; }
-.dl-scope[data-font="space"] .mono { letter-spacing: .04em; }

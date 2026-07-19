@@ -312,7 +312,7 @@ export function initShowcase(): () => void {
   const phoneScreen = document.getElementById("phoneScreen");
   const joinPhone = document.getElementById("joinPhone");
   if (phoneScreen && joinPhone) {
-    const brandRow = `<div class="ps-brand"><svg viewBox="0 0 96 96"><circle cx="48" cy="48" r="34" fill="none" stroke="currentColor" stroke-width="10"/><circle cx="48" cy="48" r="12" fill="#E0684B"/></svg><span>Corner Coffee</span></div>`;
+    const brandRow = `<div class="ps-brand"><svg viewBox="0 0 96 96"><circle cx="48" cy="48" r="34" fill="none" stroke="currentColor" stroke-width="10"/><circle cx="48" cy="48" r="12" fill="var(--coral)"/></svg><span>Corner Coffee</span></div>`;
     phoneScreen.innerHTML = `
       <div class="ps ps-join">${brandRow}
         <h4>Your card at Corner Coffee</h4>
@@ -401,7 +401,7 @@ export function initShowcase(): () => void {
   let ledgerTotal: HTMLElement | null = null;
   const amounts = [8.5, 4, 9, 4, 5.5, 8.5, 4, 10];
   if (bcGrid) {
-    const stampSVG = `<svg viewBox="0 0 96 96"><circle cx="48" cy="48" r="34" fill="none" stroke="#E0684B" stroke-width="11"/><circle cx="48" cy="48" r="13" fill="#E0684B"/></svg>`;
+    const stampSVG = `<svg viewBox="0 0 96 96"><circle cx="48" cy="48" r="34" fill="none" stroke="var(--coral)" stroke-width="11"/><circle cx="48" cy="48" r="13" fill="var(--coral)"/></svg>`;
     for (let i = 0; i < 10; i++) {
       const c = document.createElement("div");
       c.className = "bc-stamp";
@@ -490,13 +490,13 @@ export function initShowcase(): () => void {
     const fade = clamp(1 - t / 2.6, 0, 1);
     const cx = inkCv.width * 0.5;
     const cy = inkCv.height * 0.34;
-    inkCtx.strokeStyle = "#F6F1E3";
+    inkCtx.strokeStyle = "#FAFAF2";
     inkCtx.globalAlpha = clamp(0.5 - t * 0.5, 0, 1);
     inkCtx.lineWidth = Math.max(1, 26 - t * 40);
     inkCtx.beginPath();
     inkCtx.arc(cx, cy, t * 900, 0, 7);
     inkCtx.stroke();
-    inkCtx.fillStyle = "#F6F1E3";
+    inkCtx.fillStyle = "#FAFAF2";
     for (const p of burstParts) {
       p.x += p.vx; p.y += p.vy; p.vy += 0.14; p.vx *= 0.984; p.vy *= 0.99; p.ang += p.spin;
       inkCtx.globalAlpha = p.o * fade * 0.85;
@@ -725,8 +725,8 @@ export function initShowcase(): () => void {
     const pop = age < 0.3 ? 1 + (0.3 - age) * 1.4 : 1;
     ictx.scale(pop * d, pop * d);
     ictx.globalAlpha = clamp(age * 6, 0, 0.82);
-    ictx.strokeStyle = "#E0684B";
-    ictx.fillStyle = "#E0684B";
+    ictx.strokeStyle = "#58CC02";
+    ictx.fillStyle = "#58CC02";
     ictx.lineWidth = s.size * 0.18;
     ictx.beginPath();
     ictx.arc(0, 0, s.size * 0.68, s.seed, s.seed + Math.PI * 1.86);

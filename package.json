@@ -17,6 +17,6 @@
     "db:seed": "pnpm --filter @kembali/db db:seed"
   },
   "devDependencies": {
-    "turbo": "^2.10.4"
+    "turbo": "^2.10.5"
   }
 }

@@ -23,7 +23,7 @@
     "@capacitor/cli": "^8.0.0",
     "@kembali/config": "workspace:*",
     "@types/node": "^22.10.5",
-    "eslint": "^10.6.0",
+    "eslint": "^10.7.0",
     "typescript": "^5.9.3"
   }
 }

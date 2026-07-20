@@ -14,7 +14,7 @@
     "@kembali/core": "workspace:*",
     "@kembali/db": "workspace:*",
     "@kembali/ui": "workspace:*",
-    "@sentry/nextjs": "^10.63.0",
+    "@sentry/nextjs": "^10.66.0",
     "drizzle-orm": "^0.45.2",
     "next": "^16.2.10",
     "pdf-lib": "^1.17.1",
@@ -25,13 +25,13 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4.3.2",
+    "@tailwindcss/postcss": "^4.3.3",
     "@types/node": "^24.0.0",
     "@types/qrcode": "^1.5.6",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
-    "eslint": "^10.6.0",
-    "tailwindcss": "^4.3.2",
+    "eslint": "^10.7.0",
+    "tailwindcss": "^4.3.3",
     "typescript": "^5.9.3"
   }
 }

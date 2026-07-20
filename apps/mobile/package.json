@@ -24,6 +24,6 @@
     "@kembali/config": "workspace:*",
     "@types/node": "^22.10.5",
     "eslint": "^10.6.0",
-    "typescript": "^5.9.3"
+    "typescript": "^7.0.2"
   }
 }

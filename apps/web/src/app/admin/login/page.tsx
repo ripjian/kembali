@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { formatRetryAfter } from "@kembali/core";
 import { LogoWordmark } from "@kembali/ui";
 
 import { adminLogin } from "@/lib/admin-actions";
@@ -9,10 +10,15 @@ export const dynamic = "force-dynamic";
 export default async function AdminLoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; locked?: string }>;
 }) {
   if (await getAdminContext()) redirect("/admin");
-  const { error } = await searchParams;
+  const { error, locked } = await searchParams;
+  const lockedSeconds = Number(locked);
+  const lockedWait =
+    Number.isFinite(lockedSeconds) && lockedSeconds > 0
+      ? formatRetryAfter(lockedSeconds)
+      : null;
 
   return (
     <main className="mx-auto flex min-h-dvh max-w-sm flex-col justify-center gap-6 px-5 py-10">
@@ -59,7 +65,14 @@ export default async function AdminLoginPage({
         </button>
       </form>
 
-      {error && (
+      {lockedWait && (
+        <p role="alert" className="rounded-xl border border-error/40 bg-surface px-4 py-3 text-sm text-error">
+          Too many sign-in attempts. Try again in {lockedWait}. If you have
+          forgotten your password, ask your store owner to set a new one.
+        </p>
+      )}
+
+      {error && !lockedWait && (
         <p role="alert" className="rounded-xl border border-error/40 bg-surface px-4 py-3 text-sm text-error">
           Email or password didn&apos;t match. Check them and try again.
         </p>

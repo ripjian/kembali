@@ -1,15 +1,24 @@
 import { NextResponse } from "next/server";
 
 import {
+  formatRetryAfter,
   generateOtpCode,
   hashOtpCode,
   OTP_DEV_BYPASS_CODE,
+  OTP_REQUEST_IP_POLICY,
+  OTP_REQUEST_PHONE_POLICY,
   OTP_TTL_MINUTES,
 } from "@kembali/core";
 import { schema, withTenant } from "@kembali/db";
 import { and, eq, gt, isNull } from "drizzle-orm";
 import { z } from "zod";
 
+import {
+  clientAddressKey,
+  consumeAuthAttempt,
+  logLockout,
+  pruneAuthAttempts,
+} from "@/lib/auth-throttle";
 import { getDb } from "@/lib/db";
 import { resolveJoinTenantId } from "@/lib/join";
 import { getOtpSender, OTP_DEV_NOTICE } from "@/lib/otp-sender";
@@ -33,6 +42,31 @@ export async function POST(req: Request) {
   }
 
   const db = await getDb();
+
+  // Send caps (SECURITY.md rule 6). Every send is charged, delivered or not:
+  // the limit is on volume, because each message costs money and sender
+  // reputation. Recording before deciding is what holds the cap against a
+  // parallel burst; the failures are never cleared on this path for the same
+  // reason. The per-phone limit does the abuse work, so the per-address cap
+  // can stay high enough for a real counter queue on shop wifi.
+  const address = await clientAddressKey();
+  const keys = { identifier: phone, addressKey: address };
+  const throttle = await consumeAuthAttempt(db, {
+    kind: "otp_request",
+    identifier: phone,
+    addressKey: address,
+    pairPolicy: OTP_REQUEST_PHONE_POLICY,
+    identityPolicy: OTP_REQUEST_PHONE_POLICY,
+    ipPolicy: OTP_REQUEST_IP_POLICY,
+  });
+  if (throttle.locked) {
+    logLockout("otp_request", throttle, keys);
+    return NextResponse.json(
+      { error: `Too many codes requested. Try again in ${formatRetryAfter(throttle.retryAfterSeconds)}.` },
+      { status: 429, headers: { "Retry-After": String(throttle.retryAfterSeconds) } },
+    );
+  }
+
   const code = generateOtpCode();
   const tenantId = await resolveJoinTenantId(
     parsed.success ? parsed.data.tenantId : undefined,
@@ -70,6 +104,11 @@ export async function POST(req: Request) {
   // Deliver via the configured provider. NullSender (no provider yet) sends
   // nothing; a real WhatsApp/SMS sender slots in here with no route changes.
   await getOtpSender().send(phone, code);
+
+  await pruneAuthAttempts(db, "otp_request", [
+    OTP_REQUEST_PHONE_POLICY,
+    OTP_REQUEST_IP_POLICY,
+  ]);
 
   // With no provider connected (dev only), print the code so it can still be
   // used (code only - never the phone number; SECURITY.md rule 10).

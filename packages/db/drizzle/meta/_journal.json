@@ -99,6 +99,13 @@
       "when": 1783704640722,
       "tag": "0013_tenant_brand_colors",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1785386828518,
+      "tag": "0014_auth_attempts",
+      "breakpoints": true
     }
   ]
 }

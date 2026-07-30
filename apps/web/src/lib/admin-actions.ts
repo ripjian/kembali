@@ -3,9 +3,14 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
+import { randomBytes } from "node:crypto";
+
 import {
   hashPassword,
   verifyPassword,
+  LOGIN_IDENTITY_POLICY,
+  LOGIN_IP_POLICY,
+  LOGIN_PAIR_POLICY,
   PERMISSION_KEYS,
   type RolePermissionMatrix,
 } from "@kembali/core";
@@ -14,6 +19,13 @@ import { and, asc, eq, ne, sql } from "drizzle-orm";
 import { z } from "zod";
 
 import { destroySessions, getAdminContext, startAdminSession } from "./auth";
+import {
+  clearAuthFailures,
+  clientAddressKey,
+  consumeAuthAttempt,
+  logLockout,
+  pruneAuthAttempts,
+} from "./auth-throttle";
 import { getDb } from "./db";
 import { modulesSchema } from "./modules";
 import { authorizeTenantAction } from "./panel";
@@ -58,6 +70,17 @@ const loginSchema = z.object({
   password: z.string().min(1),
 });
 
+/** A real scrypt hash of a value nobody can supply, so a login for an
+ * unknown email still pays the hashing cost. Without this, "no such user"
+ * returns in microseconds while a wrong password takes ~100ms, and that gap
+ * enumerates staff emails (ASVS V2.2.1). Built on first use, not at import:
+ * scrypt at module load blocks the event loop during cold start and build. */
+let decoyHashCache: string | null = null;
+function decoyHash(): string {
+  decoyHashCache ??= hashPassword(randomBytes(32).toString("hex"));
+  return decoyHashCache;
+}
+
 export async function adminLogin(formData: FormData) {
   const parsed = loginSchema.safeParse({
     email: formData.get("email"),
@@ -67,11 +90,31 @@ export async function adminLogin(formData: FormData) {
   const { email, password } = parsed.data;
   const db = await getDb();
 
+  // Record and judge this attempt before touching credentials (SECURITY.md
+  // rule 6). Recording first is what makes the cap hold against parallel
+  // requests. The lockout message is identical for every email, so it cannot
+  // be used to discover which accounts exist.
+  const address = await clientAddressKey();
+  const keys = { identifier: email, addressKey: address };
+  const throttle = await consumeAuthAttempt(db, {
+    kind: "login",
+    identifier: email,
+    addressKey: address,
+    pairPolicy: LOGIN_PAIR_POLICY,
+    identityPolicy: LOGIN_IDENTITY_POLICY,
+    ipPolicy: LOGIN_IP_POLICY,
+  });
+  if (throttle.locked) {
+    logLockout("login", throttle, keys);
+    redirect(`/admin/login?locked=${throttle.retryAfterSeconds}`);
+  }
+
   const [admin] = await db
     .select()
     .from(schema.platformAdmins)
     .where(eq(schema.platformAdmins.email, email));
   if (admin && verifyPassword(password, admin.passwordHash)) {
+    await clearAuthFailures(db, { kind: "login", ...keys });
     await startAdminSession(db, "platform", admin.id, null);
     redirect("/admin");
   }
@@ -84,9 +127,20 @@ export async function adminLogin(formData: FormData) {
     return row ?? null;
   });
   if (staff?.passwordHash && verifyPassword(password, staff.passwordHash)) {
+    await clearAuthFailures(db, { kind: "login", ...keys });
     await startAdminSession(db, "staff", staff.id, staff.tenantId);
     redirect("/admin");
   }
+
+  // Unknown email, or a known email with no password set: still hash, so the
+  // response time matches a genuine wrong-password attempt.
+  if (!admin && !staff?.passwordHash) verifyPassword(password, decoyHash());
+
+  await pruneAuthAttempts(db, "login", [
+    LOGIN_PAIR_POLICY,
+    LOGIN_IDENTITY_POLICY,
+    LOGIN_IP_POLICY,
+  ]);
   redirect("/admin/login?error=1");
 }
 

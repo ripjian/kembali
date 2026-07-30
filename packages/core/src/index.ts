@@ -24,8 +24,24 @@ export {
 } from "./otp";
 export { needsRegistration } from "./registration";
 export {
+  evaluateThrottle,
+  throttlePruneCutoff,
+  widestSpanSeconds,
+  formatRetryAfter,
+  LOGIN_PAIR_POLICY,
+  LOGIN_IDENTITY_POLICY,
+  LOGIN_IP_POLICY,
+  OTP_REQUEST_PHONE_POLICY,
+  OTP_REQUEST_IP_POLICY,
+  OTP_VERIFY_PAIR_POLICY,
+  OTP_VERIFY_IP_POLICY,
+  type ThrottlePolicy,
+  type ThrottleVerdict,
+} from "./throttle";
+export {
   hashPassword,
   verifyPassword,
+  hashAuthIdentifier,
   createSessionToken,
   hashSessionToken,
   signQrToken,

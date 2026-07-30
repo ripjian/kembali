@@ -42,6 +42,22 @@ export function hashSessionToken(token: string): string {
   return createHash("sha256").update(token).digest("hex");
 }
 
+/* ---- security-log keys ----------------------------------------------- */
+
+/**
+ * Key for the auth-attempt log: emails, phone numbers and IP addresses are
+ * personal data (SECURITY.md rule 10, PDPA), but throttling only needs to
+ * count them. HMAC with the app secret keeps the log countable without
+ * storing the values, and without letting a leaked table be reversed by
+ * hashing a phone book.
+ *
+ * Case and surrounding space are normalised so "A@b.com " and "a@b.com"
+ * cannot be used as two separate buckets to double the allowance.
+ */
+export function hashAuthIdentifier(value: string, secret: string): string {
+  return createHmac("sha256", secret).update(value.trim().toLowerCase()).digest("hex");
+}
+
 /* ---- customer QR tokens (signed, short TTL - SECURITY.md rule 5) ------ */
 
 const qrPayloadSchema = z.object({

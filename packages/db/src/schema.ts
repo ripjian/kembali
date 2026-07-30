@@ -53,6 +53,11 @@ const tenantId = () =>
 
 export const staffRole = pgEnum("staff_role", ["owner", "manager", "cashier"]);
 export const sessionKind = pgEnum("session_kind", ["customer", "staff", "platform"]);
+export const authAttemptKind = pgEnum("auth_attempt_kind", [
+  "login",
+  "otp_request",
+  "otp_verify",
+]);
 export const cardStatus = pgEnum("card_status", ["active", "completed", "revoked"]);
 export const stampSource = pgEnum("stamp_source", ["qr", "manual"]);
 export const rewardState = pgEnum("reward_state", ["earned", "redeemed", "expired"]);
@@ -235,6 +240,38 @@ export const sessions = pgTable(
       withCheck: sql`true`,
     }),
     index("sessions_expiry_idx").on(t.expiresAt),
+  ],
+);
+
+export const authAttempts = pgTable(
+  "auth_attempts",
+  {
+    id: id(),
+    kind: authAttemptKind("kind").notNull(),
+    /** HMAC of the email or phone being targeted: countable, not minable
+     * (SECURITY.md rule 10 - personal data stays out of the security log). */
+    identifierHash: text("identifier_hash").notNull(),
+    /** HMAC of the client address; null when the platform gives us none. */
+    ipHash: text("ip_hash"),
+    succeeded: boolean("succeeded").notNull().default(false),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    // Global auth infrastructure, like `sessions`: no tenant business data,
+    // and login attempts for platform admins have no tenant at all. Keyed
+    // by unguessable hashes and deliberately outside tenant RLS
+    // (SECURITY.md §4).
+    pgPolicy("auth_attempts_app_access", {
+      for: "all",
+      to: appRole,
+      using: sql`true`,
+      withCheck: sql`true`,
+    }),
+    index("auth_attempts_identity_idx").on(t.kind, t.identifierHash, t.createdAt),
+    index("auth_attempts_ip_idx").on(t.kind, t.ipHash, t.createdAt),
+    // Pruning deletes by (kind, created_at) on every auth failure, which
+    // matches neither index above as a prefix.
+    index("auth_attempts_prune_idx").on(t.kind, t.createdAt),
   ],
 );
 

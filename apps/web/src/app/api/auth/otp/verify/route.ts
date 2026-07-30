@@ -1,16 +1,26 @@
 import { NextResponse } from "next/server";
 
 import {
+  formatRetryAfter,
   hashOtpCode,
   isOtpBypass,
   needsRegistration,
   OTP_MAX_ATTEMPTS,
+  OTP_VERIFY_IP_POLICY,
+  OTP_VERIFY_PAIR_POLICY,
 } from "@kembali/core";
 import { schema, withTenant } from "@kembali/db";
 import { and, asc, desc, eq, gt, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
 
 import { startCustomerSession } from "@/lib/auth";
+import {
+  clearAuthFailures,
+  clientAddressKey,
+  consumeAuthAttempt,
+  logLockout,
+  pruneAuthAttempts,
+} from "@/lib/auth-throttle";
 import { OTP_BYPASS_ENABLED } from "@/lib/config";
 import { getDb } from "@/lib/db";
 import { resolveJoinTenantId } from "@/lib/join";
@@ -37,6 +47,28 @@ export async function POST(req: Request) {
   }
   const { code } = parsed.data;
   const db = await getDb();
+
+  // The per-code attempt cap stops one code being brute-forced; these stop a
+  // host cycling codes across phones (SECURITY.md rule 6). Recorded before
+  // the decision so a parallel burst cannot walk through the cap.
+  const address = await clientAddressKey();
+  const keys = { identifier: phone, addressKey: address };
+  const throttle = await consumeAuthAttempt(db, {
+    kind: "otp_verify",
+    identifier: phone,
+    addressKey: address,
+    pairPolicy: OTP_VERIFY_PAIR_POLICY,
+    identityPolicy: OTP_VERIFY_PAIR_POLICY,
+    ipPolicy: OTP_VERIFY_IP_POLICY,
+  });
+  if (throttle.locked) {
+    logLockout("otp_verify", throttle, keys);
+    return NextResponse.json(
+      { error: `Too many attempts. Try again in ${formatRetryAfter(throttle.retryAfterSeconds)}.` },
+      { status: 429, headers: { "Retry-After": String(throttle.retryAfterSeconds) } },
+    );
+  }
+
   const tenantId = await resolveJoinTenantId(parsed.data.tenantId);
 
   const result = await withTenant(db, tenantId, async (tx) => {
@@ -111,12 +143,19 @@ export async function POST(req: Request) {
   });
 
   if (!result.ok) {
+    // The attempt is already recorded; just keep the table tidy.
+    await pruneAuthAttempts(db, "otp_verify", [
+      OTP_VERIFY_PAIR_POLICY,
+      OTP_VERIFY_IP_POLICY,
+    ]);
     return NextResponse.json(
       { error: "That code didn't match. Check it or request a new one." },
       { status: 400 },
     );
   }
 
+  // A correct code clears this phone's failures from this address.
+  await clearAuthFailures(db, { kind: "otp_verify", ...keys });
   await startCustomerSession(db, result.customerId, tenantId);
   return NextResponse.json({ ok: true, needsProfile: result.needsProfile });
 }

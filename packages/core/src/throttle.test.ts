@@ -3,9 +3,12 @@ import { describe, expect, it } from "vitest";
 import {
   evaluateThrottle,
   formatRetryAfter,
+  LOGIN_DEVICE_PAIR_POLICY,
+  LOGIN_DEVICE_POLICY,
   LOGIN_IDENTITY_POLICY,
   LOGIN_IP_POLICY,
   LOGIN_PAIR_POLICY,
+  OTP_REQUEST_DEVICE_POLICY,
   OTP_REQUEST_IP_POLICY,
   OTP_REQUEST_PHONE_POLICY,
   throttlePruneCutoff,
@@ -148,6 +151,33 @@ describe("policy shape", () => {
     expect(OTP_REQUEST_IP_POLICY.maxFailures).toBeGreaterThan(
       OTP_REQUEST_PHONE_POLICY.maxFailures * 5,
     );
+  });
+});
+
+describe("device policy shape", () => {
+  it("locks one browser on one account as fast as the address pair does", () => {
+    // A person who mistypes five times should see the same wait whichever
+    // key notices first, so the two tight limits agree.
+    expect(LOGIN_DEVICE_PAIR_POLICY.maxFailures).toBe(LOGIN_PAIR_POLICY.maxFailures);
+  });
+
+  it("is tighter on one browser across accounts than on a shared address", () => {
+    // One browser working through a list of accounts is not a shared office.
+    // Safe to be strict: nobody can pin this key on a stranger.
+    expect(LOGIN_DEVICE_POLICY.maxFailures).toBeLessThan(LOGIN_IP_POLICY.maxFailures);
+  });
+
+  it("keeps one phone from spending the whole shop's send budget", () => {
+    expect(OTP_REQUEST_DEVICE_POLICY.maxFailures).toBeLessThan(
+      OTP_REQUEST_IP_POLICY.maxFailures,
+    );
+  });
+
+  it("never lets the device limit be the only thing standing in the way", () => {
+    // Clearing cookies resets the device key, so the address limits must
+    // remain meaningful on their own.
+    expect(LOGIN_IP_POLICY.maxFailures).toBeGreaterThan(0);
+    expect(OTP_REQUEST_IP_POLICY.maxFailures).toBeGreaterThan(0);
   });
 });
 

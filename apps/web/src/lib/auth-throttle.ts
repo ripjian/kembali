@@ -1,6 +1,8 @@
 import "server-only";
 
-import { headers } from "next/headers";
+import { randomBytes } from "node:crypto";
+
+import { cookies, headers } from "next/headers";
 
 import {
   evaluateThrottle,
@@ -13,7 +15,7 @@ import { schema, type KembaliDb } from "@kembali/db";
 import { and, eq, gte, lt, or } from "drizzle-orm";
 import { z } from "zod";
 
-import { qrTokenSecret } from "./config";
+import { IS_PRODUCTION, qrTokenSecret } from "./config";
 
 /* Storage and counting for auth throttling (SECURITY.md rule 6).
  * The policy arithmetic is pure and tested in `@kembali/core/throttle`.
@@ -56,6 +58,46 @@ function pepper(): string {
  * table by hashing a phone book. */
 const identityKey = (value: string) => hashAuthIdentifier(`authid:v1:${value}`, pepper());
 const addressKey = (value: string) => hashAuthIdentifier(`ip:v1:${value}`, pepper());
+const deviceHashOf = (value: string) => hashAuthIdentifier(`device:v1:${value}`, pepper());
+
+/* ---- device key ------------------------------------------------------- */
+
+/** Opaque, httpOnly, security-only. Not readable by scripts and never used
+ * for analytics: it exists so a browser that has been grinding credentials
+ * stays recognisable when its address changes. */
+const DEVICE_COOKIE = "kb_dev";
+const DEVICE_TTL_DAYS = 180;
+
+/**
+ * Read the browser's device key, minting one if this is a first visit.
+ *
+ * Returns null only when the caller sends no cookie *and* the response
+ * cannot set one, which is the scripted-attacker case: those fall through to
+ * the address limits by design. Absent devices are never bucketed together,
+ * because a shared "unknown device" bucket would let one attacker lock out
+ * every first-time visitor.
+ */
+export async function deviceKey(): Promise<string | null> {
+  const store = await cookies();
+  const existing = store.get(DEVICE_COOKIE)?.value;
+  if (existing) return deviceHashOf(existing);
+
+  const minted = randomBytes(24).toString("base64url");
+  try {
+    store.set(DEVICE_COOKIE, minted, {
+      httpOnly: true,
+      secure: IS_PRODUCTION,
+      sameSite: "lax",
+      path: "/",
+      maxAge: DEVICE_TTL_DAYS * 86400,
+    });
+  } catch {
+    // Cookies cannot be set while rendering; the caller is a page, not an
+    // auth entry point. Skip the device axis rather than fail the request.
+    return null;
+  }
+  return deviceHashOf(minted);
+}
 
 const ipSchema = z.union([z.ipv4(), z.ipv6()]);
 
@@ -108,18 +150,24 @@ export interface ConsumeInput {
   /** Email or phone being targeted. */
   identifier: string;
   addressKey: string;
+  /** Browser key, or null when this caller keeps no cookies. */
+  deviceKey: string | null;
   /** Tight limit on this account from this address. */
   pairPolicy: ThrottlePolicy;
   /** Backstop for the account across all addresses. */
   identityPolicy: ThrottlePolicy;
   /** Limit for the address across all accounts. */
   ipPolicy: ThrottlePolicy;
+  /** Tight limit on this account from this browser. */
+  devicePairPolicy: ThrottlePolicy;
+  /** Limit for the browser across all accounts. */
+  devicePolicy: ThrottlePolicy;
 }
 
 export interface ConsumeResult extends ThrottleVerdict {
   /** Which limit tripped, for the log line. Never surfaced to the caller: the
    * message stays identical so a lockout leaks no account list. */
-  axis: "pair" | "identity" | "ip" | null;
+  axis: "device-pair" | "device" | "pair" | "identity" | "ip" | null;
 }
 
 /**
@@ -135,7 +183,14 @@ export async function consumeAuthAttempt(
 ): Promise<ConsumeResult> {
   const now = new Date();
   const idHash = identityKey(input.identifier);
-  const policies = [input.pairPolicy, input.identityPolicy, input.ipPolicy];
+  const device = input.deviceKey;
+  const policies = [
+    input.pairPolicy,
+    input.identityPolicy,
+    input.ipPolicy,
+    input.devicePairPolicy,
+    input.devicePolicy,
+  ];
   const since = throttlePruneCutoff(policies, now);
 
   return db.transaction(async (tx) => {
@@ -143,6 +198,7 @@ export async function consumeAuthAttempt(
       kind: input.kind,
       identifierHash: idHash,
       ipHash: input.addressKey,
+      deviceHash: device,
       succeeded: false,
     });
 
@@ -150,6 +206,7 @@ export async function consumeAuthAttempt(
       .select({
         identifierHash: schema.authAttempts.identifierHash,
         ipHash: schema.authAttempts.ipHash,
+        deviceHash: schema.authAttempts.deviceHash,
         createdAt: schema.authAttempts.createdAt,
       })
       .from(schema.authAttempts)
@@ -161,12 +218,31 @@ export async function consumeAuthAttempt(
           or(
             eq(schema.authAttempts.identifierHash, idHash),
             eq(schema.authAttempts.ipHash, input.addressKey),
+            ...(device ? [eq(schema.authAttempts.deviceHash, device)] : []),
           ),
         ),
       );
 
     const times = (predicate: (r: (typeof rows)[number]) => boolean) =>
       rows.filter(predicate).map((r) => r.createdAt);
+
+    // Device first: it is the most precise signal and the only key nobody
+    // can forge onto someone else, so a lock here is never collateral damage.
+    if (device) {
+      const devicePair = evaluateThrottle(
+        times((r) => r.identifierHash === idHash && r.deviceHash === device),
+        input.devicePairPolicy,
+        now,
+      );
+      if (devicePair.locked) return { ...devicePair, axis: "device-pair" as const };
+
+      const deviceAll = evaluateThrottle(
+        times((r) => r.deviceHash === device),
+        input.devicePolicy,
+        now,
+      );
+      if (deviceAll.locked) return { ...deviceAll, axis: "device" as const };
+    }
 
     const pair = evaluateThrottle(
       times((r) => r.identifierHash === idHash && r.ipHash === input.addressKey),
@@ -206,16 +282,29 @@ export async function consumeAuthAttempt(
  */
 export async function clearAuthFailures(
   db: KembaliDb,
-  input: { kind: AttemptKind; identifier: string; addressKey: string },
+  input: {
+    kind: AttemptKind;
+    identifier: string;
+    addressKey: string;
+    deviceKey: string | null;
+  },
 ): Promise<void> {
+  const idHash = identityKey(input.identifier);
   await db
     .delete(schema.authAttempts)
     .where(
       and(
         eq(schema.authAttempts.kind, input.kind),
-        eq(schema.authAttempts.identifierHash, identityKey(input.identifier)),
-        eq(schema.authAttempts.ipHash, input.addressKey),
+        // Always scoped to the account that just succeeded, so a success can
+        // never refund an attacker's budget against a different account.
+        eq(schema.authAttempts.identifierHash, idHash),
         eq(schema.authAttempts.succeeded, false),
+        or(
+          eq(schema.authAttempts.ipHash, input.addressKey),
+          ...(input.deviceKey
+            ? [eq(schema.authAttempts.deviceHash, input.deviceKey)]
+            : []),
+        ),
       ),
     );
 }
@@ -244,12 +333,13 @@ export async function pruneAuthAttempts(
 export function logLockout(
   kind: AttemptKind,
   result: ConsumeResult,
-  keys: { identifier: string; addressKey: string },
+  keys: { identifier: string; addressKey: string; deviceKey: string | null },
 ): void {
   const idPrefix = identityKey(keys.identifier).slice(0, 10);
   const ipPrefix = keys.addressKey.slice(0, 10);
+  const devPrefix = keys.deviceKey ? keys.deviceKey.slice(0, 10) : "none";
   console.warn(
     `[auth] ${kind} locked on ${result.axis} axis after ${result.failures} failures ` +
-      `(id:${idPrefix} addr:${ipPrefix}); retry in ${result.retryAfterSeconds}s`,
+      `(id:${idPrefix} addr:${ipPrefix} dev:${devPrefix}); retry in ${result.retryAfterSeconds}s`,
   );
 }

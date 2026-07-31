@@ -5,6 +5,7 @@ import {
   generateOtpCode,
   hashOtpCode,
   OTP_DEV_BYPASS_CODE,
+  OTP_REQUEST_DEVICE_POLICY,
   OTP_REQUEST_IP_POLICY,
   OTP_REQUEST_PHONE_POLICY,
   OTP_TTL_MINUTES,
@@ -16,6 +17,7 @@ import { z } from "zod";
 import {
   clientAddressKey,
   consumeAuthAttempt,
+  deviceKey,
   logLockout,
   pruneAuthAttempts,
 } from "@/lib/auth-throttle";
@@ -50,14 +52,18 @@ export async function POST(req: Request) {
   // reason. The per-phone limit does the abuse work, so the per-address cap
   // can stay high enough for a real counter queue on shop wifi.
   const address = await clientAddressKey();
-  const keys = { identifier: phone, addressKey: address };
+  const device = await deviceKey();
+  const keys = { identifier: phone, addressKey: address, deviceKey: device };
   const throttle = await consumeAuthAttempt(db, {
     kind: "otp_request",
     identifier: phone,
     addressKey: address,
+    deviceKey: device,
     pairPolicy: OTP_REQUEST_PHONE_POLICY,
     identityPolicy: OTP_REQUEST_PHONE_POLICY,
     ipPolicy: OTP_REQUEST_IP_POLICY,
+    devicePairPolicy: OTP_REQUEST_DEVICE_POLICY,
+    devicePolicy: OTP_REQUEST_DEVICE_POLICY,
   });
   if (throttle.locked) {
     logLockout("otp_request", throttle, keys);
@@ -108,6 +114,7 @@ export async function POST(req: Request) {
   await pruneAuthAttempts(db, "otp_request", [
     OTP_REQUEST_PHONE_POLICY,
     OTP_REQUEST_IP_POLICY,
+    OTP_REQUEST_DEVICE_POLICY,
   ]);
 
   // With no provider connected (dev only), print the code so it can still be

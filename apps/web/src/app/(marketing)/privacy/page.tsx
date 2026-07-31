@@ -55,6 +55,10 @@ export default function PrivacyPage() {
                 <dd>The 2024 PDPA amendments require breach notification within 72 hours. Our incident plan is built around that clock, not added after it.</dd>
               </div>
               <div className="faq-row reveal">
+                <dt>Cookies</dt>
+                <dd>Only the ones the product needs: one that keeps you signed in, and one random id that helps us spot a browser trying to guess passwords. No advertising or tracking cookies, and none of them can be read by scripts.</dd>
+              </div>
+              <div className="faq-row reveal">
                 <dt>What we never do</dt>
                 <dd>No selling of customer data, no ads, no card numbers. Kembali is paid by shops, so shops are who we answer to.</dd>
               </div>

@@ -25,7 +25,8 @@ export interface ThrottlePolicy {
   lockoutSeconds: number;
 }
 
-/* Three keys, deliberately:
+/* Several keys, deliberately, and every one of them can only ever *add*
+ * locking. No key is trusted enough to relax another.
  *
  *  pair     = (identity, source address). The fast, tight limit. Locking on
  *             this pair means an attacker grinding someone else's email locks
@@ -35,6 +36,19 @@ export interface ThrottlePolicy {
  *  identity = the account alone. A deliberately high backstop for a genuinely
  *             distributed attack, not an everyday limit.
  *  ip       = the address alone. Catches one host spraying many accounts.
+ *  device   = an opaque cookie on the browser. Two honest properties:
+ *             it survives the address changing (mobile data reassigns
+ *             addresses constantly, so an attacker who moves network keeps
+ *             this key), and it is the only key an attacker *cannot* forge
+ *             onto someone else, because nobody can set your cookie. That
+ *             makes device limits safe to keep tight: they can never be used
+ *             to sabotage a stranger.
+ *
+ *             It is also the weakest key, because clearing cookies resets it.
+ *             So it is never the enforcement backbone and never replaces the
+ *             address axis: it catches the careless attacker and the
+ *             network-hopping one, and a scripted attacker that stores no
+ *             cookies simply falls through to the address limits.
  */
 
 /** Password login for one account from one address. Five tries then a
@@ -58,6 +72,24 @@ export const LOGIN_IDENTITY_POLICY: ThrottlePolicy = {
  * shared office address is not punished for one colleague's bad memory. */
 export const LOGIN_IP_POLICY: ThrottlePolicy = {
   maxFailures: 20,
+  windowSeconds: 15 * 60,
+  lockoutSeconds: 15 * 60,
+};
+
+/** One account from one browser. Matches the pair limit: a person who
+ * mistypes five times sees the same wait whichever key notices first. */
+export const LOGIN_DEVICE_PAIR_POLICY: ThrottlePolicy = {
+  maxFailures: 5,
+  windowSeconds: 15 * 60,
+  lockoutSeconds: 15 * 60,
+};
+
+/** One browser across accounts. Tighter than the address limit because a
+ * single browser trying many accounts is not a shared office, it is a
+ * person working through a list. Safe to keep tight: this key cannot be
+ * pinned on anyone else. */
+export const LOGIN_DEVICE_POLICY: ThrottlePolicy = {
+  maxFailures: 10,
   windowSeconds: 15 * 60,
   lockoutSeconds: 15 * 60,
 };
@@ -99,6 +131,22 @@ export const OTP_VERIFY_IP_POLICY: ThrottlePolicy = {
   maxFailures: 60,
   windowSeconds: 60 * 60,
   lockoutSeconds: 30 * 60,
+};
+
+/** OTP sends from one browser, whatever number is typed. Sits below the
+ * address cap so one phone cannot spend the whole shop's budget, while the
+ * counter queue (many devices, one address) is untouched. */
+export const OTP_REQUEST_DEVICE_POLICY: ThrottlePolicy = {
+  maxFailures: 8,
+  windowSeconds: 60 * 60,
+  lockoutSeconds: 30 * 60,
+};
+
+/** Wrong codes from one browser, across phone numbers. */
+export const OTP_VERIFY_DEVICE_POLICY: ThrottlePolicy = {
+  maxFailures: 12,
+  windowSeconds: 60 * 60,
+  lockoutSeconds: 15 * 60,
 };
 
 /** Longest span any policy for a kind can depend on, so pruning never

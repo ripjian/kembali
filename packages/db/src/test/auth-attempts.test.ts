@@ -153,6 +153,39 @@ describe("auth_attempts storage", () => {
     expect(rows).toHaveLength(1);
   });
 
+  it("stores a device key, and leaves it null when the caller sends none", async () => {
+    await db.insert(schema.authAttempts).values({
+      kind: "login",
+      identifierHash: HASH_A,
+      ipHash: IP_A,
+      deviceHash: "d".repeat(64),
+    });
+    await db.insert(schema.authAttempts).values({
+      kind: "login",
+      identifierHash: HASH_A,
+      ipHash: IP_A,
+    });
+    const stored = (await db.select().from(schema.authAttempts)).map((r) => r.deviceHash);
+    expect(stored).toHaveLength(2);
+    expect(stored).toContain("d".repeat(64));
+    expect(stored).toContain(null);
+  });
+
+  it("never groups device-less attempts together", async () => {
+    // A shared "unknown device" bucket would let one attacker lock out every
+    // first-time visitor, so device-less rows must stay unmatched by any
+    // device predicate rather than collapsing into one key.
+    await db.insert(schema.authAttempts).values([
+      { kind: "login", identifierHash: HASH_A, ipHash: IP_A },
+      { kind: "login", identifierHash: HASH_B, ipHash: IP_A },
+    ]);
+    const withDevice = await db
+      .select()
+      .from(schema.authAttempts)
+      .where(eq(schema.authAttempts.deviceHash, "d".repeat(64)));
+    expect(withDevice).toHaveLength(0);
+  });
+
   it("separates the three attempt kinds", async () => {
     const now = new Date();
     for (const kind of ["login", "otp_request", "otp_verify"] as const) {

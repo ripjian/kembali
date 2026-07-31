@@ -6,6 +6,7 @@ import {
   isOtpBypass,
   needsRegistration,
   OTP_MAX_ATTEMPTS,
+  OTP_VERIFY_DEVICE_POLICY,
   OTP_VERIFY_IP_POLICY,
   OTP_VERIFY_PAIR_POLICY,
 } from "@kembali/core";
@@ -18,6 +19,7 @@ import {
   clearAuthFailures,
   clientAddressKey,
   consumeAuthAttempt,
+  deviceKey,
   logLockout,
   pruneAuthAttempts,
 } from "@/lib/auth-throttle";
@@ -52,14 +54,18 @@ export async function POST(req: Request) {
   // host cycling codes across phones (SECURITY.md rule 6). Recorded before
   // the decision so a parallel burst cannot walk through the cap.
   const address = await clientAddressKey();
-  const keys = { identifier: phone, addressKey: address };
+  const device = await deviceKey();
+  const keys = { identifier: phone, addressKey: address, deviceKey: device };
   const throttle = await consumeAuthAttempt(db, {
     kind: "otp_verify",
     identifier: phone,
     addressKey: address,
+    deviceKey: device,
     pairPolicy: OTP_VERIFY_PAIR_POLICY,
     identityPolicy: OTP_VERIFY_PAIR_POLICY,
     ipPolicy: OTP_VERIFY_IP_POLICY,
+    devicePairPolicy: OTP_VERIFY_DEVICE_POLICY,
+    devicePolicy: OTP_VERIFY_DEVICE_POLICY,
   });
   if (throttle.locked) {
     logLockout("otp_verify", throttle, keys);
@@ -147,6 +153,7 @@ export async function POST(req: Request) {
     await pruneAuthAttempts(db, "otp_verify", [
       OTP_VERIFY_PAIR_POLICY,
       OTP_VERIFY_IP_POLICY,
+      OTP_VERIFY_DEVICE_POLICY,
     ]);
     return NextResponse.json(
       { error: "That code didn't match. Check it or request a new one." },

@@ -253,6 +253,11 @@ export const authAttempts = pgTable(
     identifierHash: text("identifier_hash").notNull(),
     /** HMAC of the client address; null when the platform gives us none. */
     ipHash: text("ip_hash"),
+    /** HMAC of the browser's opaque device cookie; null when the caller sent
+     * none (a fresh browser, or a script that stores no cookies). Absent is
+     * never bucketed together: a shared "no device" bucket would let one
+     * attacker lock out every first-time visitor. */
+    deviceHash: text("device_hash"),
     succeeded: boolean("succeeded").notNull().default(false),
     createdAt: createdAt(),
   },
@@ -269,6 +274,7 @@ export const authAttempts = pgTable(
     }),
     index("auth_attempts_identity_idx").on(t.kind, t.identifierHash, t.createdAt),
     index("auth_attempts_ip_idx").on(t.kind, t.ipHash, t.createdAt),
+    index("auth_attempts_device_idx").on(t.kind, t.deviceHash, t.createdAt),
     // Pruning deletes by (kind, created_at) on every auth failure, which
     // matches neither index above as a prefix.
     index("auth_attempts_prune_idx").on(t.kind, t.createdAt),

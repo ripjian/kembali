@@ -8,6 +8,8 @@ import { randomBytes } from "node:crypto";
 import {
   hashPassword,
   verifyPassword,
+  LOGIN_DEVICE_PAIR_POLICY,
+  LOGIN_DEVICE_POLICY,
   LOGIN_IDENTITY_POLICY,
   LOGIN_IP_POLICY,
   LOGIN_PAIR_POLICY,
@@ -23,6 +25,7 @@ import {
   clearAuthFailures,
   clientAddressKey,
   consumeAuthAttempt,
+  deviceKey,
   logLockout,
   pruneAuthAttempts,
 } from "./auth-throttle";
@@ -95,14 +98,18 @@ export async function adminLogin(formData: FormData) {
   // requests. The lockout message is identical for every email, so it cannot
   // be used to discover which accounts exist.
   const address = await clientAddressKey();
-  const keys = { identifier: email, addressKey: address };
+  const device = await deviceKey();
+  const keys = { identifier: email, addressKey: address, deviceKey: device };
   const throttle = await consumeAuthAttempt(db, {
     kind: "login",
     identifier: email,
     addressKey: address,
+    deviceKey: device,
     pairPolicy: LOGIN_PAIR_POLICY,
     identityPolicy: LOGIN_IDENTITY_POLICY,
     ipPolicy: LOGIN_IP_POLICY,
+    devicePairPolicy: LOGIN_DEVICE_PAIR_POLICY,
+    devicePolicy: LOGIN_DEVICE_POLICY,
   });
   if (throttle.locked) {
     logLockout("login", throttle, keys);
@@ -140,6 +147,8 @@ export async function adminLogin(formData: FormData) {
     LOGIN_PAIR_POLICY,
     LOGIN_IDENTITY_POLICY,
     LOGIN_IP_POLICY,
+    LOGIN_DEVICE_PAIR_POLICY,
+    LOGIN_DEVICE_POLICY,
   ]);
   redirect("/admin/login?error=1");
 }

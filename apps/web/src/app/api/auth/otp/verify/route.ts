@@ -14,7 +14,7 @@ import { schema, withTenant } from "@kembali/db";
 import { and, asc, desc, eq, gt, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
 
-import { startCustomerSession } from "@/lib/auth";
+import { pruneExpiredSessions, startCustomerSession } from "@/lib/auth";
 import {
   clearAuthFailures,
   clientAddressKey,
@@ -163,6 +163,7 @@ export async function POST(req: Request) {
 
   // A correct code clears this phone's failures from this address.
   await clearAuthFailures(db, { kind: "otp_verify", ...keys });
+  await pruneExpiredSessions(db);
   await startCustomerSession(db, result.customerId, tenantId);
   return NextResponse.json({ ok: true, needsProfile: result.needsProfile });
 }

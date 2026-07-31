@@ -18,7 +18,7 @@ const bodySchema = z.object({
 });
 
 export async function POST(req: Request) {
-  const admin = await getAdminContext();
+  const admin = await getAdminContext({ allowRotation: true });
   if (!admin) {
     return NextResponse.json({ error: "Sign in to redeem rewards." }, { status: 401 });
   }

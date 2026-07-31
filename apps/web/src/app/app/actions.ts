@@ -31,7 +31,7 @@ const profileSchema = z.object({
 });
 
 export async function completeCustomerProfile(formData: FormData) {
-  const session = await getCustomerSession();
+  const session = await getCustomerSession({ allowRotation: true });
   if (!session) redirect("/app/login");
 
   const parsed = profileSchema.safeParse({
@@ -70,7 +70,7 @@ export async function completeCustomerProfile(formData: FormData) {
 }
 
 export async function reserveRedemption(formData: FormData) {
-  const session = await getCustomerSession();
+  const session = await getCustomerSession({ allowRotation: true });
   if (!session) redirect("/app/login");
   const rewardItemId = z.uuid().safeParse(formData.get("rewardItemId"));
   if (!rewardItemId.success) redirect("/app");
@@ -115,7 +115,7 @@ export async function reserveRedemption(formData: FormData) {
 }
 
 export async function cancelRedemption(formData: FormData) {
-  const session = await getCustomerSession();
+  const session = await getCustomerSession({ allowRotation: true });
   if (!session) redirect("/app/login");
   const redemptionId = z.uuid().safeParse(formData.get("redemptionId"));
   if (!redemptionId.success) redirect("/app");

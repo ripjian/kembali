@@ -20,7 +20,12 @@ import { schema, withPlatform, withTenant, type KembaliDb } from "@kembali/db";
 import { and, asc, eq, ne, sql } from "drizzle-orm";
 import { z } from "zod";
 
-import { destroySessions, getAdminContext, startAdminSession } from "./auth";
+import {
+  destroySessions,
+  getAdminContext,
+  pruneExpiredSessions,
+  startAdminSession,
+} from "./auth";
 import {
   clearAuthFailures,
   clientAddressKey,
@@ -122,6 +127,7 @@ export async function adminLogin(formData: FormData) {
     .where(eq(schema.platformAdmins.email, email));
   if (admin && verifyPassword(password, admin.passwordHash)) {
     await clearAuthFailures(db, { kind: "login", ...keys });
+    await pruneExpiredSessions(db);
     await startAdminSession(db, "platform", admin.id, null);
     redirect("/admin");
   }
@@ -135,6 +141,7 @@ export async function adminLogin(formData: FormData) {
   });
   if (staff?.passwordHash && verifyPassword(password, staff.passwordHash)) {
     await clearAuthFailures(db, { kind: "login", ...keys });
+    await pruneExpiredSessions(db);
     await startAdminSession(db, "staff", staff.id, staff.tenantId);
     redirect("/admin");
   }
@@ -236,7 +243,7 @@ function readOutlets(formData: FormData) {
 /* ---- platform: merchants ------------------------------------------------ */
 
 async function requirePlatform() {
-  const admin = await getAdminContext();
+  const admin = await getAdminContext({ allowRotation: true });
   if (!admin || admin.kind !== "platform") redirect("/admin");
   return admin;
 }

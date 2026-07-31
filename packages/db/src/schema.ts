@@ -229,7 +229,21 @@ export const sessions = pgTable(
     subjectId: uuid("subject_id").notNull(),
     /** null for platform sessions */
     tenantId: uuid("tenant_id").references(() => tenants.id),
+    /** Absolute ceiling, set at creation and never extended. */
     expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    /** Idle clock. Written coarsely (see `touchAfterSeconds`), not per request. */
+    lastUsedAt: timestamp("last_used_at", { withTimezone: true }).notNull().defaultNow(),
+    /** When the current token was issued. Creation counts as a rotation. */
+    rotatedAt: timestamp("rotated_at", { withTimezone: true }).notNull().defaultNow(),
+    /** sha256 of the token this one replaced. Accepted until
+     * `previous_valid_until`, then kept a while longer so a replay reads as
+     * theft rather than as an unknown token (@kembali/core `evaluateSession`). */
+    previousTokenHash: text("previous_token_hash"),
+    previousValidUntil: timestamp("previous_valid_until", { withTimezone: true }),
+    /** When the current token was first seen in use. Null means the rotation
+     * reply may never have reached the browser, which is what tells a dropped
+     * response apart from a stolen token. */
+    tokenConfirmedAt: timestamp("token_confirmed_at", { withTimezone: true }),
     createdAt: createdAt(),
   },
   (t) => [
@@ -240,6 +254,7 @@ export const sessions = pgTable(
       withCheck: sql`true`,
     }),
     index("sessions_expiry_idx").on(t.expiresAt),
+    index("sessions_previous_token_idx").on(t.previousTokenHash),
   ],
 );
 

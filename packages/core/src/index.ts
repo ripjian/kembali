@@ -43,6 +43,16 @@ export {
   type ThrottleVerdict,
 } from "./throttle";
 export {
+  evaluateSession,
+  cookieMaxAge,
+  previousTokenCutoff,
+  CUSTOMER_SESSION_POLICY,
+  ADMIN_SESSION_POLICY,
+  type SessionPolicy,
+  type SessionState,
+  type SessionVerdict,
+} from "./session";
+export {
   hashPassword,
   verifyPassword,
   hashAuthIdentifier,

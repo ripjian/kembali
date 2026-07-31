@@ -28,7 +28,7 @@ const rewardRules = z.object({ rewardValidDays: z.number().int().positive().opti
 const rewardDefs = z.array(z.object({ type: z.string(), title: z.string().optional() }));
 
 export async function POST(req: Request) {
-  const admin = await getAdminContext();
+  const admin = await getAdminContext({ allowRotation: true });
   if (!admin) {
     return NextResponse.json({ error: "Sign in to stamp cards." }, { status: 401 });
   }

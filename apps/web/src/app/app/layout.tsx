@@ -4,6 +4,8 @@ import { Plus_Jakarta_Sans } from "next/font/google";
 import { getCustomerSession } from "@/lib/auth";
 import { getTenantColors } from "@/lib/tenant-theme";
 
+import { SessionKeepAlive } from "@/components/session-keep-alive";
+
 import { TenantTheme } from "./tenant-theme";
 
 const jakarta = Plus_Jakarta_Sans({
@@ -32,6 +34,7 @@ export default async function CustomerAppLayout({
   return (
     <div className={`${jakarta.variable} min-h-dvh bg-bg font-sans text-text`}>
       <TenantTheme tenantId={session?.tenantId ?? "default"} colors={colors}>
+        {session ? <SessionKeepAlive /> : null}
         {children}
       </TenantTheme>
     </div>

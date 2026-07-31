@@ -20,5 +20,6 @@ export const OTP_BYPASS_ENABLED = !IS_PRODUCTION;
  * assertions. env.ts validates + fails the boot when this is "none" in prod. */
 export const OTP_PROVIDER = process.env["OTP_PROVIDER"] ?? "none";
 
-export const CUSTOMER_SESSION_TTL_DAYS = 30;
-export const ADMIN_SESSION_TTL_HOURS = 12;
+/* Session lifetimes live in `@kembali/core` (CUSTOMER_SESSION_POLICY /
+ * ADMIN_SESSION_POLICY): they are three interacting clocks plus a rotation
+ * interval, not a single number, and they are unit-tested there. */

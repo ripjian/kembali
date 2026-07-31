@@ -107,7 +107,7 @@ export async function authorizeTenantAction(
   tenantId: string,
   permission: PermissionKey | null,
 ): Promise<{ admin: AdminContext; slug: string }> {
-  const admin = await getAdminContext();
+  const admin = await getAdminContext({ allowRotation: true });
   if (!admin) redirect("/admin/login");
   const db = await getDb();
 

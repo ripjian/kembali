@@ -11,7 +11,7 @@ import { getDb } from "@/lib/db";
 /** Short-lived signed stamp token for the logged-in customer's card -
  * refetched by the card page every ~60s (SECURITY.md rule 5). */
 export async function GET() {
-  const session = await getCustomerSession();
+  const session = await getCustomerSession({ allowRotation: true });
   if (!session) {
     return NextResponse.json({ error: "Sign in to see your code." }, { status: 401 });
   }

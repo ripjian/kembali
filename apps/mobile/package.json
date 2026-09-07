@@ -15,15 +15,15 @@
     "run:android": "cap run android"
   },
   "dependencies": {
-    "@capacitor/android": "^8.0.0",
-    "@capacitor/core": "^8.0.0",
-    "@capacitor/ios": "^8.0.0"
+    "@capacitor/android": "^8.5.1",
+    "@capacitor/core": "^8.5.1",
+    "@capacitor/ios": "^8.5.1"
   },
   "devDependencies": {
-    "@capacitor/cli": "^8.0.0",
+    "@capacitor/cli": "^8.5.1",
     "@kembali/config": "workspace:*",
     "@types/node": "^22.10.5",
-    "eslint": "^10.6.0",
+    "eslint": "^10.9.1",
     "typescript": "^5.9.3"
   }
 }

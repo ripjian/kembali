@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 
 import { generateRedemptionCode, redemptionExpiry } from "@kembali/core";
-import { schema, withTenant } from "@kembali/db";
+import { isUniqueViolation, schema, withTenant } from "@kembali/db";
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 
@@ -44,27 +44,35 @@ export async function completeCustomerProfile(formData: FormData) {
   const p = parsed.data;
 
   const db = await getDb();
-  await withTenant(db, session.tenantId, async (tx) => {
-    await tx
-      .update(schema.customers)
-      .set({
-        name: p.name,
-        email: p.email,
-        birthday: p.birthday,
-        // PDPA: consent per channel; empty means no marketing.
-        marketingOptIns: p.marketing ? { whatsapp: true } : {},
-      })
-      .where(eq(schema.customers.id, session.customerId));
-    await tx.insert(schema.auditLog).values({
-      tenantId: session.tenantId,
-      actorType: "customer",
-      actorId: session.customerId,
-      action: "customer.profile_completed",
-      entity: "customer",
-      entityId: session.customerId,
-      meta: { marketing: p.marketing, hasEmail: p.email !== null },
+  try {
+    await withTenant(db, session.tenantId, async (tx) => {
+      await tx
+        .update(schema.customers)
+        .set({
+          name: p.name,
+          email: p.email,
+          birthday: p.birthday,
+          // PDPA: consent per channel; empty means no marketing.
+          marketingOptIns: p.marketing ? { whatsapp: true } : {},
+        })
+        .where(eq(schema.customers.id, session.customerId));
+      await tx.insert(schema.auditLog).values({
+        tenantId: session.tenantId,
+        actorType: "customer",
+        actorId: session.customerId,
+        action: "customer.profile_completed",
+        entity: "customer",
+        entityId: session.customerId,
+        meta: { marketing: p.marketing, hasEmail: p.email !== null },
+      });
     });
-  });
+  } catch (err) {
+    // Email is unique per store; another member already registered it.
+    if (isUniqueViolation(err, "customers_tenant_email_uq")) {
+      redirect("/app/register?error=email");
+    }
+    throw err;
+  }
 
   redirect("/app");
 }

@@ -16,6 +16,10 @@ const jakarta = Plus_Jakarta_Sans({
 export const metadata: Metadata = {
   title: "Your card",
   description: "Your digital stamp card. Scan, stamp, get rewarded.",
+  // Installable card: the manifest is scoped to /app so the marketing site
+  // never prompts "add to home screen" (icons in public/icons, sand + mark).
+  manifest: "/app.webmanifest",
+  appleWebApp: { capable: true, statusBarStyle: "default", title: "Kembali" },
 };
 
 export const viewport: Viewport = {

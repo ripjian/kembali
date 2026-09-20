@@ -32,7 +32,9 @@ export default async function NewCustomerPage({
         <p role="alert" className="rounded-xl border border-error/40 bg-surface px-4 py-3 text-sm text-error">
           {error === "exists"
             ? "A customer with that phone number already exists."
-            : "Check the name and phone number, then try again."}
+            : error === "email"
+              ? "A customer with that email already exists. Use a different email, or leave it empty."
+              : "Check the name and phone number, then try again."}
         </p>
       )}
 

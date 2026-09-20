@@ -16,24 +16,37 @@ export interface DateRange {
   to: Date;
 }
 
-/** Parse ?from/?to (YYYY-MM-DD); default to the last 30 days. `to` is
- * inclusive (end of day). */
+/* Merchants think in Malaysian calendar days (no DST, fixed +08:00), and
+ * production servers run in UTC, so the range is parsed and printed with an
+ * explicit offset rather than the server's local zone. Otherwise a
+ * `from` of the 1st renders back as the 31st on reload and every filter
+ * link slides the range one day further. */
+const MY_OFFSET = "+08:00";
+const MY_OFFSET_MS = 8 * 3600_000;
+
+/** Parse ?from/?to (YYYY-MM-DD, Malaysian days); default to the last 30
+ * days. `to` is inclusive (end of day). */
 export function readDateRange(sp: {
   from?: string;
   to?: string;
 }): DateRange {
-  const to = sp.to ? new Date(`${sp.to}T23:59:59.999`) : new Date();
-  const from = sp.from
-    ? new Date(`${sp.from}T00:00:00`)
-    : new Date(to.getTime() - 29 * 86_400_000);
-  return {
-    from: Number.isNaN(from.getTime()) ? new Date(to.getTime() - 29 * 86_400_000) : from,
-    to: Number.isNaN(to.getTime()) ? new Date() : to,
+  // Anything that is not a valid YYYY-MM-DD falls back to the default, and
+  // the `from` fallback is computed from the SAFE `to`, so a bad `to` can
+  // never leak an Invalid Date into the page (it would crash on render).
+  const parse = (value: string | undefined, time: string): Date | null => {
+    if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
+    const d = new Date(`${value}T${time}${MY_OFFSET}`);
+    return Number.isNaN(d.getTime()) ? null : d;
   };
+  const to = parse(sp.to, "23:59:59.999") ?? new Date();
+  const from = parse(sp.from, "00:00:00") ?? new Date(to.getTime() - 29 * 86_400_000);
+  // A reversed range is a typo, not a query: swap rather than return nothing.
+  return from <= to ? { from, to } : { from: to, to: from };
 }
 
+/** The Malaysian calendar day of an instant, as a date-input value. */
 export function toDateInput(d: Date): string {
-  return d.toISOString().slice(0, 10);
+  return new Date(d.getTime() + MY_OFFSET_MS).toISOString().slice(0, 10);
 }
 
 export interface CustomerReportRow {

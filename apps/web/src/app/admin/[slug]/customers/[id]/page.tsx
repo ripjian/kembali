@@ -183,6 +183,16 @@ export default async function CustomerDetailPage({
           Check the name and phone number, then try again.
         </p>
       )}
+      {error === "phone" && (
+        <p role="alert" className="rounded-xl border border-error/40 bg-surface px-4 py-3 text-sm text-error">
+          Another customer already has that phone number. Check it and try again.
+        </p>
+      )}
+      {error === "email" && (
+        <p role="alert" className="rounded-xl border border-error/40 bg-surface px-4 py-3 text-sm text-error">
+          Another customer already has that email. Use a different one, or leave it empty.
+        </p>
+      )}
 
       {adjusted && (
         <p role="status" className="rounded-xl border border-leaf/50 bg-surface px-4 py-3 text-sm text-text">

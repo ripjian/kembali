@@ -16,7 +16,13 @@ import {
   PERMISSION_KEYS,
   type RolePermissionMatrix,
 } from "@kembali/core";
-import { schema, withPlatform, withTenant, type KembaliDb } from "@kembali/db";
+import {
+  isUniqueViolation,
+  schema,
+  withPlatform,
+  withTenant,
+  type KembaliDb,
+} from "@kembali/db";
 import { and, asc, eq, ne, sql } from "drizzle-orm";
 import { z } from "zod";
 
@@ -690,6 +696,14 @@ export async function createCustomer(formData: FormData) {
       .from(schema.customers)
       .where(eq(schema.customers.phone, phone));
     if (existing) return null;
+    // Email is unique per store too (customers_tenant_email_uq).
+    if (input.email) {
+      const [emailTaken] = await tx
+        .select({ id: schema.customers.id })
+        .from(schema.customers)
+        .where(eq(schema.customers.email, input.email));
+      if (emailTaken) return "email" as const;
+    }
     const [customer] = await tx
       .insert(schema.customers)
       .values({
@@ -729,6 +743,7 @@ export async function createCustomer(formData: FormData) {
     return customer.id;
   });
 
+  if (customerId === "email") redirect(`/admin/${slug}/customers/new?error=email`);
   if (!customerId) redirect(`/admin/${slug}/customers/new?error=exists`);
   redirect(`/admin/${slug}/customers/${customerId}`);
 }
@@ -749,30 +764,44 @@ export async function updateCustomer(formData: FormData) {
   const input = parsed.data;
 
   const db = await getDb();
-  await withTenant(db, tenantId.data, async (tx) => {
-    await tx
-      .update(schema.customers)
-      .set({
-        name: input.name,
-        phone,
-        email: input.email || null,
-        birthday: input.birthday || null,
-        marketingOptIns: {
-          whatsapp: input.optInWhatsapp,
-          email: input.optInEmail,
-        },
-      })
-      .where(eq(schema.customers.id, customerId.data));
-    await audit(tx, {
-      tenantId: tenantId.data,
-      actorType: admin.kind,
-      actorId: admin.subjectId,
-      action: "customer.updated",
-      entity: "customer",
-      entityId: customerId.data,
+  const base = `/admin/${slug}/customers/${customerId.data}`;
+  try {
+    await withTenant(db, tenantId.data, async (tx) => {
+      await tx
+        .update(schema.customers)
+        .set({
+          name: input.name,
+          phone,
+          email: input.email || null,
+          birthday: input.birthday || null,
+          marketingOptIns: {
+            whatsapp: input.optInWhatsapp,
+            email: input.optInEmail,
+          },
+        })
+        .where(eq(schema.customers.id, customerId.data));
+      await audit(tx, {
+        tenantId: tenantId.data,
+        actorType: admin.kind,
+        actorId: admin.subjectId,
+        action: "customer.updated",
+        entity: "customer",
+        entityId: customerId.data,
+      });
     });
-  });
-  redirect(`/admin/${slug}/customers/${customerId.data}?saved=1`);
+  } catch (err) {
+    // Phone and email are each unique per store; a clash with another
+    // member is a user-facing message, not a crash. Reopen the modal so
+    // the staff member can correct the field.
+    if (isUniqueViolation(err, "customers_tenant_phone_uq")) {
+      redirect(`${base}?edit=1&error=phone`);
+    }
+    if (isUniqueViolation(err, "customers_tenant_email_uq")) {
+      redirect(`${base}?edit=1&error=email`);
+    }
+    throw err;
+  }
+  redirect(`${base}?saved=1`);
 }
 
 /* ---- points (Phase 2) ---------------------------------------------------- */

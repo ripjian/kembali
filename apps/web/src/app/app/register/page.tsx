@@ -62,6 +62,12 @@ export default async function RegisterPage({
           Check your details. A name is required, and any email must be valid.
         </p>
       )}
+      {error === "email" && (
+        <p role="alert" className="rounded-xl border border-error/40 bg-surface px-4 py-3 text-sm text-error">
+          That email is already on another card at this store. Use a different
+          email, or leave it empty.
+        </p>
+      )}
 
       <form action={completeCustomerProfile} className="flex flex-col gap-4">
         <label className="flex flex-col gap-1.5 text-sm font-medium text-text">

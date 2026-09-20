@@ -102,3 +102,45 @@ describe("profile completion", () => {
     expect(leak).toBeNull();
   });
 });
+
+describe("unique email per store", () => {
+  it("a second card with the same email at one store is a recognisable unique violation", async () => {
+    const { isUniqueViolation } = await import("../errors");
+    await withTenant(db, A, (tx) =>
+      tx
+        .update(schema.customers)
+        .set({ name: "First", email: "shared@example.com" })
+        .where(eq(schema.customers.id, A_CUST)),
+    );
+    const other = "aaaaaaaa-0000-4000-8000-000000000a02";
+    await withTenant(db, A, (tx) =>
+      tx.insert(schema.customers).values({ id: other, tenantId: A, phone: "+60111222999" }),
+    );
+    let caught: unknown = null;
+    try {
+      await withTenant(db, A, (tx) =>
+        tx
+          .update(schema.customers)
+          .set({ name: "Second", email: "shared@example.com" })
+          .where(eq(schema.customers.id, other)),
+      );
+    } catch (err) {
+      caught = err;
+    }
+    expect(caught).not.toBeNull();
+    expect(isUniqueViolation(caught, "customers_tenant_email_uq")).toBe(true);
+    expect(isUniqueViolation(caught, "customers_tenant_phone_uq")).toBe(false);
+    expect(isUniqueViolation(new Error("plain"))).toBe(false);
+  });
+
+  it("the same email at another store is fine (uniqueness is per tenant)", async () => {
+    await withTenant(db, B, (tx) =>
+      tx
+        .update(schema.customers)
+        .set({ name: "Elsewhere", email: "shared@example.com" })
+        .where(eq(schema.customers.id, B_CUST)),
+    );
+    const row = await readCustomer(B, B_CUST);
+    expect(row?.email).toBe("shared@example.com");
+  });
+});

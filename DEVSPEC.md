@@ -29,6 +29,7 @@ Nothing ships half-open. Before calling any feature done, walk this checklist. I
 - Edge: shared family phone → one customer per phone per tenant, by design. Do not "fix".
 
 ## 2. Registration & profile — Phase 1, shipped 2026-07-11
+- First card view shows a three-card welcome (`customers.onboarded_at` null → dialog; Skip/Got it sets it). Staff get the equivalent on the overview (`staff_users.onboarded_at`): owners/managers a live setup checklist, cashiers a counter walkthrough. Shipped 2026-09-21.
 - Fields locked (Decision Log): full name required, phone verified read-only, email optional validated, birthday skippable (date only), marketing opt-in unchecked default.
 - Closures: profile edit in /app/profile must allow updating email/birthday/opt-ins later; name edit allowed (typos); phone NOT editable by customer (see §1 edge). Merchant-side edit gated by editCustomers permission. Both writes audit-logged with different actor types.
 - Birthday powers Phase 4 automation; no promise of timing in UI copy.
@@ -36,6 +37,7 @@ Nothing ships half-open. Before calling any feature done, walk this checklist. I
 
 ## 3. Stamping & transactions — Phase 1, shipped; evolves every phase
 - Cashier scans member QR (rotating 90s token) → keys amount (RM, record-keeping ONLY, no payments ever until founder reverses 2026-07-09 decision) → one action writes: stamp_events row + point_events row (if points module on) + outlet_id + staff_id.
+- First stamp of a card also settles a pending referral (§17) inside the same transaction.
 - Closures: undo last stamp (5-min, compensating events for BOTH stamps and points, audit-logged); velocity rules (per card, per cashier — VERIFY IN CODE for current thresholds); "reward ready" surfaced on scan; manual lookup by phone when QR fails.
 - Edge: amount = 0 or blank → **VERIFY IN CODE**; recommended: stamp allowed with zero amount (visit-based stamping is valid), points accrue 0.
 - Edge: offline at counter → Phase 6 offline queue. Until then: fail visibly with retry; NEVER optimistically fake success; NEVER fabricate timestamps. When the queue ships: client_captured_at + server received_at, ledger ordered by server time, velocity evaluated on receipt, duplicates deduped by client-generated idempotency key. Design APIs with an idempotency key NOW (cheap insurance).
@@ -83,7 +85,7 @@ Nothing ships half-open. Before calling any feature done, walk this checklist. I
 - Role matrix: 6 permission keys × 3 roles, tenant-overridable, defaults in @kembali/core, enforced server-side on nav, pages, actions, APIs. Any new feature adds its permission key to the matrix + MODULES.md.
 
 ## 11. Reports — Phase 1+2, shipped; deepens each phase
-- Overview previews capped at latest 25 + tooltip + "See full report"; full pages (customers, unified transactions with type+outlet filters, rewards) with date range + pagination + CSV.
+- Overview previews capped at latest 25 + tooltip + "See full report"; full pages (customers with segment filter, unified transactions with type + outlet + served-by filters, activity by day/hour/weekday, rewards, referrals) with date range + pagination + CSV. All dates are Malaysian calendar days (fixed +08:00). Lapsed = no visit in 30 days (constant `LAPSED_DAYS`; Phase 4 segments make it configurable).
 - CSV gating: analytics downloads = Founding + Growth only (planAllowsReportDownload in @kembali/core); Starter sees lock + upgrade hint; PDPA export never gated.
 - Every new value-moving module adds: a preview card + a full page + CSV + (platform side) usage visibility. Phase 4 adds messages report; Phase 6 adds advanced analytics (do not build early).
 
@@ -96,7 +98,7 @@ Nothing ships half-open. Before calling any feature done, walk this checklist. I
 - Wallet passes (Phase 3) must derive pass colors from the same utilities.
 
 ## 14. Data lifecycle & PDPA (cross-cutting, partially built)
-- Export: per-customer data export free on every plan (Settings). Includes profile, transactions, adjustments, redemptions, consents, merchant notes about them (§9).
+- Export **shipped 2026-09-21**: all-customers CSV at `/admin/[slug]/settings/export`, one customer's complete JSON at `/customers/[id]/export` (profile, consents, card, visits, points history, coupons, referrals), and the customer's own copy at `/app/export`. Permission `exportData` (owner-only default); customer self-export needs only their session. Every export writes an audit row. Never plan-gated. Merchant notes (§9) are not built yet; when they are, include them here.
 - Deletion: **policy decided in principle, VERIFY IN CODE**: ledgers are append-only and must reconcile, so customer deletion = anonymization (null the PII: name/phone/email/birthday; keep events under an anonymized id). If a true-delete request arrives legally, escalate to founder. Retention policy duration: **ASK FOUNDER** (recommend: anonymize on request immediately; auto-anonymize after N years inactivity, N undecided).
 - Merchant offboarding (churn): **ASK FOUNDER** when first merchant cancels. Options: export-and-freeze (tenant disabled, data kept M months, then purged) vs immediate purge on request. Invoice/PRICING promise "your data is yours" implies generous export before any purge.
 
@@ -110,9 +112,12 @@ Nothing ships half-open. Before calling any feature done, walk this checklist. I
 - Phase 4 additions: templates (EN/BM/CN), automations (welcome/birthday/milestone/win-back) with quiet hours + per-customer frequency cap, test-send to self, audience preview count, credits balance + top-ups (RM0.50 marketing msg), opt-in enforcement absolute (no opt-in, no send, no exceptions), message history on customer detail.
 - Edge: credit balance hits zero mid-automation → pause sends + notify merchant, never silently drop or overdraft. Template rejected by Meta → surface status in admin, fall back gracefully.
 
-## 17. Referrals — Phase 5
-- Both-sides reward on referee's FIRST STAMP (not signup — kills fake-signup fraud). Anti-abuse: self-referral block (same phone/device heuristics), velocity caps, audit flags. Personal link/QR + share sheet; status tracker ("reward arrives on their first visit"). Referral events are point_events with source=referral. Config: reward amounts per side, merchant-set, defaults suggested.
-- **ASK FOUNDER** at build: reward as points or as a coupon? (Recommend points; simpler.)
+## 17. Referrals — Phase 5, core shipped 2026-09-21
+- Both-sides reward on referee's FIRST STAMP (not signup). Shipped: personal 6-char code (`customers.referral_code`, unique per tenant, minted on first card view while the program is live), share link `/app/join/[slug]?ref=CODE` with native share sheet, status list on the card, invite banner on the join page, payout line on the cashier's scan result.
+- **DECIDED 2026-09-21 (founder):** reward type is configurable per side — nothing / points / free voucher for a catalog item. Voucher = zero-cost `redemptions` row (`grant_source=referral`, validity `voucherValidDays`) confirmed like any coupon; confirm writes no zero-delta ledger row. Points = `point_events` with `source=referral` and a customer-visible reason.
+- Anti-abuse shipped: self-invite ignored; existing members via a link ignored (only a NEW customer row counts); cap `maxPerReferrer` per `windowDays` (0 = uncapped) counted on pending+rewarded rows, over-cap invites stored as `rejected` with `note=cap` so the report explains; a voucher whose catalog item was hidden grants nothing (snapshot says `none`). Device heuristics NOT built.
+- Settings live on the Rewards page (`manageRewards`), plan-gated `planAllowsReferrals` (Founding + Growth) and module `referrals`. Settings are validated with `referralSettingsSchema`; voucher items must belong to the tenant.
+- Closures still open: referral QR image, WhatsApp share template (Phase 4), top-referrer list, and what happens to a pending referral when the referrer is anonymised (§14) — **ASK FOUNDER** then; recommendation: keep the row, rewards still pay the friend.
 
 ## 18. Platform admin (system) — evolves continuously
 - Exists: merchant directory + creation (sectioned: General → Plan/modules → Program → Outlets → Owner), module toggles, password resets, audit log, theming, plan field.

@@ -9,10 +9,11 @@ lands or moves (SOP 6). Permission keys are the `@kembali/core` role-matrix keys
 system admin).
 
 > **Plan availability shorthand.** Almost everything is available on every paid
-> plan — the loyalty core is not gated (PRICING.md). The only in-product gate
-> today is **analytics CSV download** (Founding + Growth). Wallet/tags/WhatsApp/
-> referrals/custom-domain are plan-differentiated but not built yet (greyed
-> "Coming soon" on `/pricing`). "All" below means Founding, Starter and Growth.
+> plan — the loyalty core is not gated (PRICING.md). In-product gates today:
+> **analytics CSV download** and the **referral program** (both Founding +
+> Growth). Wallet/tags/WhatsApp/custom-domain are plan-differentiated but not
+> built yet (greyed "Coming soon" on `/pricing`). "All" below means Founding,
+> Starter and Growth. The PDPA export is never gated.
 
 ## Live modules
 
@@ -42,20 +43,25 @@ system admin).
 | Customer join (tenant-scoped) | customer · `/app/join/[slug]` | customer | A merchant's QR opens their branded join page; the slug decides which tenant a customer joins, independent of any session. OTP request/verify create the customer under the scanned tenant | — | All | 1 | Live |
 | Customer registration | customer · `/app/register` | customer | After OTP verify, a nameless customer completes a one-screen profile (full name required, phone verified/read-only, email optional, birthday skippable, marketing opt-in unchecked per PDPA), themed in the tenant's colours. Returning named customers skip it. `completeCustomerProfile` action: zod, `withTenant`, audit-logged | — | All | 1 | Live |
 | Audit log | system · written by privileged actions | platform + merchant admin | Append-only record of privileged actions (staff, points, redemptions, tenant changes) | — (write); viewer UI planned | All | 1 | Live (viewer UI planned) |
+| First-access guides | merchant admin · `/admin/[slug]` overview; cashier · same; customer · `/app` | owner, manager, cashier, customer | Owner/manager: five-step setup checklist checked against live data (card ready, points + first reward, team, QR kit, test stamp) until hidden. Cashier: three-step counter walkthrough. Customer: three-card welcome dialog on first card view. Dismissal stored on the person (`onboarded_at`), so it shows once, on any device | — | All | 1 (remaining, shipped 2026-09-21) | Live |
+| Settings + PDPA export | merchant admin · `/admin/[slug]/settings` (+ `/settings/export`), `/customers/[id]/export`; customer · `/app/export` | owner (export), customer (own data) | All-customers CSV (profile, consent, balance, visits, spend, last visit, invite code); one customer's complete JSON record from their profile; "Download my data" on the customer card. **Free on every plan, never gated**; every download audit-logged. Settings also shows the stamp program and outlets read-only (self-service editing: PROPOSALS.md §1) | `exportData` (owner-only default) | All | 1 (remaining, shipped 2026-09-21) | Live |
+| Activity report | merchant admin · `/admin/[slug]/reports/activity` | merchant admin | Visits, members, new members, sales and points by Malaysian day; busiest hours (07:00–23:00) and weekdays; CSV (plan-gated like other analytics) | `viewReports` | All | 2 (shipped 2026-09-21) | Live |
+| Report filters (segments, served-by) | merchant admin · `/reports/customers?segment=`, `/reports/transactions?staff=` | merchant admin | Customers report: everyone / new in period / came back (2+ visits) / lapsed (30+ days) with a last-visit column; transactions report: "Served by" staff filter and column; overview gains points-outstanding, lapsed-members and invites tiles plus quick links | `viewReports` | All | 2 (shipped 2026-09-21) | Live |
+| Referral program | merchant admin · `/admin/[slug]/rewards` (settings), `/reports/referrals`; customer · `/app` (Invite a friend), `/app/join/[slug]?ref=CODE` | merchant admin, customer, cashier (sees payout on scan) | Members get a personal invite code and share link; a friend who joins through it is recorded pending, and **both sides are rewarded on the friend's first stamp** (never at sign-up). Rewards per side: nothing, points, or a free voucher for a catalog item (zero-cost coupon confirmed like any other). Cap per member per window; self-invites ignored; over-cap invites kept as "not counted" for the report. Referral point events carry `source=referral`; vouchers carry `grant_source=referral` | `manageRewards` (settings), `viewReports` (report) | **Founding + Growth** (`planAllowsReferrals`); module toggle `referrals` (off by default, on for Founding/Growth at creation) | 5 (pulled forward 2026-09-21) | Live |
 | Marketing site | public · `/`, `/story`, `/roadmap`, `/pricing`, `/security`, `/privacy`, `/contact`, `/about`, quiet `/your-app` | prospect | Editorial showcase surface (`.sc-root` scoped): landing (reach-out quiz → tailored pitch → card simulator), story, roadmap, pricing incl. build-your-own estimator (PRICING.md §9 proposal), branded-app demo page for chains | — | n/a | 0.5–2 | Live |
 
 ## Planned modules (not built — do not build ahead of phase)
 
 | Module | For | What it will do | Plans | Phase | Status |
 |---|---|---|---|---|---|
-| PDPA data export | merchant admin (settings) | Export all customer data to CSV — **free on every plan, forever** (separate from the gated analytics downloads above) | All | 1 (remaining) | Planned |
 | Real OTP delivery | customer | Send OTP by SMS/WhatsApp (today the code is dev-only) | All | 1 (remaining) | Planned |
-| Onboarding wizard + printable QR kit | merchant admin | Guided setup and a printable counter QR | All | 1 (remaining) | Planned |
 | Apple / Google Wallet passes | customer | Add-to-wallet, live pass updates | Starter + Growth | 3 | Planned |
-| VIP / staff member tags | merchant admin | Point multipliers per tag (replaces base rate) | Growth | 3 | Planned |
+| VIP / staff member tags | merchant admin | Point multipliers per tag (replaces base rate) — PROPOSALS.md §2 | Growth | 3 | Planned |
 | WhatsApp automations + campaigns | merchant admin | Welcome/birthday/win-back, campaign builder, credits | Growth | 4 | Planned |
-| Referral rewards | customer + merchant admin | Personal referral links, both-sides rewards | Growth | 5 | Planned |
-| API / POS + advanced analytics | platform / merchant admin | Public API, POS integrations, deeper multi-outlet reporting | Growth | 6 | Planned |
+| API / POS + advanced analytics | platform / merchant admin | Public API, POS integrations, deeper multi-outlet reporting — PROPOSALS.md §3 | Growth | 6 | Planned |
+| Merchant-side program + outlet settings | merchant admin | Edit the stamp card and outlets without Kembali — PROPOSALS.md §1 | All | proposed | Planned |
+| TOTP MFA | platform admin (mandatory), owners (optional) | Authenticator codes on password sign-in — PROPOSALS.md §4 | All | security stage 3 | Planned |
+| Native branded app build | chains | iOS/Android shell per brand with push — PROPOSALS.md §5, APP.md Stage 3 | Growth 6+ outlets | proposed | Planned |
 | Custom domain white-label | merchant admin | Serve the customer card on the merchant's own domain | Growth | 6 | Planned |
 
 ## Notes

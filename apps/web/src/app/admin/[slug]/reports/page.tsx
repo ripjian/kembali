@@ -7,6 +7,7 @@ import { desc, eq, gte, sql } from "drizzle-orm";
 import { getDb } from "@/lib/db";
 import { formatDateTime, formatRM } from "@/lib/format";
 import { getPanelContext } from "@/lib/panel";
+import { countLapsedMembers } from "@/lib/report-data";
 
 /* Reports overview - activity, sales, repeat behaviour, points & rewards.
  * Each list preview is capped to the latest 25; "See full report" opens a
@@ -218,6 +219,18 @@ export default async function ReportsPage({
       .orderBy(desc(schema.redemptions.redeemedAt))
       .limit(25);
 
+    // Points still owed to members: what a full redemption run would cost.
+    const [outstanding] = await tx
+      .select({ n: sql<number>`coalesce(sum(${schema.customers.pointsBalance}), 0)::int` })
+      .from(schema.customers);
+    const [referrals] = await tx
+      .select({
+        invites: sql<number>`count(*)::int`,
+        rewarded: sql<number>`count(*) filter (where ${schema.referrals.state} = 'rewarded')::int`,
+      })
+      .from(schema.referrals)
+      .where(gte(schema.referrals.createdAt, since));
+
     return {
       totals,
       repeat,
@@ -230,8 +243,11 @@ export default async function ReportsPage({
       adjustments,
       redemptionsByReward,
       recentRedemptions,
+      outstanding,
+      referrals,
     };
   });
+  const lapsed = await countLapsedMembers(db, ctx.tenant.id);
 
   const activeCards = data.totals?.cards ?? 0;
   const repeatCards = data.repeat?.n ?? 0;
@@ -252,7 +268,24 @@ export default async function ReportsPage({
       ? [
           { label: "Points earned", value: String(data.pointsAgg?.earned ?? 0) },
           { label: "Points spent", value: String(data.pointsAgg?.spent ?? 0) },
+          { label: "Points members still hold", value: String(data.outstanding?.n ?? 0) },
         ]
+      : []),
+    { label: "Lapsed members (no visit in 30 days)", value: String(lapsed) },
+    ...(ctx.tenant.modules.referrals
+      ? [
+          {
+            label: "Invites → first visits",
+            value: `${data.referrals?.rewarded ?? 0}/${data.referrals?.invites ?? 0}`,
+          },
+        ]
+      : []),
+  ];
+  const moreReports = [
+    { href: `${ctx.base}/reports/activity`, label: "Activity by day and hour" },
+    { href: `${ctx.base}/reports/customers?segment=lapsed`, label: "Lapsed members" },
+    ...(ctx.tenant.modules.referrals
+      ? [{ href: `${ctx.base}/reports/referrals`, label: "Referrals" }]
       : []),
   ];
 
@@ -293,6 +326,18 @@ export default async function ReportsPage({
           </div>
         ))}
       </section>
+
+      <nav aria-label="More reports" className="flex flex-wrap gap-2">
+        {moreReports.map((r) => (
+          <Link
+            key={r.href}
+            href={r.href}
+            className="rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-medium text-text hover:bg-surface-alt"
+          >
+            {r.label} →
+          </Link>
+        ))}
+      </nav>
 
       <section className="rounded-xl border border-border bg-surface">
         <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3">

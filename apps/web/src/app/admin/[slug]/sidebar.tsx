@@ -23,6 +23,7 @@ interface SidebarProps {
     rewards: boolean;
     reports: boolean;
     team: boolean;
+    settings: boolean;
   };
   theme: AdminTheme;
 }

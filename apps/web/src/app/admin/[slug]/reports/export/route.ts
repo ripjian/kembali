@@ -3,10 +3,13 @@ import { planAllowsReportDownload } from "@kembali/core";
 import { getDb } from "@/lib/db";
 import { getPanelContext } from "@/lib/panel";
 import {
+  fetchActivityReport,
   fetchCustomersReport,
+  fetchReferralsReport,
   fetchRewardsReport,
   fetchTransactionsReport,
   readDateRange,
+  readSegment,
   toCsv,
   type TxnTypeFilter,
 } from "@/lib/report-data";
@@ -48,17 +51,42 @@ export async function GET(
   if (type === "transactions") {
     const txn = (url.searchParams.get("txn") ?? "all") as TxnTypeFilter;
     const outlet = url.searchParams.get("outlet") || null;
-    const { rows } = await fetchTransactionsReport(db, ctx.tenant.id, range, txn, outlet);
+    const staff = url.searchParams.get("staff") || null;
+    const { rows } = await fetchTransactionsReport(db, ctx.tenant.id, range, txn, outlet, staff);
     filename = "transactions";
     csv = toCsv(
-      ["Date", "Type", "Customer", "Outlet", "Amount (RM)", "Points"],
+      ["Date", "Type", "Customer", "Outlet", "Served by", "Amount (RM)", "Points"],
       rows.map((r) => [
         iso(r.at),
         r.kind,
         r.customer,
         r.outlet ?? "",
+        r.staff ?? "",
         r.amountCents != null ? RM(r.amountCents) : "",
         r.points != null ? r.points : "",
+      ]),
+    );
+  } else if (type === "activity") {
+    const { byDay } = await fetchActivityReport(db, ctx.tenant.id, range);
+    filename = "activity";
+    csv = toCsv(
+      ["Day", "Visits", "Members", "New members", "Sales (RM)", "Points earned"],
+      byDay.map((d) => [d.day, d.visits, d.members, d.newMembers, RM(d.salesCents), d.points]),
+    );
+  } else if (type === "referrals") {
+    const rows = await fetchReferralsReport(db, ctx.tenant.id, range);
+    filename = "referrals";
+    csv = toCsv(
+      ["Invited on", "Invited by", "Friend", "Status", "Note", "First visit", "Inviter got", "Friend got"],
+      rows.map((r) => [
+        iso(r.at),
+        r.referrer,
+        r.referee,
+        r.state,
+        r.note ?? "",
+        r.qualifiedAt ? iso(r.qualifiedAt) : "",
+        r.referrerGot,
+        r.refereeGot,
       ]),
     );
   } else if (type === "rewards") {
@@ -69,10 +97,11 @@ export async function GET(
       rows.map((r) => [iso(r.at), r.reward, r.customer, r.pointsCost, r.state, r.staff]),
     );
   } else {
-    const rows = await fetchCustomersReport(db, ctx.tenant.id, range);
-    filename = "customers";
+    const segment = readSegment(url.searchParams.get("segment") ?? undefined);
+    const rows = await fetchCustomersReport(db, ctx.tenant.id, range, segment);
+    filename = segment === "all" ? "customers" : `customers-${segment}`;
     csv = toCsv(
-      ["Customer", "Phone", "Joined", "Visits", "Spend (RM)", "Points"],
+      ["Customer", "Phone", "Joined", "Visits", "Spend (RM)", "Points", "Last visit"],
       rows.map((r) => [
         r.name,
         r.phone,
@@ -80,6 +109,7 @@ export async function GET(
         r.visits,
         RM(r.spendCents),
         r.points,
+        r.lastVisit ? iso(r.lastVisit) : "",
       ]),
     );
   }

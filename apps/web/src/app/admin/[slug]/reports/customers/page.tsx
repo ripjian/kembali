@@ -6,7 +6,13 @@ import { planAllowsReportDownload } from "@kembali/core";
 import { getDb } from "@/lib/db";
 import { formatDate, formatRM } from "@/lib/format";
 import { getPanelContext } from "@/lib/panel";
-import { fetchCustomersReport, readDateRange, toDateInput } from "@/lib/report-data";
+import {
+  CUSTOMER_SEGMENTS,
+  fetchCustomersReport,
+  readDateRange,
+  readSegment,
+  toDateInput,
+} from "@/lib/report-data";
 
 import {
   DateRangeForm,
@@ -22,7 +28,7 @@ export default async function CustomersReportPage({
   searchParams,
 }: {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ from?: string; to?: string; page?: string }>;
+  searchParams: Promise<{ from?: string; to?: string; page?: string; segment?: string }>;
 }) {
   const { slug } = await params;
   const ctx = await getPanelContext(slug);
@@ -32,11 +38,12 @@ export default async function CustomersReportPage({
   const page = Math.max(1, Number.parseInt(sp.page ?? "1", 10) || 1);
 
   const db = await getDb();
-  const all = await fetchCustomersReport(db, ctx.tenant.id, range);
+  const segment = readSegment(sp.segment);
+  const all = await fetchCustomersReport(db, ctx.tenant.id, range, segment);
   const pages = Math.max(1, Math.ceil(all.length / PER));
   const rows = all.slice((page - 1) * PER, page * PER);
 
-  const q = `from=${toDateInput(range.from)}&to=${toDateInput(range.to)}`;
+  const q = `from=${toDateInput(range.from)}&to=${toDateInput(range.to)}&segment=${segment}`;
   const exportHref = `${ctx.base}/reports/export?type=customers&${q}`;
   const hrefFor = (p: number) => `${ctx.base}/reports/customers?${q}&page=${p}`;
 
@@ -53,7 +60,22 @@ export default async function CustomersReportPage({
         />
       </ReportHeader>
 
-      <DateRangeForm action={`${ctx.base}/reports/customers`} range={range} />
+      <DateRangeForm action={`${ctx.base}/reports/customers`} range={range}>
+        <label className="text-xs font-medium text-text">
+          Show
+          <select
+            name="segment"
+            defaultValue={segment}
+            className="mt-1 block h-10 rounded-lg border border-border bg-surface px-3 text-sm text-text outline-none focus:border-primary"
+          >
+            {CUSTOMER_SEGMENTS.map((s) => (
+              <option key={s.value} value={s.value}>
+                {s.label}
+              </option>
+            ))}
+          </select>
+        </label>
+      </DateRangeForm>
 
       <section className="overflow-x-auto rounded-xl border border-border bg-surface">
         <table className="w-full min-w-[560px] text-left text-sm">
@@ -65,13 +87,16 @@ export default async function CustomersReportPage({
               <th className="px-4 py-3 font-medium">Visits</th>
               <th className="px-4 py-3 font-medium">Spend</th>
               <th className="px-4 py-3 font-medium">Points</th>
+              <th className="px-4 py-3 font-medium">Last visit</th>
             </tr>
           </thead>
           <tbody>
             {rows.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-4 py-6 text-text-muted">
-                  No customer activity in this period.
+                <td colSpan={7} className="px-4 py-6 text-text-muted">
+                  {segment === "lapsed"
+                    ? "Nobody has lapsed. Every member visited in the last 30 days."
+                    : "No customer activity in this period."}
                 </td>
               </tr>
             )}
@@ -95,6 +120,9 @@ export default async function CustomersReportPage({
                 </td>
                 <td className="px-4 py-3 tabular-nums text-text" data-stat>
                   {c.points}
+                </td>
+                <td className="px-4 py-3 text-text-secondary">
+                  {c.lastVisit ? formatDate(c.lastVisit) : "-"}
                 </td>
               </tr>
             ))}

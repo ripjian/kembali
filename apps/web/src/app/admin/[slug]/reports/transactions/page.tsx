@@ -8,6 +8,7 @@ import { formatDateTime, formatRM } from "@/lib/format";
 import { getPanelContext } from "@/lib/panel";
 import {
   fetchOutlets,
+  fetchStaffOptions,
   fetchTransactionsReport,
   readDateRange,
   toDateInput,
@@ -29,9 +30,11 @@ const TYPES: { value: TxnTypeFilter; label: string }[] = [
   { value: "earned", label: "Points earned" },
   { value: "adjustment", label: "Adjustments" },
   { value: "redemption", label: "Redemptions" },
+  { value: "referral", label: "Referral rewards" },
 ];
 
 const KIND_LABEL: Record<string, string> = {
+  referral: "Referral reward",
   stamp: "Stamp",
   earned: "Points earned",
   adjustment: "Adjustment",
@@ -49,6 +52,7 @@ export default async function TransactionsReportPage({
     page?: string;
     txn?: string;
     outlet?: string;
+    staff?: string;
   }>;
 }) {
   const { slug } = await params;
@@ -65,6 +69,8 @@ export default async function TransactionsReportPage({
   const outlets = await fetchOutlets(db, ctx.tenant.id);
   const multiOutlet = outlets.length > 1;
   const outletId = multiOutlet && outlets.some((o) => o.id === sp.outlet) ? sp.outlet! : null;
+  const staff = await fetchStaffOptions(db, ctx.tenant.id);
+  const staffId = staff.some((m) => m.id === sp.staff) ? sp.staff! : null;
 
   const { rows: all, truncated } = await fetchTransactionsReport(
     db,
@@ -72,13 +78,15 @@ export default async function TransactionsReportPage({
     range,
     txn,
     outletId,
+    staffId,
   );
   const pages = Math.max(1, Math.ceil(all.length / PER));
   const rows = all.slice((page - 1) * PER, page * PER);
 
   const q =
     `from=${toDateInput(range.from)}&to=${toDateInput(range.to)}&txn=${txn}` +
-    (outletId ? `&outlet=${outletId}` : "");
+    (outletId ? `&outlet=${outletId}` : "") +
+    (staffId ? `&staff=${staffId}` : "");
   const exportHref = `${ctx.base}/reports/export?type=transactions&${q}`;
   const hrefFor = (p: number) => `${ctx.base}/reports/transactions?${q}&page=${p}`;
 
@@ -118,12 +126,27 @@ export default async function TransactionsReportPage({
               </select>
             </label>
           )}
+          <label className="text-xs font-medium text-text">
+            Served by
+            <select
+              name="staff"
+              defaultValue={staffId ?? ""}
+              className="mt-1 block h-10 rounded-lg border border-border bg-surface px-3 text-sm text-text outline-none focus:border-primary"
+            >
+              <option value="">Anyone</option>
+              {staff.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.name}
+                </option>
+              ))}
+            </select>
+          </label>
         </DateRangeForm>
         <div className="flex flex-wrap gap-1 rounded-xl border border-border bg-surface p-1">
           {TYPES.map((t) => (
             <Link
               key={t.value}
-              href={`${ctx.base}/reports/transactions?from=${toDateInput(range.from)}&to=${toDateInput(range.to)}&txn=${t.value}${outletId ? `&outlet=${outletId}` : ""}`}
+              href={`${ctx.base}/reports/transactions?from=${toDateInput(range.from)}&to=${toDateInput(range.to)}&txn=${t.value}${outletId ? `&outlet=${outletId}` : ""}${staffId ? `&staff=${staffId}` : ""}`}
               className={`rounded-lg px-3 py-1.5 text-xs font-medium ${
                 txn === t.value
                   ? "bg-primary text-on-primary"
@@ -151,6 +174,7 @@ export default async function TransactionsReportPage({
               <th className="px-4 py-3 font-medium">Type</th>
               <th className="px-4 py-3 font-medium">Customer</th>
               {multiOutlet && <th className="px-4 py-3 font-medium">Outlet</th>}
+              <th className="px-4 py-3 font-medium">Served by</th>
               <th className="px-4 py-3 font-medium">Amount</th>
               <th className="px-4 py-3 font-medium">Points</th>
             </tr>
@@ -158,7 +182,7 @@ export default async function TransactionsReportPage({
           <tbody>
             {rows.length === 0 && (
               <tr>
-                <td colSpan={multiOutlet ? 6 : 5} className="px-4 py-6 text-text-muted">
+                <td colSpan={multiOutlet ? 7 : 6} className="px-4 py-6 text-text-muted">
                   No transactions in this period.
                 </td>
               </tr>
@@ -171,6 +195,7 @@ export default async function TransactionsReportPage({
                 {multiOutlet && (
                   <td className="px-4 py-3 text-text-secondary">{r.outlet ?? "-"}</td>
                 )}
+                <td className="px-4 py-3 text-text-secondary">{r.staff ?? "-"}</td>
                 <td className="px-4 py-3 tabular-nums text-text" data-stat>
                   {r.amountCents != null ? formatRM(r.amountCents) : "-"}
                 </td>

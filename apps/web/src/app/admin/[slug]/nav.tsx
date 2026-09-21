@@ -19,6 +19,7 @@ export function AdminNav({
     rewards: boolean;
     reports: boolean;
     team: boolean;
+    settings: boolean;
   };
   /** Called when a link is tapped - lets the mobile drawer close itself. */
   onNavigate?: () => void;
@@ -39,12 +40,17 @@ export function AdminNav({
         { href: `${base}/reports`, label: "Overview", exact: true },
         { href: `${base}/reports/customers`, label: "Customers" },
         { href: `${base}/reports/transactions`, label: "Transactions" },
+        { href: `${base}/reports/activity`, label: "Activity" },
         ...(modules.rewards
           ? [{ href: `${base}/reports/rewards`, label: "Rewards" }]
+          : []),
+        ...(modules.referrals
+          ? [{ href: `${base}/reports/referrals`, label: "Referrals" }]
           : []),
       ],
     },
     { href: `${base}/team`, label: "Team", show: allowed.team },
+    { href: `${base}/settings`, label: "Settings", show: allowed.settings },
   ].filter((l) => l.show);
 
   return (

@@ -247,6 +247,15 @@ export default async function CustomerDetailPage({
         <div className="flex flex-wrap items-start justify-between gap-3">
           <h2 className="text-sm font-semibold text-text">Details</h2>
           <div className="flex gap-2">
+          {ctx.can("exportData") && (
+            <a
+              href={`${ctx.base}/customers/${customer.id}/export`}
+              className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-text hover:bg-surface-alt"
+              data-export-customer
+            >
+              Download data
+            </a>
+          )}
           {ctx.tenant.modules.points && ctx.can("adjustPoints") && (
             <AdjustPointsButton
               tenantId={ctx.tenant.id}

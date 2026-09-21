@@ -1,11 +1,120 @@
 import Link from "next/link";
 
 import { schema, withTenant } from "@kembali/db";
-import { and, desc, eq, gte, sql } from "drizzle-orm";
+import { and, asc, desc, eq, gte, sql } from "drizzle-orm";
 
 import { getDb } from "@/lib/db";
 import { formatDateTime, formatRM } from "@/lib/format";
-import { getPanelContext } from "@/lib/panel";
+import { getPanelContext, type PanelContext } from "@/lib/panel";
+
+import { OnboardingGuide, type OnboardingStep } from "./onboarding";
+
+/** Steps for the first-access guide, checked against live data; null once
+ * the person has finished it (or for platform admins). */
+async function loadOnboarding(
+  ctx: PanelContext,
+  db: Awaited<ReturnType<typeof getDb>>,
+): Promise<{ role: "owner" | "manager" | "cashier"; steps: OnboardingStep[] } | null> {
+  if (ctx.admin.kind !== "staff" || ctx.admin.role === "platform") return null;
+  const role = ctx.admin.role;
+  return withTenant(db, ctx.tenant.id, async (tx) => {
+    const [me] = await tx
+      .select({ onboardedAt: schema.staffUsers.onboardedAt })
+      .from(schema.staffUsers)
+      .where(eq(schema.staffUsers.id, ctx.admin.subjectId));
+    if (!me || me.onboardedAt) return null;
+    const [program] = await tx
+      .select()
+      .from(schema.programs)
+      .orderBy(asc(schema.programs.createdAt))
+      .limit(1);
+    const [counts] = await tx
+      .select({
+        staff: sql<number>`(select count(*) from ${schema.staffUsers})::int`,
+        rewards: sql<number>`(select count(*) from ${schema.rewardItems} where ${schema.rewardItems.active})::int`,
+        stamps: sql<number>`(select count(*) from ${schema.stampEvents})::int`,
+        outlets: sql<number>`(select count(*) from ${schema.outlets})::int`,
+        pointsPerRm: sql<number>`(select ${schema.tenants.pointsPerRm} from ${schema.tenants} limit 1)`,
+      })
+      .from(schema.tenants);
+    const base = ctx.base;
+    const rewardTitle =
+      Array.isArray(program?.rewardDefinitions) &&
+      program.rewardDefinitions[0] &&
+      typeof program.rewardDefinitions[0] === "object" &&
+      "title" in program.rewardDefinitions[0]
+        ? String((program.rewardDefinitions[0] as { title?: string }).title ?? "a reward")
+        : "a reward";
+    if (role === "cashier") {
+      const steps: OnboardingStep[] = [
+        ...((counts?.outlets ?? 0) > 1
+          ? [
+              {
+                title: "Choose today's outlet",
+                detail: "The scan page asks once a day which outlet you are serving at.",
+              },
+            ]
+          : []),
+        {
+          title: "Stamp a member",
+          detail: "Tap Scan member, key in the amount, then scan the code on their phone. Camera or paste, both work.",
+          href: `${base}/scan`,
+          cta: "Open scan",
+        },
+        {
+          title: "Confirm a reward",
+          detail: "Tap Scan reward when a member shows a coupon. Check the name, then confirm. Each coupon works once.",
+        },
+        {
+          title: "If a code will not scan",
+          detail: 'Ask the member to tap "Code won\'t scan?" on their card and paste what they show you.',
+        },
+      ];
+      return { role, steps };
+    }
+    const steps: OnboardingStep[] = [
+      {
+        title: "Your stamp card is ready",
+        detail: program
+          ? `${program.name}: ${program.stampsRequired} stamps earn ${rewardTitle.toLowerCase()}. Contact Kembali to change it.`
+          : "Contact Kembali to set up your stamp card.",
+        done: Boolean(program),
+      },
+      ...(ctx.tenant.modules.rewards
+        ? [
+            {
+              title: "Set points and add a reward",
+              detail: "Decide how many points RM1 earns, then add the first thing members can redeem.",
+              href: `${base}/rewards`,
+              cta: "Open rewards",
+              done: (counts?.pointsPerRm ?? 0) > 0 && (counts?.rewards ?? 0) > 0,
+            },
+          ]
+        : []),
+      {
+        title: "Add your team",
+        detail: "Cashiers sign in with their own email and only see the scan page.",
+        href: `${base}/team`,
+        cta: "Open team",
+        done: (counts?.staff ?? 0) > 1,
+      },
+      {
+        title: "Print your QR kit",
+        detail: "Customers scan the counter poster to start their card in seconds.",
+        href: `${base}/qr-kit`,
+        cta: "Open QR kit",
+      },
+      {
+        title: "Do a test stamp",
+        detail: "Open the join link on your own phone, then stamp yourself from the scan page.",
+        href: `${base}/scan`,
+        cta: "Open scan",
+        done: (counts?.stamps ?? 0) > 0,
+      },
+    ];
+    return { role, steps };
+  });
+}
 
 export default async function AdminOverviewPage({
   params,
@@ -16,6 +125,7 @@ export default async function AdminOverviewPage({
   const ctx = await getPanelContext(slug);
 
   const db = await getDb();
+  const guide = await loadOnboarding(ctx, db);
   const dayStart = new Date();
   dayStart.setHours(0, 0, 0, 0);
 
@@ -73,6 +183,14 @@ export default async function AdminOverviewPage({
       <p className="text-lg font-medium text-text" data-greeting>
         Selamat kembali ke {ctx.tenant.name} 👋
       </p>
+      {guide && (
+        <OnboardingGuide
+          tenantId={ctx.tenant.id}
+          storeName={ctx.tenant.name}
+          role={guide.role}
+          steps={guide.steps}
+        />
+      )}
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold text-text">Overview</h1>

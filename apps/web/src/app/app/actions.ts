@@ -143,3 +143,18 @@ export async function cancelRedemption(formData: FormData) {
   );
   redirect("/app");
 }
+
+/** The welcome guide was read or skipped: never show it to this person
+ * again, on any device. */
+export async function completeCustomerOnboarding() {
+  const session = await getCustomerSession({ allowRotation: true });
+  if (!session) redirect("/app/login");
+  const db = await getDb();
+  await withTenant(db, session.tenantId, (tx) =>
+    tx
+      .update(schema.customers)
+      .set({ onboardedAt: new Date() })
+      .where(eq(schema.customers.id, session.customerId)),
+  );
+  redirect("/app");
+}

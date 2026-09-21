@@ -14,6 +14,9 @@ import {
   LOGIN_IP_POLICY,
   LOGIN_PAIR_POLICY,
   PERMISSION_KEYS,
+  planAllowsReferrals,
+  referralRewardSchema,
+  referralSettingsSchema,
   type RolePermissionMatrix,
 } from "@kembali/core";
 import {
@@ -995,4 +998,89 @@ export async function redeemReward(formData: FormData) {
       ? `/admin/${slug}/customers/${customerId.data}`
       : `/admin/${slug}/customers`,
   );
+}
+
+/* ---- first-access guide ------------------------------------------------- */
+
+/** Finish or hide the first-access guide for the signed-in staff member.
+ * Platform admins never see it, so this is a no-op for them. */
+export async function completeStaffOnboarding(formData: FormData) {
+  const tenantId = z.uuid().safeParse(formData.get("tenantId"));
+  if (!tenantId.success) redirect("/admin");
+  const { admin, slug } = await authorizeTenantAction(tenantId.data, null);
+  if (admin.kind === "staff") {
+    const db = await getDb();
+    await withTenant(db, tenantId.data, (tx) =>
+      tx
+        .update(schema.staffUsers)
+        .set({ onboardedAt: new Date() })
+        .where(eq(schema.staffUsers.id, admin.subjectId)),
+    );
+  }
+  redirect(`/admin/${slug}`);
+}
+
+/* ---- referral program (Phase 5) ----------------------------------------- */
+
+function readRewardFields(formData: FormData, side: "referrer" | "referee"): unknown {
+  const type = formData.get(`${side}Type`);
+  if (type === "points") {
+    return { type, points: Number(formData.get(`${side}Points`)) };
+  }
+  if (type === "voucher") {
+    return { type, rewardItemId: formData.get(`${side}Item`) };
+  }
+  return { type: "none" };
+}
+
+export async function updateReferralSettings(formData: FormData) {
+  const tenantId = z.uuid().safeParse(formData.get("tenantId"));
+  if (!tenantId.success) redirect("/admin");
+  const { admin, slug } = await authorizeTenantAction(tenantId.data, "manageRewards");
+
+  const parsed = referralSettingsSchema.safeParse({
+    enabled: formData.get("enabled") === "on",
+    referrer: readRewardFields(formData, "referrer"),
+    referee: readRewardFields(formData, "referee"),
+    maxPerReferrer: Number(formData.get("maxPerReferrer")),
+    windowDays: Number(formData.get("windowDays")),
+    voucherValidDays: Number(formData.get("voucherValidDays")),
+  });
+  if (!parsed.success) redirect(`/admin/${slug}/rewards?error=referrals`);
+  const settings = parsed.data;
+
+  const db = await getDb();
+  const outcome = await withTenant(db, tenantId.data, async (tx) => {
+    const [tenant] = await tx
+      .select({ plan: schema.tenants.plan })
+      .from(schema.tenants);
+    if (!tenant || !planAllowsReferrals(tenant.plan)) return "plan" as const;
+    // Voucher rewards must point at this store's own catalog (RLS scopes
+    // the lookup, so another store's item id simply isn't found).
+    for (const side of [settings.referrer, settings.referee]) {
+      const reward = referralRewardSchema.parse(side);
+      if (reward.type !== "voucher") continue;
+      const [item] = await tx
+        .select({ id: schema.rewardItems.id })
+        .from(schema.rewardItems)
+        .where(eq(schema.rewardItems.id, reward.rewardItemId));
+      if (!item) return "item" as const;
+    }
+    await tx
+      .update(schema.tenants)
+      .set({ referralSettings: settings })
+      .where(eq(schema.tenants.id, tenantId.data));
+    await audit(tx, {
+      tenantId: tenantId.data,
+      actorType: admin.kind,
+      actorId: admin.subjectId,
+      action: "referrals.settings_updated",
+      entity: "tenant",
+      entityId: tenantId.data,
+      meta: settings,
+    });
+    return "ok" as const;
+  });
+  if (outcome !== "ok") redirect(`/admin/${slug}/rewards?error=referrals`);
+  redirect(`/admin/${slug}/rewards?saved=referrals`);
 }

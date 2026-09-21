@@ -4,7 +4,9 @@ import {
   formatRetryAfter,
   hashOtpCode,
   isOtpBypass,
+  isReferralCode,
   needsRegistration,
+  normalizeReferralCode,
   OTP_MAX_ATTEMPTS,
   OTP_VERIFY_DEVICE_POLICY,
   OTP_VERIFY_IP_POLICY,
@@ -27,12 +29,15 @@ import { OTP_BYPASS_ENABLED } from "@/lib/config";
 import { getDb } from "@/lib/db";
 import { resolveJoinTenantId } from "@/lib/join";
 import { normalizePhone, phoneInputSchema } from "@/lib/phone";
+import { recordReferralAtSignup } from "@/lib/referrals";
 
 const bodySchema = z.object({
   phone: phoneInputSchema,
   code: z.string().regex(/^\d{6}$/, "Enter the 6-digit code"),
   // The tenant whose join page issued the code (tenant-scoped join).
   tenantId: z.string().optional(),
+  // A friend's invite code (Phase 5); only a brand-new customer counts.
+  ref: z.string().max(20).optional(),
 });
 
 export async function POST(req: Request) {
@@ -116,6 +121,11 @@ export async function POST(req: Request) {
         .insert(schema.customers)
         .values({ tenantId, phone })
         .returning();
+      // An invite only counts for someone who did not have a card here.
+      const ref = parsed.data.ref ? normalizeReferralCode(parsed.data.ref) : "";
+      if (customer && isReferralCode(ref)) {
+        await recordReferralAtSignup(tx, { tenantId, code: ref, refereeCustomerId: customer.id });
+      }
     }
     if (!customer) return { ok: false as const };
 

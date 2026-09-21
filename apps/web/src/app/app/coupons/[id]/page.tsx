@@ -67,7 +67,7 @@ export default async function CouponPage({
       <section className="rounded-2xl border border-border bg-surface p-6 text-center shadow-sm">
         <h1 className="text-lg font-semibold text-text">{data.title}</h1>
         <p className="mt-1 text-xs tabular-nums text-text-muted" data-stat>
-          {data.pointsCost} points
+          {data.pointsCost === 0 ? "Free voucher" : `${data.pointsCost} points`}
         </p>
 
         {state === "reserved" && (

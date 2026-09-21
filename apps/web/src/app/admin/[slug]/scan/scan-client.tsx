@@ -24,6 +24,13 @@ interface StampResult {
   rewardEarned: boolean;
   pointsEarned: number;
   pointsBalance: number;
+  /** Set when this first stamp paid out a referral (both sides). */
+  referral?: {
+    referrerName: string;
+    refereeName: string;
+    referrerReward: string;
+    refereeReward: string;
+  } | null;
 }
 
 interface CouponInfo {
@@ -447,6 +454,13 @@ function MemberScan({ onBack, showBack }: { onBack: () => void; showBack: boolea
             <p className="mt-1 text-sm text-text-secondary" data-points-earned>
               +{result.pointsEarned} points · balance now{" "}
               <span className="tabular-nums">{result.pointsBalance}</span>
+            </p>
+          )}
+          {result.referral && (
+            <p className="mt-2 rounded-lg bg-surface-alt px-3 py-2 text-xs text-text" data-referral-paid>
+              Invite rewarded: {result.referral.refereeName} gets{" "}
+              {result.referral.refereeReward}, and {result.referral.referrerName}{" "}
+              gets {result.referral.referrerReward}.
             </p>
           )}
         </div>

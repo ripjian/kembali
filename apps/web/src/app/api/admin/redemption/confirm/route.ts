@@ -100,15 +100,19 @@ export async function POST(req: Request) {
       .returning({ id: schema.redemptions.id });
     if (!won) return { error: "This coupon was already used." };
 
-    await tx.insert(schema.pointEvents).values({
-      tenantId,
-      customerId: customer.id,
-      delta: -coupon.pointsCost,
-      source: "redemption",
-      staffId: admin.kind === "staff" ? admin.subjectId : null,
-      redemptionId: coupon.id,
-      outletId: servingOutletId,
-    });
+    // A free voucher (referral grant) moves no points, so it writes no
+    // ledger row; the redemption row itself is the record.
+    if (coupon.pointsCost > 0) {
+      await tx.insert(schema.pointEvents).values({
+        tenantId,
+        customerId: customer.id,
+        delta: -coupon.pointsCost,
+        source: "redemption",
+        staffId: admin.kind === "staff" ? admin.subjectId : null,
+        redemptionId: coupon.id,
+        outletId: servingOutletId,
+      });
+    }
     await tx.insert(schema.auditLog).values({
       tenantId,
       actorType: admin.kind,

@@ -16,6 +16,7 @@ import { getAdminContext } from "@/lib/auth";
 import { qrTokenSecret } from "@/lib/config";
 import { getDb } from "@/lib/db";
 import { parseModules } from "@/lib/modules";
+import { qualifyReferralOnFirstStamp } from "@/lib/referrals";
 import { resolveEventOutletId } from "@/lib/serving-outlet";
 
 const bodySchema = z.object({
@@ -151,6 +152,18 @@ export async function POST(req: Request) {
       .set({ stampsCount: sql`${schema.cards.stampsCount} + 1` })
       .where(eq(schema.cards.id, card.id));
 
+    // A friend's FIRST stamp is what pays a referral (DEVSPEC §17).
+    const referral =
+      card.stampsCount === 0
+        ? await qualifyReferralOnFirstStamp(tx, {
+            tenantId,
+            refereeCustomerId: card.customerId,
+            staffId: admin.kind === "staff" ? admin.subjectId : null,
+            outletId: servingOutletId,
+            actor: { type: admin.kind, id: admin.subjectId },
+          })
+        : null;
+
     let rewardEarned = false;
     if (earnsReward(newCount, program.stampsRequired)) {
       rewardEarned = true;
@@ -181,6 +194,7 @@ export async function POST(req: Request) {
       rewardEarned,
       pointsEarned,
       pointsBalance: balanceRow?.balance ?? 0,
+      referral,
     };
   });
 

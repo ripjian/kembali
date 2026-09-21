@@ -9,9 +9,18 @@ import { Button, LogoMark, StampGrid } from "@kembali/ui";
 import { destroySessions, getCustomerSession } from "@/lib/auth";
 import { getDb } from "@/lib/db";
 import { formatDateTime, formatDate, formatRM } from "@/lib/format";
+import { requestOrigin } from "@/lib/join";
 import { parseModules } from "@/lib/modules";
+import {
+  describeReward,
+  ensureReferralCode,
+  readReferralProgram,
+  rewardTitlesFor,
+} from "@/lib/referrals";
 
+import { ShareInvite } from "./invite";
 import { ShowQrButton } from "./show-qr";
+import { WelcomeGuide } from "./welcome";
 
 export const dynamic = "force-dynamic";
 
@@ -44,7 +53,11 @@ export default async function CardPage() {
       .from(schema.programs)
       .where(eq(schema.programs.id, card.programId));
     const [tenant] = await tx
-      .select({ name: schema.tenants.name, modules: schema.tenants.modules })
+      .select({
+        name: schema.tenants.name,
+        slug: schema.tenants.slug,
+        modules: schema.tenants.modules,
+      })
       .from(schema.tenants);
     const events = await tx
       .select({
@@ -88,6 +101,31 @@ export default async function CardPage() {
       )
       .orderBy(desc(schema.redemptions.createdAt))
       .limit(1);
+
+    // Referral program (Phase 5): personal code, what each side gets, and
+    // the status of the invites this member has sent.
+    const referralProgram = await readReferralProgram(tx);
+    const referralCode = referralProgram.live
+      ? await ensureReferralCode(tx, customer.id)
+      : null;
+    const invites = referralProgram.live
+      ? await tx
+          .select({
+            id: schema.referrals.id,
+            state: schema.referrals.state,
+            createdAt: schema.referrals.createdAt,
+            qualifiedAt: schema.referrals.qualifiedAt,
+            friend: schema.customers.name,
+          })
+          .from(schema.referrals)
+          .leftJoin(schema.customers, eq(schema.referrals.refereeCustomerId, schema.customers.id))
+          .where(eq(schema.referrals.referrerCustomerId, customer.id))
+          .orderBy(desc(schema.referrals.createdAt))
+          .limit(10)
+      : [];
+    const rewardTitles = referralProgram.live
+      ? await rewardTitlesFor(tx, referralProgram.settings)
+      : new Map<string, string>();
     return {
       customer,
       card,
@@ -98,6 +136,10 @@ export default async function CardPage() {
       pointEvents,
       rewardItems,
       openCoupon,
+      referralProgram,
+      referralCode,
+      invites,
+      rewardTitles,
     } as const;
   });
 
@@ -122,8 +164,18 @@ export default async function CardPage() {
     pointEvents,
     rewardItems,
     openCoupon,
+    referralProgram,
+    referralCode,
+    invites,
+    rewardTitles,
   } = data;
   const modules = parseModules(tenant?.modules);
+  const inviteUrl =
+    referralCode && tenant
+      ? `${await requestOrigin()}/app/join/${tenant.slug}?ref=${referralCode}`
+      : null;
+  const youGet = describeReward(referralProgram.settings.referrer, rewardTitles);
+  const friendGets = describeReward(referralProgram.settings.referee, rewardTitles);
   const progress = computeCardProgress({
     stampsCount: card.stampsCount,
     stampsRequired: program.stampsRequired,
@@ -161,7 +213,9 @@ export default async function CardPage() {
         label:
           event.source === "adjustment"
             ? event.reason ?? "Points adjustment"
-            : "Reward redeemed",
+            : event.source === "referral"
+              ? event.reason ?? "Referral reward"
+              : "Reward redeemed",
         amountCents: null,
         points: event.delta,
         stamp: false,
@@ -172,6 +226,13 @@ export default async function CardPage() {
 
   return (
     <main className="mx-auto flex min-h-dvh max-w-sm flex-col gap-6 px-5 py-8">
+      {customer.onboardedAt === null && (
+        <WelcomeGuide
+          store={tenant?.name ?? "the store"}
+          stamps={program.stampsRequired}
+          points={modules.points}
+        />
+      )}
       <header className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <LogoMark size={32} className="dark:hidden" />
@@ -299,6 +360,45 @@ export default async function CardPage() {
         </section>
       )}
 
+      {/* Invite a friend (Phase 5) */}
+      {inviteUrl && (
+        <section className="rounded-2xl border border-border bg-surface p-6 shadow-sm" data-invite>
+          <h2 className="text-sm font-semibold text-text">Invite a friend</h2>
+          <p className="mt-1 text-xs text-text-muted">
+            {youGet === "nothing"
+              ? `Your friend gets ${friendGets} after their first stamp.`
+              : friendGets === "nothing"
+                ? `You get ${youGet} when a friend makes their first visit.`
+                : `You get ${youGet} and your friend gets ${friendGets}, once they make their first visit.`}
+          </p>
+          <div className="mt-3">
+            <ShareInvite url={inviteUrl} store={tenant?.name ?? "the store"} />
+          </div>
+          <p className="mt-2 break-all text-center font-mono text-[11px] text-text-muted" data-invite-url>
+            {inviteUrl}
+          </p>
+          {invites.length > 0 && (
+            <ul className="mt-3 flex flex-col">
+              {invites.map((inv) => (
+                <li
+                  key={inv.id}
+                  className="flex items-center justify-between gap-2 border-b border-border py-2 text-xs last:border-b-0"
+                >
+                  <span className="min-w-0 truncate text-text">{inv.friend ?? "A friend"}</span>
+                  <span className="shrink-0 text-text-muted">
+                    {inv.state === "rewarded"
+                      ? `Rewarded ${inv.qualifiedAt ? formatDate(inv.qualifiedAt) : ""}`
+                      : inv.state === "pending"
+                        ? "Reward arrives on their first visit"
+                        : "Not counted"}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      )}
+
       {/* Stamp-card rewards already earned */}
       <section className="rounded-2xl border border-border bg-surface p-6 shadow-sm">
         <h2 className="text-sm font-semibold text-text">Your rewards</h2>
@@ -389,6 +489,13 @@ export default async function CardPage() {
         <Button className="w-full" aria-hidden disabled>
           Add to wallet (coming soon)
         </Button>
+        <a
+          href="/app/export"
+          className="mt-4 inline-block text-xs font-medium text-text-muted underline hover:text-text"
+          data-export-self
+        >
+          Download my data
+        </a>
       </div>
     </main>
   );

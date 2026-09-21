@@ -10,11 +10,17 @@ import { useState, type ReactNode } from "react";
 
 export function LoginForm({
   tenantId,
+  referralCode,
+  notice,
   title,
   phoneSubtitle,
   logo,
 }: {
   tenantId?: string;
+  /** Invite code from a friend's link; recorded when a NEW customer joins. */
+  referralCode?: string;
+  /** Rendered under the header, e.g. "Aisyah invited you". */
+  notice?: ReactNode;
   title: string;
   phoneSubtitle: string;
   logo: ReactNode;
@@ -53,7 +59,7 @@ export function LoginForm({
     const res = await fetch("/api/auth/otp/verify", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ phone, code, tenantId }),
+      body: JSON.stringify({ phone, code, tenantId, ref: referralCode }),
     });
     const data = await res.json();
     setBusy(false);
@@ -80,6 +86,8 @@ export function LoginForm({
           </p>
         </div>
       </header>
+
+      {notice}
 
       {step === "phone" ? (
         <form onSubmit={requestCode} className="flex flex-col gap-3">

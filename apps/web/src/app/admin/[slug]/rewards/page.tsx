@@ -1,12 +1,14 @@
 import { redirect } from "next/navigation";
 
+import { parseReferralSettings } from "@kembali/core";
 import { schema, withTenant } from "@kembali/db";
-import { desc, sql } from "drizzle-orm";
+import { desc, gte, sql } from "drizzle-orm";
 
 import { updatePointsRate } from "@/lib/admin-actions";
 import { getDb } from "@/lib/db";
 import { getPanelContext } from "@/lib/panel";
 
+import { ReferralSettingsSection } from "./referral-settings";
 import { CreateRewardButton, EditRewardButton } from "./reward-modals";
 
 /* Rewards & points settings (Phase 2): the RM→points rate and the catalog
@@ -28,8 +30,19 @@ export default async function RewardsPage({
   const db = await getDb();
   const data = await withTenant(db, ctx.tenant.id, async (tx) => {
     const [tenant] = await tx
-      .select({ pointsPerRm: schema.tenants.pointsPerRm })
+      .select({
+        pointsPerRm: schema.tenants.pointsPerRm,
+        referralSettings: schema.tenants.referralSettings,
+      })
       .from(schema.tenants);
+    const since = new Date(Date.now() - 30 * 86_400_000);
+    const [referralStats] = await tx
+      .select({
+        invites: sql<number>`count(*)::int`,
+        rewarded: sql<number>`count(*) filter (where ${schema.referrals.state} = 'rewarded')::int`,
+      })
+      .from(schema.referrals)
+      .where(gte(schema.referrals.createdAt, since));
     const items = await tx
       .select()
       .from(schema.rewardItems)
@@ -41,7 +54,16 @@ export default async function RewardsPage({
       })
       .from(schema.redemptions)
       .groupBy(schema.redemptions.rewardItemId);
-    return { pointsPerRm: tenant?.pointsPerRm ?? 1, items, redeemCounts };
+    return {
+      pointsPerRm: tenant?.pointsPerRm ?? 1,
+      referralSettings: parseReferralSettings(tenant?.referralSettings),
+      referralStats: {
+        invites30d: referralStats?.invites ?? 0,
+        rewarded30d: referralStats?.rewarded ?? 0,
+      },
+      items,
+      redeemCounts,
+    };
   });
   const redeemedBy = new Map(data.redeemCounts.map((r) => [r.rewardItemId, r.redeemed]));
 
@@ -59,14 +81,20 @@ export default async function RewardsPage({
 
       {saved && (
         <p role="status" className="rounded-xl border border-leaf/50 bg-surface px-4 py-3 text-sm text-text">
-          {saved === "rate" ? "Points rate saved." : "Reward saved."}
+          {saved === "rate"
+            ? "Points rate saved."
+            : saved === "referrals"
+              ? "Referral settings saved."
+              : "Reward saved."}
         </p>
       )}
       {error && (
         <p role="alert" className="rounded-xl border border-error/40 bg-surface px-4 py-3 text-sm text-error">
           {error === "rate"
             ? "The rate must be a number between 0 and 1000."
-            : "Check the reward details, then try again."}
+            : error === "referrals"
+              ? "Check the referral settings. A voucher needs a reward from your catalog, and points must be at least 1."
+              : "Check the reward details, then try again."}
         </p>
       )}
 
@@ -111,6 +139,16 @@ export default async function RewardsPage({
             </div>
           </form>
         </section>
+      )}
+
+      {ctx.tenant.modules.referrals && (
+        <ReferralSettingsSection
+          tenantId={ctx.tenant.id}
+          plan={ctx.tenant.plan}
+          settings={data.referralSettings}
+          items={data.items.filter((i) => i.active).map((i) => ({ id: i.id, title: i.title }))}
+          stats={data.referralStats}
+        />
       )}
 
       <section className="rounded-xl border border-border bg-surface">

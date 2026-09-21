@@ -18,3 +18,19 @@ export const REFERRAL_PLANS = ["founding", "growth"] as const;
 export function planAllowsReferrals(plan: string): boolean {
   return (REFERRAL_PLANS as readonly string[]).includes(plan);
 }
+
+/** Monthly price per outlet (MYR) for the invoice note when a merchant
+ * adds an outlet themselves. Mirrors PRICING.md §2; null = not priced
+ * (trial). Keep in sync when pricing changes. */
+export function planOutletPriceRm(plan: string): number | null {
+  switch (plan) {
+    case "founding":
+      return 99;
+    case "starter":
+      return 149;
+    case "growth":
+      return 279;
+    default:
+      return null;
+  }
+}

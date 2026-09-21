@@ -153,6 +153,7 @@ export default async function CustomerDetailPage({
       ? computeCardProgress({
           stampsCount: card.stampsCount,
           stampsRequired: program.stampsRequired,
+          rewardsEarned: rewards.length,
         })
       : null;
 

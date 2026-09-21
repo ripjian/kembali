@@ -72,7 +72,8 @@ Nothing ships half-open. Before calling any feature done, walk this checklist. I
 ## 8. Outlets — Phase 1/round-2, shipped light
 - First-class: address (line/postcode/city/state/country); first outlet mandatory at merchant creation; tenant address deprecated (migrated to first outlet).
 - Cashier picks serving outlet once/day (cookie; skipped for single-outlet); banner + dropdown above scan buttons; every stamp/point/redemption records outlet_id.
-- Closures: outlet edit; outlet retire = deactivate only once events reference it (events keep the FK); adding outlet mid-life is a platform-admin action now (**ASK FOUNDER** when merchants ask to self-serve: plan gate? price per outlet applies).
+- **DECIDED 2026-09-21:** merchants self-serve outlets (add / edit / retire / bring back) in Settings, permission `manageSettings`. Retire = `active=false` (events keep the FK; the picker, QR kit, serving-outlet fallback and invoice drop it; report filters keep it labelled "(retired)"). The last active outlet cannot be retired. Adding shows the per-outlet price (`planOutletPriceRm`) and writes `outlet.created` (`meta.billing=true`); the platform merchants page lists these for invoicing.
+- Program edits (name, stamps required, reward, validity) are merchant-side too: future stamps only, `programs.updated_at` set, `program.updated` audit row with before/after, the customer card shows "Card updated … your stamps carry over" for 30 days. Progress is measured from rewards already earned (core), so lowering the requirement below a member's count pays at their next stamp and raising it keeps every stamp.
 - Per-branch staff permissions + cross-outlet analytics stay Phase 6; do not pull forward.
 
 ## 9. Customers CRM — Phase 1+2, shipped

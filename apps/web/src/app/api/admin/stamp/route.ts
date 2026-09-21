@@ -146,6 +146,14 @@ export async function POST(req: Request) {
       });
     }
 
+    // Rewards already earned decide whether this stamp completes a loop, so
+    // a merchant editing "stamps required" never wipes progress (core
+    // computeCardProgress / earnsReward).
+    const [earnedSoFar] = await tx
+      .select({ n: sql<number>`count(*)::int` })
+      .from(schema.rewards)
+      .where(eq(schema.rewards.cardId, card.id));
+    const rewardsEarned = earnedSoFar?.n ?? 0;
     const newCount = card.stampsCount + 1;
     await tx
       .update(schema.cards)
@@ -165,7 +173,7 @@ export async function POST(req: Request) {
         : null;
 
     let rewardEarned = false;
-    if (earnsReward(newCount, program.stampsRequired)) {
+    if (earnsReward(newCount, program.stampsRequired, rewardsEarned)) {
       rewardEarned = true;
       const defs = rewardDefs.safeParse(program.rewardDefinitions);
       const rules = rewardRules.safeParse(program.expiryRules);
@@ -181,6 +189,7 @@ export async function POST(req: Request) {
     const progress = computeCardProgress({
       stampsCount: newCount,
       stampsRequired: program.stampsRequired,
+      rewardsEarned: rewardsEarned + (rewardEarned ? 1 : 0),
     });
     const [balanceRow] = await tx
       .select({ balance: schema.customers.pointsBalance })

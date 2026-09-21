@@ -81,6 +81,7 @@ export { pointsForAmount, sumPointDeltas } from "./points";
 export {
   planAllowsReportDownload,
   planAllowsReferrals,
+  planOutletPriceRm,
   REPORT_DOWNLOAD_PLANS,
   REFERRAL_PLANS,
 } from "./plans";

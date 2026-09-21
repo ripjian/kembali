@@ -96,5 +96,10 @@ describe("stamp velocity", () => {
     expect(earnsReward(9, 9)).toBe(true);
     expect(earnsReward(18, 9)).toBe(true);
     expect(earnsReward(8, 9)).toBe(false);
+    // with rewards already earned: a lowered requirement pays at the next stamp
+    expect(earnsReward(8, 5, 0)).toBe(true);
+    expect(earnsReward(10, 9, 1)).toBe(false);
+    expect(earnsReward(18, 9, 1)).toBe(true);
+    expect(earnsReward(7, 12, 0)).toBe(false);
   });
 });

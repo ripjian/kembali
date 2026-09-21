@@ -30,6 +30,17 @@ export function checkStampVelocity(
 
 /** A reward is earned each time the count crosses a multiple of the
  * program requirement (cards loop - see computeCardProgress). */
-export function earnsReward(newStampsCount: number, stampsRequired: number): boolean {
-  return newStampsCount > 0 && newStampsCount % stampsRequired === 0;
+export function earnsReward(
+  newStampsCount: number,
+  stampsRequired: number,
+  /** Rewards already earned by the card. With it, a stamp earns a reward
+   * whenever the stamps not yet "spent" on a reward reach the requirement,
+   * which survives the merchant editing the requirement (see
+   * computeCardProgress). Without it, the classic fixed loop applies. */
+  rewardsEarned?: number,
+): boolean {
+  if (rewardsEarned === undefined) {
+    return newStampsCount > 0 && newStampsCount % stampsRequired === 0;
+  }
+  return newStampsCount - rewardsEarned * stampsRequired >= stampsRequired;
 }

@@ -158,6 +158,9 @@ export const outlets = pgTable(
     lat: doublePrecision("lat"),
     lng: doublePrecision("lng"),
     timezone: text("timezone").notNull().default("Asia/Kuala_Lumpur"),
+    /** Retired outlets keep their history (events reference them) but leave
+     * the cashier's picker, the QR kit and the invoice. */
+    active: boolean("active").notNull().default(true),
     createdAt: createdAt(),
   },
   (t) => [
@@ -349,6 +352,8 @@ export const programs = pgTable(
     rewardDefinitions: jsonb("reward_definitions").notNull().default([]),
     expiryRules: jsonb("expiry_rules").notNull().default({}),
     active: boolean("active").notNull().default(true),
+    /** Last merchant edit; the customer card mentions a recent change. */
+    updatedAt: timestamp("updated_at", { withTimezone: true }),
     createdAt: createdAt(),
   },
   (t) => [tenantPolicy("programs"), index("programs_tenant_idx").on(t.tenantId)],
@@ -653,6 +658,13 @@ export const auditLog = pgTable(
       for: "insert",
       to: appRole,
       withCheck: sql`current_setting('app.platform_admin', true) = 'true'`,
+    }),
+    // The platform admin reads merchants' billing-relevant changes (outlets
+    // added or retired) across tenants. Set only by withPlatform.
+    pgPolicy("audit_log_platform_select", {
+      for: "select",
+      to: appRole,
+      using: sql`current_setting('app.platform_admin', true) = 'true'`,
     }),
     index("audit_log_tenant_idx").on(t.tenantId, t.createdAt),
   ],

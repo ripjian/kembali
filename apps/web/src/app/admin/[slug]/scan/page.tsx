@@ -27,6 +27,7 @@ export default async function ScanPage({
     const outlets = await tx
       .select({ id: schema.outlets.id, name: schema.outlets.name })
       .from(schema.outlets)
+      .where(eq(schema.outlets.active, true))
       .orderBy(schema.outlets.createdAt);
     const todays = await tx
       .select({

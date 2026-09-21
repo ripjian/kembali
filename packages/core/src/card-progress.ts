@@ -5,6 +5,13 @@ import { z } from "zod";
 const inputSchema = z.object({
   stampsCount: z.number().int().min(0),
   stampsRequired: z.number().int().min(1),
+  /** Rewards this card has already earned (rows in `rewards`). When given,
+   * progress is measured from the stamps those rewards consumed, so a
+   * merchant changing "stamps required" never wipes a member's progress:
+   * lowering it below a member's count owes them a reward at their next
+   * stamp; raising it keeps every stamp they have. Omitted = the classic
+   * fixed-size loop (floor(count / required)). */
+  rewardsEarned: z.number().int().min(0).optional(),
 });
 
 export interface CardProgress {
@@ -16,19 +23,26 @@ export interface CardProgress {
   stampsRemaining: number;
   /** 0..1 fill for the progress bar (leaf color, per BRAND.md). */
   progress: number;
+  /** True when the card already holds enough stamps for the next reward
+   * (the requirement was lowered); the very next stamp grants it. */
+  rewardOwed: boolean;
 }
 
 export function computeCardProgress(input: {
   stampsCount: number;
   stampsRequired: number;
+  rewardsEarned?: number;
 }): CardProgress {
-  const { stampsCount, stampsRequired } = inputSchema.parse(input);
-  const rewardsEarned = Math.floor(stampsCount / stampsRequired);
-  const stampsTowardNext = stampsCount % stampsRequired;
+  const { stampsCount, stampsRequired, rewardsEarned: given } = inputSchema.parse(input);
+  const rewardsEarned = given ?? Math.floor(stampsCount / stampsRequired);
+  const raw = Math.max(0, stampsCount - rewardsEarned * stampsRequired);
+  const rewardOwed = raw >= stampsRequired;
+  const stampsTowardNext = rewardOwed ? stampsRequired - 1 : raw;
   return {
     rewardsEarned,
     stampsTowardNext,
     stampsRemaining: stampsRequired - stampsTowardNext,
     progress: stampsTowardNext / stampsRequired,
+    rewardOwed,
   };
 }

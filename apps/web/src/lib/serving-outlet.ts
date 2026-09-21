@@ -48,16 +48,19 @@ export async function pickOutletId(
   tx: any,
   preferredId: string | null,
 ): Promise<string | null> {
+  // Retired outlets never receive new events: a stale cookie for one falls
+  // through to the first active outlet.
   if (preferredId) {
     const [match] = await tx
       .select({ id: schema.outlets.id })
       .from(schema.outlets)
-      .where(and(eq(schema.outlets.id, preferredId)));
+      .where(and(eq(schema.outlets.id, preferredId), eq(schema.outlets.active, true)));
     if (match) return match.id;
   }
   const [first] = await tx
     .select({ id: schema.outlets.id })
     .from(schema.outlets)
+    .where(eq(schema.outlets.active, true))
     .orderBy(asc(schema.outlets.createdAt))
     .limit(1);
   return first?.id ?? null;

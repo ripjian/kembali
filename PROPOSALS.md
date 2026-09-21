@@ -7,7 +7,11 @@
 > When a proposal is approved: Decision Log row in ROADMAP §13, then the
 > relevant DEVSPEC section, then MODULES.md.
 
-## 1. Merchant-side program and outlet settings
+## 1. Merchant-side program and outlet settings — APPROVED and shipped 2026-09-21
+
+> Founder approved with both recommendations: self-serve outlets with the
+> invoice note and platform list; no approval step for program edits.
+> Built as described below (Decision Log 2026-09-21, MODULES.md).
 
 **What merchants could do.** Owners edit their own stamp card (name, stamps
 required, reward title, reward validity days) and manage outlets (add,
@@ -185,8 +189,7 @@ plus store review time (one to two weeks per store, per release).
 
 1. TOTP MFA (small, closes the security review's stage 3, prerequisite for
    API keys).
-2. Merchant-side program and outlet settings (removes Kembali from routine
-   changes before the first pilots).
+2. ~~Merchant-side program and outlet settings~~ shipped 2026-09-21.
 3. VIP tags (Phase 3 as planned, alongside wallet passes once the Apple and
    Google accounts exist).
 4. Native branded app (once tooling and an Apple account exist).

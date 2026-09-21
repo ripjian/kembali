@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { LogoWordmark } from "@kembali/ui";
 
 import { schema, withPlatform } from "@kembali/db";
-import { and, asc, desc, eq, ilike, inArray, isNotNull, or, sql, type SQL } from "drizzle-orm";
+import { and, asc, desc, eq, gte, ilike, inArray, isNotNull, or, sql, type SQL } from "drizzle-orm";
 
 import { adminLogout } from "@/lib/admin-actions";
 import { getAdminContext } from "@/lib/auth";
@@ -142,11 +142,35 @@ export default async function MerchantsPage({
       .selectDistinct({ v: schema.tenants.country })
       .from(schema.tenants);
 
+    // Billing-relevant changes merchants made themselves (outlets added or
+    // retired) in the last 30 days: pricing is per outlet, so each one
+    // belongs on the next invoice.
+    const billing = await tx
+      .select({
+        id: schema.auditLog.id,
+        at: schema.auditLog.createdAt,
+        action: schema.auditLog.action,
+        meta: schema.auditLog.meta,
+        tenantName: schema.tenants.name,
+        tenantSlug: schema.tenants.slug,
+      })
+      .from(schema.auditLog)
+      .innerJoin(schema.tenants, eq(schema.auditLog.tenantId, schema.tenants.id))
+      .where(
+        and(
+          inArray(schema.auditLog.action, ["outlet.created", "outlet.retired", "outlet.reactivated"]),
+          gte(schema.auditLog.createdAt, new Date(Date.now() - 30 * 86_400_000)),
+        ),
+      )
+      .orderBy(desc(schema.auditLog.createdAt))
+      .limit(25);
+
     return {
       rows,
       total: total?.n ?? 0,
       states: states.map((s) => s.v).filter((v): v is string => Boolean(v)),
       countries: countries.map((c) => c.v),
+      billing,
     };
   });
 
@@ -316,6 +340,42 @@ export default async function MerchantsPage({
             </tbody>
           </table>
         </section>
+
+        {data.billing.length > 0 && (
+          <section className="rounded-xl border border-border bg-surface" data-billing-changes>
+            <div className="border-b border-border px-4 py-3">
+              <h2 className="text-sm font-semibold text-text">Outlet changes to invoice</h2>
+              <p className="mt-0.5 text-xs text-text-muted">
+                Merchants added or retired these outlets themselves in the last 30 days.
+              </p>
+            </div>
+            <ul>
+              {data.billing.map((b) => {
+                const meta = (b.meta ?? {}) as { name?: string };
+                const verb =
+                  b.action === "outlet.created"
+                    ? "added"
+                    : b.action === "outlet.retired"
+                      ? "retired"
+                      : "brought back";
+                return (
+                  <li
+                    key={b.id}
+                    className="flex flex-wrap items-center justify-between gap-2 border-b border-border px-4 py-2.5 text-sm last:border-b-0"
+                  >
+                    <span className="text-text">
+                      <Link href={`/admin/${b.tenantSlug}`} className="font-medium hover:underline">
+                        {b.tenantName}
+                      </Link>{" "}
+                      {verb} <span className="font-medium">{meta.name ?? "an outlet"}</span>
+                    </span>
+                    <span className="text-xs text-text-muted">{formatDate(b.at)}</span>
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        )}
 
         {/* pagination */}
         <div className="flex items-center justify-between text-xs text-text-muted">

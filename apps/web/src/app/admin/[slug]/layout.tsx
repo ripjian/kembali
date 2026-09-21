@@ -27,7 +27,7 @@ export default async function PanelLayout({
       rewards: ctx.can("manageRewards"),
       reports: ctx.can("viewReports"),
       team: ctx.can("manageTeam") || admin.kind === "platform",
-      settings: ctx.can("exportData") || admin.kind === "platform",
+      settings: ctx.can("exportData") || ctx.can("manageSettings") || admin.kind === "platform",
     },
     theme,
   };

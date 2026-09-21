@@ -158,12 +158,14 @@ export interface OutletOption {
 
 /** Outlets for a tenant - used for the report/history outlet filter. */
 export function fetchOutlets(db: KembaliDb, tenantId: string): Promise<OutletOption[]> {
-  return withTenant(db, tenantId, (tx) =>
-    tx
-      .select({ id: schema.outlets.id, name: schema.outlets.name })
+  return withTenant(db, tenantId, async (tx) => {
+    const rows = await tx
+      .select({ id: schema.outlets.id, name: schema.outlets.name, active: schema.outlets.active })
       .from(schema.outlets)
-      .orderBy(schema.outlets.createdAt),
-  );
+      .orderBy(schema.outlets.createdAt);
+    // Retired outlets stay filterable (their history is real) but say so.
+    return rows.map((o) => ({ id: o.id, name: o.active ? o.name : `${o.name} (retired)` }));
+  });
 }
 
 const POINT_SOURCE: Record<"transaction" | "adjustment" | "redemption" | "referral", TxnKind> = {

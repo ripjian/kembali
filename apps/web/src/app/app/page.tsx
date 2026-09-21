@@ -179,7 +179,13 @@ export default async function CardPage() {
   const progress = computeCardProgress({
     stampsCount: card.stampsCount,
     stampsRequired: program.stampsRequired,
+    rewardsEarned: rewards.length,
   });
+  // A recent merchant edit to the card is worth a line (DEVSPEC §8/§3).
+  const programChanged =
+    program.updatedAt && Date.now() - program.updatedAt.getTime() < 30 * 86_400_000
+      ? program.updatedAt
+      : null;
   const rewardTitle =
     Array.isArray(program.rewardDefinitions) &&
     program.rewardDefinitions[0] &&
@@ -290,6 +296,12 @@ export default async function CardPage() {
           more {progress.stampsRemaining === 1 ? "stamp" : "stamps"} to{" "}
           {rewardTitle.toLowerCase()}
         </p>
+        {programChanged && (
+          <p className="mt-2 text-xs text-text-muted" data-program-changed>
+            Card updated {formatDate(programChanged)}: {program.stampsRequired} stamps now
+            earn {rewardTitle.toLowerCase()}. Your stamps carry over.
+          </p>
+        )}
         <div className="mt-5">
           <ShowQrButton />
         </div>

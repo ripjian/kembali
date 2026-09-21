@@ -1,6 +1,6 @@
 import { customerJoinUrl, deriveTenantTheme } from "@kembali/core";
 import { schema, withTenant } from "@kembali/db";
-import { asc } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 
 import { getDb } from "@/lib/db";
 import { requestOrigin } from "@/lib/join";
@@ -22,6 +22,7 @@ export default async function QrKitPage({
     tx
       .select({ id: schema.outlets.id, name: schema.outlets.name })
       .from(schema.outlets)
+      .where(eq(schema.outlets.active, true))
       .orderBy(asc(schema.outlets.createdAt)),
   );
 

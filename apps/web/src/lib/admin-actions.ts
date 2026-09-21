@@ -1084,3 +1084,196 @@ export async function updateReferralSettings(formData: FormData) {
   if (outcome !== "ok") redirect(`/admin/${slug}/rewards?error=referrals`);
   redirect(`/admin/${slug}/rewards?saved=referrals`);
 }
+
+/* ---- merchant-side program + outlet settings (approved 2026-09-21) ------ */
+
+const programInputSchema = z.object({
+  name: z.string().trim().min(2).max(60),
+  stampsRequired: z.coerce.number().int().min(2).max(30),
+  rewardTitle: z.string().trim().min(2).max(120),
+  rewardValidDays: z.coerce.number().int().min(7).max(365),
+});
+
+/** Edit the stamp card. Applies to future stamps only; members keep every
+ * stamp (core computeCardProgress measures from rewards already earned). */
+export async function updateProgram(formData: FormData) {
+  const tenantId = z.uuid().safeParse(formData.get("tenantId"));
+  if (!tenantId.success) redirect("/admin");
+  const { admin, slug } = await authorizeTenantAction(tenantId.data, "manageSettings");
+  const parsed = programInputSchema.safeParse({
+    name: formData.get("name"),
+    stampsRequired: formData.get("stampsRequired"),
+    rewardTitle: formData.get("rewardTitle"),
+    rewardValidDays: formData.get("rewardValidDays"),
+  });
+  if (!parsed.success) redirect(`/admin/${slug}/settings?error=program`);
+  const p = parsed.data;
+
+  const db = await getDb();
+  await withTenant(db, tenantId.data, async (tx) => {
+    const [program] = await tx
+      .select()
+      .from(schema.programs)
+      .orderBy(asc(schema.programs.createdAt))
+      .limit(1);
+    if (!program) return;
+    const before = {
+      name: program.name,
+      stampsRequired: program.stampsRequired,
+      rewardDefinitions: program.rewardDefinitions,
+      expiryRules: program.expiryRules,
+    };
+    await tx
+      .update(schema.programs)
+      .set({
+        name: p.name,
+        stampsRequired: p.stampsRequired,
+        rewardDefinitions: [{ type: "reward", title: p.rewardTitle }],
+        expiryRules: { rewardValidDays: p.rewardValidDays },
+        updatedAt: new Date(),
+      })
+      .where(eq(schema.programs.id, program.id));
+    await audit(tx, {
+      tenantId: tenantId.data,
+      actorType: admin.kind,
+      actorId: admin.subjectId,
+      action: "program.updated",
+      entity: "program",
+      entityId: program.id,
+      meta: { before, after: p },
+    });
+  });
+  redirect(`/admin/${slug}/settings?saved=program`);
+}
+
+const outletFormSchema = z.object({
+  name: z.string().trim().min(2).max(80),
+  addressLine: z.string().trim().max(160),
+  postcode: z.string().trim().max(10),
+  city: z.string().trim().max(80),
+  state: z.string().trim().max(80),
+  country: z.string().trim().max(80),
+});
+
+function readOutletForm(formData: FormData) {
+  return outletFormSchema.safeParse({
+    name: formData.get("name"),
+    addressLine: formData.get("addressLine") ?? "",
+    postcode: formData.get("postcode") ?? "",
+    city: formData.get("city") ?? "",
+    state: formData.get("state") ?? "",
+    country: formData.get("country") ?? "",
+  });
+}
+
+/** Add an outlet. Pricing is per outlet, so this is a billing event: the
+ * audit row is what the platform admin's "outlet changes" list reads. */
+export async function createOutlet(formData: FormData) {
+  const tenantId = z.uuid().safeParse(formData.get("tenantId"));
+  if (!tenantId.success) redirect("/admin");
+  const { admin, slug } = await authorizeTenantAction(tenantId.data, "manageSettings");
+  const parsed = readOutletForm(formData);
+  if (!parsed.success) redirect(`/admin/${slug}/settings?error=outlet`);
+  const o = parsed.data;
+
+  const db = await getDb();
+  await withTenant(db, tenantId.data, async (tx) => {
+    const [row] = await tx
+      .insert(schema.outlets)
+      .values({
+        tenantId: tenantId.data,
+        name: o.name,
+        addressLine: o.addressLine || null,
+        postcode: o.postcode || null,
+        city: o.city || null,
+        state: o.state || null,
+        country: o.country || "Malaysia",
+      })
+      .returning({ id: schema.outlets.id });
+    await audit(tx, {
+      tenantId: tenantId.data,
+      actorType: admin.kind,
+      actorId: admin.subjectId,
+      action: "outlet.created",
+      entity: "outlet",
+      entityId: row?.id,
+      meta: { name: o.name, city: o.city || null, billing: true },
+    });
+  });
+  redirect(`/admin/${slug}/settings?saved=outlet`);
+}
+
+export async function updateOutlet(formData: FormData) {
+  const tenantId = z.uuid().safeParse(formData.get("tenantId"));
+  const outletId = z.uuid().safeParse(formData.get("outletId"));
+  if (!tenantId.success || !outletId.success) redirect("/admin");
+  const { admin, slug } = await authorizeTenantAction(tenantId.data, "manageSettings");
+  const parsed = readOutletForm(formData);
+  if (!parsed.success) redirect(`/admin/${slug}/settings?error=outlet`);
+  const o = parsed.data;
+
+  const db = await getDb();
+  await withTenant(db, tenantId.data, async (tx) => {
+    await tx
+      .update(schema.outlets)
+      .set({
+        name: o.name,
+        addressLine: o.addressLine || null,
+        postcode: o.postcode || null,
+        city: o.city || null,
+        state: o.state || null,
+        country: o.country || "Malaysia",
+      })
+      .where(eq(schema.outlets.id, outletId.data));
+    await audit(tx, {
+      tenantId: tenantId.data,
+      actorType: admin.kind,
+      actorId: admin.subjectId,
+      action: "outlet.updated",
+      entity: "outlet",
+      entityId: outletId.data,
+      meta: { name: o.name },
+    });
+  });
+  redirect(`/admin/${slug}/settings?saved=outlet`);
+}
+
+/** Retire (or bring back) an outlet. Retire = deactivate: events keep the
+ * outlet id; the picker, QR kit and invoice drop it. The last active
+ * outlet cannot be retired. */
+export async function setOutletActive(formData: FormData) {
+  const tenantId = z.uuid().safeParse(formData.get("tenantId"));
+  const outletId = z.uuid().safeParse(formData.get("outletId"));
+  const active = formData.get("active") === "true";
+  if (!tenantId.success || !outletId.success) redirect("/admin");
+  const { admin, slug } = await authorizeTenantAction(tenantId.data, "manageSettings");
+
+  const db = await getDb();
+  const outcome = await withTenant(db, tenantId.data, async (tx) => {
+    if (!active) {
+      const [count] = await tx
+        .select({ n: sql<number>`count(*)::int` })
+        .from(schema.outlets)
+        .where(eq(schema.outlets.active, true));
+      if ((count?.n ?? 0) <= 1) return "last" as const;
+    }
+    const [row] = await tx
+      .update(schema.outlets)
+      .set({ active })
+      .where(eq(schema.outlets.id, outletId.data))
+      .returning({ name: schema.outlets.name });
+    if (!row) return "gone" as const;
+    await audit(tx, {
+      tenantId: tenantId.data,
+      actorType: admin.kind,
+      actorId: admin.subjectId,
+      action: active ? "outlet.reactivated" : "outlet.retired",
+      entity: "outlet",
+      entityId: outletId.data,
+      meta: { name: row.name, billing: true },
+    });
+    return "ok" as const;
+  });
+  if (outcome === "last") redirect(`/admin/${slug}/settings?error=lastoutlet`);
+  redirect(`/admin/${slug}/settings?saved=outlet`);
+}

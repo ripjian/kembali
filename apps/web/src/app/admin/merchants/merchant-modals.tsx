@@ -21,6 +21,7 @@ const MODULE_FIELDS = [
   ["mod_reports", "reports", "Reports"],
   ["mod_points", "points", "Points"],
   ["mod_rewards", "rewards", "Rewards"],
+  ["mod_referrals", "referrals", "Referral program"],
 ] as const;
 
 function SectionLabel({ children }: { children: React.ReactNode }) {

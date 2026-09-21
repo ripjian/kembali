@@ -61,11 +61,12 @@ export const authAttemptKind = pgEnum("auth_attempt_kind", [
 export const cardStatus = pgEnum("card_status", ["active", "completed", "revoked"]);
 export const stampSource = pgEnum("stamp_source", ["qr", "manual"]);
 export const rewardState = pgEnum("reward_state", ["earned", "redeemed", "expired"]);
-export const referralState = pgEnum("referral_state", ["pending", "completed", "rewarded"]);
+export const referralState = pgEnum("referral_state", ["pending", "completed", "rewarded", "rejected"]);
 export const pointEventSource = pgEnum("point_event_source", [
   "transaction",
   "adjustment",
   "redemption",
+  "referral",
 ]);
 export const redemptionState = pgEnum("redemption_state", [
   "reserved",
@@ -109,6 +110,9 @@ export const tenants = pgTable(
     /** RM→points conversion: points earned per RM1 keyed in at the counter.
      * 0 pauses earning without hiding balances (Phase 2). */
     pointsPerRm: doublePrecision("points_per_rm").notNull().default(1),
+    /** Referral program (Phase 5): parsed by @kembali/core
+     * parseReferralSettings; empty = off. */
+    referralSettings: jsonb("referral_settings").notNull().default({}),
     createdAt: createdAt(),
   },
   () => [
@@ -182,6 +186,8 @@ export const staffUsers = pgTable(
     passwordHash: text("password_hash"),
     /** Cashiers are scoped to assigned outlets (ROADMAP §5). */
     outletIds: uuid("outlet_ids").array().notNull().default([]),
+    /** First-access guide finished or skipped (null = show it). */
+    onboardedAt: timestamp("onboarded_at", { withTimezone: true }),
     createdAt: createdAt(),
   },
   (t) => [
@@ -311,10 +317,18 @@ export const customers = pgTable(
     /** Projection of point_events, maintained ONLY by the DB trigger in
      * migration 0009 - direct UPDATEs to this column are rejected. */
     pointsBalance: integer("points_balance").notNull().default(0),
+    /** Personal invite code (Phase 5), minted the first time the card is
+     * opened while the program is on. Unique per store. */
+    referralCode: text("referral_code"),
+    /** Welcome guide dismissed (null = show it once on the card). */
+    onboardedAt: timestamp("onboarded_at", { withTimezone: true }),
     createdAt: createdAt(),
   },
   (t) => [
     tenantPolicy("customers"),
+    uniqueIndex("customers_tenant_referral_code_uq")
+      .on(t.tenantId, t.referralCode)
+      .where(sql`referral_code is not null`),
     // phone/email unique per tenant (ROADMAP §4) - partial so nulls are fine
     uniqueIndex("customers_tenant_phone_uq")
       .on(t.tenantId, t.phone)
@@ -453,6 +467,9 @@ export const redemptions = pgTable(
     redeemedAt: timestamp("redeemed_at", { withTimezone: true }),
     redeemedByStaffId: uuid("redeemed_by_staff_id").references(() => staffUsers.id),
     outletId: uuid("outlet_id").references(() => outlets.id),
+    /** Null = the customer spent points; "referral" = a free voucher
+     * granted by the referral program (points_cost 0). */
+    grantSource: text("grant_source"),
     createdAt: createdAt(),
   },
   (t) => [
@@ -511,10 +528,24 @@ export const referrals = pgTable(
       .notNull()
       .references(() => customers.id),
     refereeCustomerId: uuid("referee_customer_id").references(() => customers.id),
+    /** pending (friend joined, waiting for their first stamp) → rewarded |
+     * rejected (cap or rule at sign-up; kept for the report). */
     state: referralState("state").notNull().default("pending"),
+    /** Set when the friend's first stamp landed and rewards were granted. */
+    qualifiedAt: timestamp("qualified_at", { withTimezone: true }),
+    /** Snapshot of what each side received (settings can change later). */
+    referrerReward: jsonb("referrer_reward"),
+    refereeReward: jsonb("referee_reward"),
+    /** Why a referral was rejected, e.g. "cap". */
+    note: text("note"),
     createdAt: createdAt(),
   },
-  (t) => [tenantPolicy("referrals"), index("referrals_tenant_idx").on(t.tenantId)],
+  (t) => [
+    tenantPolicy("referrals"),
+    index("referrals_tenant_idx").on(t.tenantId),
+    index("referrals_referee_idx").on(t.refereeCustomerId),
+    index("referrals_referrer_idx").on(t.referrerCustomerId, t.createdAt),
+  ],
 );
 
 export const walletPasses = pgTable(

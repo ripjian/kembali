@@ -8,8 +8,18 @@ export const modulesSchema = z
     reports: z.boolean().default(true),
     points: z.boolean().default(true),
     rewards: z.boolean().default(true),
+    /** Referral program (Phase 5). Off unless the platform admin turns it
+     * on; the plan gate (planAllowsReferrals) still applies on top. */
+    referrals: z.boolean().default(false),
   })
-  .catch({ stamps: true, scan: true, reports: true, points: true, rewards: true });
+  .catch({
+    stamps: true,
+    scan: true,
+    reports: true,
+    points: true,
+    rewards: true,
+    referrals: false,
+  });
 
 export type TenantModules = z.infer<typeof modulesSchema>;
 
@@ -21,6 +31,13 @@ export function parseModules(raw: unknown): TenantModules {
  * includes all shipped modules - wallet/tags/WhatsApp aren't toggles yet -
  * so this is all-on today; it's the hook that differentiates plans as those
  * features arrive. The platform admin can still adjust each box afterwards. */
-export function modulesForPlan(_plan: string): TenantModules {
-  return { stamps: true, scan: true, reports: true, points: true, rewards: true };
+export function modulesForPlan(plan: string): TenantModules {
+  return {
+    stamps: true,
+    scan: true,
+    reports: true,
+    points: true,
+    rewards: true,
+    referrals: plan === "founding" || plan === "growth",
+  };
 }

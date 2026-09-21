@@ -78,7 +78,28 @@ export {
   type StampCheck,
 } from "./stamping";
 export { pointsForAmount, sumPointDeltas } from "./points";
-export { planAllowsReportDownload, REPORT_DOWNLOAD_PLANS } from "./plans";
+export {
+  planAllowsReportDownload,
+  planAllowsReferrals,
+  REPORT_DOWNLOAD_PLANS,
+  REFERRAL_PLANS,
+} from "./plans";
+export {
+  referralRewardSchema,
+  referralSettingsSchema,
+  parseReferralSettings,
+  DEFAULT_REFERRAL_SETTINGS,
+  generateReferralCode,
+  normalizeReferralCode,
+  isReferralCode,
+  evaluateReferral,
+  referralWindowStart,
+  referralVoucherExpiry,
+  REFERRAL_CODE_LENGTH,
+  type ReferralReward,
+  type ReferralSettings,
+  type ReferralVerdict,
+} from "./referrals";
 export {
   generateRedemptionCode,
   isRedemptionCode,

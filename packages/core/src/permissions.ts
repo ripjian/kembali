@@ -13,6 +13,7 @@ export const PERMISSION_KEYS = [
   "manageRewards",
   "redeemRewards",
   "manageTeam",
+  "exportData",
 ] as const;
 
 export type PermissionKey = (typeof PERMISSION_KEYS)[number];
@@ -27,6 +28,7 @@ export const PERMISSION_LABELS: Record<PermissionKey, string> = {
   manageRewards: "Manage the rewards catalog",
   redeemRewards: "Redeem rewards",
   manageTeam: "Manage team & roles",
+  exportData: "Export customer data",
 };
 
 export type RolePermissionMatrix = Record<
@@ -44,6 +46,7 @@ export const DEFAULT_ROLE_PERMISSIONS: RolePermissionMatrix = {
     manageRewards: true,
     redeemRewards: true,
     manageTeam: true,
+    exportData: true,
   },
   manager: {
     scan: true,
@@ -54,6 +57,7 @@ export const DEFAULT_ROLE_PERMISSIONS: RolePermissionMatrix = {
     manageRewards: true,
     redeemRewards: true,
     manageTeam: false,
+    exportData: false,
   },
   cashier: {
     scan: true,
@@ -64,6 +68,7 @@ export const DEFAULT_ROLE_PERMISSIONS: RolePermissionMatrix = {
     manageRewards: false,
     redeemRewards: true,
     manageTeam: false,
+    exportData: false,
   },
 };
 

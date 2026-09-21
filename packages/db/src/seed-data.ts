@@ -104,6 +104,24 @@ export async function seed(db: SeedDb, now: Date = new Date()): Promise<SeedSumm
       brandPrimary: "#5b3a29",
       brandAccent: "#d98a2b",
       branding: { primaryColor: "#0F3D32", accentColor: "#E0684B" },
+      modules: {
+        stamps: true,
+        scan: true,
+        reports: true,
+        points: true,
+        rewards: true,
+        referrals: true,
+      },
+      // Referral program on for the demo: 50 points to the inviter, a free
+      // pastry voucher to the friend, once the friend's first stamp lands.
+      referralSettings: {
+        enabled: true,
+        referrer: { type: "points", points: 50 },
+        referee: { type: "voucher", rewardItemId: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaa02" },
+        maxPerReferrer: 10,
+        windowDays: 30,
+        voucherValidDays: 30,
+      },
     })
     .onConflictDoNothing();
 
@@ -198,6 +216,8 @@ export async function seed(db: SeedDb, now: Date = new Date()): Promise<SeedSumm
         birthday: "1998-04-12",
         // PDPA: opted in per channel, explicitly
         marketingOptIns: { whatsapp: true },
+        referralCode: "ASY7K2",
+        onboardedAt: now,
       },
       {
         id: SEED_IDS.customers.mingWei,
@@ -207,6 +227,8 @@ export async function seed(db: SeedDb, now: Date = new Date()): Promise<SeedSumm
         name: "Tan Ming Wei",
         language: "en",
         marketingOptIns: { whatsapp: true, email: true },
+        referralCode: "TMW4P9",
+        onboardedAt: now,
       },
       {
         id: SEED_IDS.customers.priya,
@@ -215,6 +237,8 @@ export async function seed(db: SeedDb, now: Date = new Date()): Promise<SeedSumm
         name: "Priya Nair",
         language: "en",
         marketingOptIns: {},
+        referralCode: "PRN8Q3",
+        onboardedAt: now,
       },
     ])
     .onConflictDoNothing();
@@ -379,6 +403,9 @@ export async function seed(db: SeedDb, now: Date = new Date()): Promise<SeedSumm
       role: "owner",
       passwordHash: hashPassword(SEED_LOGINS.starterOwner.password),
       outletIds: [SEED_IDS.starterOutlet],
+      // Bloom already finished the first-access guide; Corner Coffee's team
+      // has not, so the demo shows both states.
+      onboardedAt: now,
     })
     .onConflictDoNothing();
   await db

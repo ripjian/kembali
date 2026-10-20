@@ -18,7 +18,7 @@
     "@kembali/config": "workspace:*",
     "@types/node": "^24.13.2",
     "eslint": "^10.6.0",
-    "typescript": "^5.9.3",
+    "typescript": "^7.0.2",
     "vitest": "^4.1.10"
   }
 }

@@ -27,3 +27,18 @@ service-account*.json
 coverage/
 *.tsbuildinfo
 .pglite/
+
+# generated media and third-party skill bundles stay local (public repo; commercial music)
+kembali-reels/**/public/
+kembali-reels/*/assets/
+kembali-reels/**/*.mp4
+kembali-reels/**/*.mov
+kembali-reels/**/*.mp3
+kembali-reels/**/*.wav
+kembali-reels/**/*.ogg
+brag-output*/
+social/
+pitch/
+.agents/
+.claude/skills/brag
+.claude/skills/ian-xiaohei-illustrations

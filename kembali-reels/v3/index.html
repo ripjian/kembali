@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="en" data-resolution="portrait">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <link rel="stylesheet" href="assets/kit.css" />
+    <style>
+      /* Reel 03 — From sign-in to first stamp. The owner's real setup steps. */
+      #bars { position: absolute; left: 70px; top: 516px; width: 940px; display: flex; gap: 12px; }
+      #bars div { flex: 1; height: 6px; border-radius: 3px; background: rgba(246,241,227,0.22); overflow: hidden; }
+      #bars i { display: block; height: 100%; background: #F6F1E3; transform-origin: 0 50%; }
+      .stc { position: absolute; left: 240px; width: 600px; height: 104px; padding: 0 28px; background: #F6F1E3; color: #16261E; border-radius: 22px; display: flex; align-items: center; gap: 22px; font-size: 32px; font-weight: 700; opacity: 0; box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
+      .stc span { width: 60px; height: 60px; border-radius: 50%; background: #0F3D32; color: #F6F1E3; display: grid; place-items: center; font-size: 26px; flex: none; }
+
+      /* Browser window: desktop admin recreated at 700 × 470 and scaled to 940 wide. */
+      #win { position: absolute; left: 70px; top: 600px; width: 940px; height: 671px; border-radius: 22px; background: #10201A; box-shadow: 0 50px 110px rgba(0,0,0,0.5); overflow: hidden; transform-origin: 100% 0%; }
+      #win .tb { height: 40px; display: flex; align-items: center; gap: 8px; padding-left: 18px; }
+      #win .tb i { width: 12px; height: 12px; border-radius: 50%; }
+      #desk { position: absolute; left: 0; top: 40px; width: 700px; height: 470px; transform: scale(1.34286); transform-origin: 0 0; background: #F6F1E3; color: #16261E; font-family: "Jakarta", sans-serif; display: flex; }
+      .side { width: 150px; padding: 16px 10px; border-right: 1px solid #E6DFCB; flex: none; }
+      .side .br { display: flex; gap: 8px; align-items: center; padding: 0 6px 14px; }
+      .side .br svg { width: 20px; height: 20px; }
+      .side .br b { display: block; font-size: 12px; font-weight: 600; }
+      .side .br small { display: block; font-size: 9.5px; color: #5C6B60; }
+      .nav { display: block; padding: 6px 8px; border-radius: 7px; font-size: 11.5px; color: #16261E; margin-top: 2px; }
+      .nav.on { background: #EDE6D2; }
+      .main { position: relative; flex: 1; overflow: hidden; }
+      .pg { position: absolute; inset: 0; padding: 18px 22px; }
+      .pg h2 { font-size: 20px; font-weight: 600; }
+      .pg .ds { margin-top: 3px; font-size: 11px; color: #5C6B60; }
+      .box { margin-top: 12px; padding: 14px 16px; background: #FFFFFF; border: 1px solid #E6DFCB; border-radius: 12px; }
+      .box h3 { font-size: 13px; font-weight: 600; }
+      .box .ds { font-size: 10px; }
+      .fl { margin-top: 9px; font-size: 10.5px; font-weight: 500; }
+      .in { position: relative; margin-top: 4px; height: 28px; border: 1px solid #DCD5BF; border-radius: 8px; padding: 0 10px; line-height: 26px; font-size: 12px; background: #FFFFFF; white-space: nowrap; overflow: hidden; }
+      .in.focus { border-color: #0F3D32; box-shadow: 0 0 0 2px rgba(15,61,50,0.15); }
+      .in .old { position: absolute; left: 10px; top: 0; }
+      .in .tp span { opacity: 0; }
+      .btn { display: inline-block; margin-top: 12px; padding: 0 14px; height: 30px; line-height: 30px; border-radius: 8px; background: #0F3D32; color: #F6F1E3; font-size: 11.5px; font-weight: 600; }
+      .btn.ghost { background: #FFFFFF; color: #16261E; border: 1px solid #DCD5BF; line-height: 28px; }
+      .toast { position: absolute; right: 18px; bottom: 16px; padding: 10px 14px; background: #0F3D32; color: #F6F1E3; border-radius: 10px; font-size: 11.5px; font-weight: 600; opacity: 0; }
+      .tm { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #EDE6D2; font-size: 12px; }
+      .tm:last-child { border-bottom: 0; }
+      .tm small { font-size: 10px; color: #5C6B60; background: #EDE6D2; border-radius: 99px; padding: 3px 8px; }
+      .modal { position: absolute; left: 90px; top: 40px; width: 330px; padding: 16px 18px; background: #FFFFFF; border-radius: 14px; box-shadow: 0 20px 50px rgba(22,38,30,0.25); opacity: 0; }
+      .scrim { position: absolute; inset: 0; background: rgba(22,38,30,0.3); opacity: 0; }
+      .dd { position: absolute; left: 0; right: 0; top: 30px; background: #FFFFFF; border: 1px solid #DCD5BF; border-radius: 8px; box-shadow: 0 10px 24px rgba(22,38,30,0.15); opacity: 0; z-index: 2; }
+      .dd div { padding: 6px 10px; font-size: 12px; }
+      .dd div.hl { background: #EDE6D2; }
+      .ol { margin-top: 10px; padding: 12px 14px; background: #FFFFFF; border: 1px solid #E6DFCB; border-radius: 12px; }
+      .ol b { font-size: 12.5px; font-weight: 600; }
+      .ol .row { display: flex; gap: 8px; margin-top: 8px; }
+      .ol .row .btn { margin-top: 0; height: 26px; line-height: 26px; font-size: 10.5px; padding: 0 10px; }
+      .ol .row .btn.ghost { line-height: 24px; }
+      .ov { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 12px; }
+      .ov div { padding: 10px; background: #FFFFFF; border: 1px solid #E6DFCB; border-radius: 10px; }
+      .ov .v { position: relative; height: 22px; font-size: 18px; font-weight: 700; }
+      .ov .v span { position: absolute; left: 0; top: 0; opacity: 0; }
+      .ov small { display: block; margin-top: 4px; font-size: 9.5px; color: #8B9689; }
+
+      #cursor { position: absolute; left: 0; top: 0; width: 40px; height: 40px; opacity: 0; z-index: 5; }
+      #cursor svg { width: 40px; height: 40px; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.35)); }
+      .ripple { position: absolute; width: 40px; height: 40px; margin: -20px 0 0 -20px; border-radius: 50%; border: 4px solid #E0684B; opacity: 0; z-index: 4; }
+
+      /* Poster that prints and lays flat. */
+      #pstage { position: absolute; left: 70px; top: 560px; width: 940px; height: 960px; perspective: 1600px; }
+      #counter { position: absolute; left: 60px; right: 60px; top: 620px; height: 260px; border-radius: 30px; background: linear-gradient(180deg, #5B3A29 0%, #3E271B 100%); opacity: 0; }
+      #poster { position: absolute; left: 250px; top: 60px; width: 440px; padding: 32px 28px 28px; text-align: center; background: #F6F1E3; color: #16261E; border-radius: 20px; box-shadow: 0 40px 90px rgba(0,0,0,0.45); opacity: 0; transform-origin: 50% 100%; }
+      #poster .t { font-family: "Fraunces", serif; font-size: 36px; font-weight: 500; }
+      #poster .q { width: 300px; height: 300px; margin: 18px auto 0; color: #0F3D32; }
+      #poster .q svg { width: 100%; height: 100%; display: block; }
+      #poster .st { margin-top: 18px; font-family: "PlexMono", monospace; font-size: 18px; letter-spacing: 0.14em; }
+
+      /* Cashier phone views */
+      .sc { padding: 20px 20px 0; }
+      .sc h2 { font-size: 22px; font-weight: 600; }
+      .sc .ds { margin-top: 4px; font-size: 13px; color: #5C6B60; }
+      .sc .srv { margin-top: 14px; padding: 12px 14px; background: #EDE6D2; border-radius: 12px; font-size: 13px; }
+      .big { margin-top: 12px; height: 132px; background: #FFFFFF; border: 1px solid #E6DFCB; border-radius: 16px; display: grid; place-items: center; text-align: center; font-size: 16px; font-weight: 600; }
+      .big small { display: block; margin-top: 4px; font-size: 12px; color: #8B9689; font-weight: 500; }
+      .camv { background: #0B1812; }
+      .camv .amt { position: absolute; left: 20px; right: 20px; top: 24px; height: 52px; border-radius: 12px; background: #FFFFFF; display: flex; align-items: center; padding: 0 16px; font-size: 18px; font-weight: 600; }
+      .camv .amt span { opacity: 0; }
+      .camv .qwrap { position: absolute; left: 75px; top: 250px; width: 240px; height: 240px; padding: 14px; background: #FFFFFF; border-radius: 16px; color: #16261E; }
+      .camv .qwrap svg { width: 100%; height: 100%; display: block; }
+      .camv .scan { position: absolute; left: 70px; top: 250px; width: 250px; height: 5px; background: #E0684B; box-shadow: 0 0 14px 5px rgba(224,104,75,0.5); opacity: 0; }
+      #burst { position: absolute; width: 120px; height: 120px; margin: -60px 0 0 -60px; border-radius: 50%; border: 6px solid #E0684B; opacity: 0; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="22.2" data-width="1080" data-height="1920">
+      <div id="glow"></div>
+
+      <section id="s1" class="clip" data-start="0" data-duration="3.4" data-track-index="1">
+        <div class="stc" id="c1" style="top:640px"><span>1</span>Set your card</div>
+        <div class="stc" id="c2" style="top:764px"><span>2</span>Add your team</div>
+        <div class="stc" id="c3" style="top:888px"><span>3</span>Print the poster</div>
+        <div class="stc" id="c4" style="top:1012px"><span>4</span>Take the first stamp</div>
+      </section>
+
+      <section id="s2" class="clip" data-start="3.1" data-duration="15.8" data-track-index="2">
+        <div id="pstage"><div id="counter"></div><div id="poster" data-layout-allow-occlusion><p class="t">Scan for your card</p><div class="q" data-qr></div><p class="st">CORNER COFFEE · SS15</p></div></div>
+        <div id="phA"></div>
+        <div id="win">
+          <div class="tb"><i style="background:#E0684B"></i><i style="background:#F6F1E3;opacity:.5"></i><i style="background:#7FB069"></i></div>
+          <div id="desk">
+            <div class="side">
+              <div class="br"><svg viewBox="0 0 80 80"><path d="M64 40 A24 24 0 1 1 57 23" fill="none" stroke="#0F3D32" stroke-width="7" stroke-linecap="round"/><polygon points="62.7,28.7 60.5,19.5 53.5,26.5" fill="#0F3D32"/><circle cx="40" cy="40" r="8" fill="#E0684B"/></svg><span><b>Corner Coffee</b><small>Nadia Rahman</small></span></div>
+              <span class="nav" id="nOverview">Overview</span><span class="nav">Scan &amp; stamp</span><span class="nav" id="nQR">QR kit</span><span class="nav">Customers</span><span class="nav">Rewards</span><span class="nav">Reports</span><span class="nav" id="nTeam">Team</span><span class="nav on" id="nSettings">Settings</span>
+            </div>
+            <div class="main">
+              <div class="pg" id="pSettings" data-layout-allow-occlusion>
+                <h2>Settings</h2><p class="ds">Your data, your stamp card, your outlets.</p>
+                <div class="box"><h3>Stamp card</h3><p class="ds">Changes apply to new stamps. Members keep every stamp they have.</p>
+                  <p class="fl">Card name</p><div class="in">Coffee Card</div>
+                  <p class="fl">Stamps to earn a reward</p><div class="in" id="fStamps"><span class="old" id="oStamps">10</span><span class="tp" id="tStamps"></span></div>
+                  <p class="fl">Reward</p><div class="in" id="fReward"><span class="old" id="oReward">Free drink</span><span class="tp" id="tReward"></span></div>
+                  <span class="btn" id="bSave">Save card</span>
+                </div>
+                <div class="toast" id="toast1">Stamp card saved.</div>
+              </div>
+              <div class="pg" id="pTeam" data-layout-allow-occlusion>
+                <h2>Team</h2><p class="ds">Cashiers sign in with their own email and only see the scan page.</p>
+                <span class="btn" id="bAdd">Add staff</span>
+                <div class="box" id="tlist" style="padding:4px 16px"><div class="tm"><span>Nadia Rahman</span><small>Owner</small></div><div class="tm" id="tFarid" style="opacity:0"><span>Farid Iskandar</span><small>Cashier</small></div></div>
+                <div class="scrim" id="scrim"></div>
+                <div class="modal" id="modal"><h3 style="font-size:14px;font-weight:600">Add staff</h3>
+                  <p class="fl">Name</p><div class="in" id="fName"><span class="tp" id="tName"></span></div>
+                  <p class="fl">Email (their sign-in)</p><div class="in" id="fEmail"><span class="tp" id="tEmail"></span></div>
+                  <p class="fl">Role</p><div class="in" id="fRole" style="overflow:visible"><span id="roleTxt">Choose a role</span><div class="dd" id="dd"><div>Owner</div><div>Manager</div><div id="oCashier">Cashier</div></div></div>
+                  <span class="btn" id="bAddStaff">Add staff</span>
+                </div>
+              </div>
+              <div class="pg" id="pQR" data-layout-allow-occlusion>
+                <h2>QR kit</h2><p class="ds">Print this and put it on your counter. Customers scan it to start their card in seconds.</p>
+                <div class="ol"><b>SS15 Subang Jaya</b><div class="row"><span class="btn" id="bA4">A4 poster</span><span class="btn ghost">A5 poster</span><span class="btn ghost">QR code (PNG)</span></div></div>
+                <div class="ol"><b>Bangsar Village</b><div class="row"><span class="btn">A4 poster</span><span class="btn ghost">A5 poster</span><span class="btn ghost">QR code (PNG)</span></div></div>
+              </div>
+              <div class="pg" id="pOver" data-layout-allow-occlusion>
+                <h2>Overview</h2><p class="ds">Today at your counter, as it happens.</p>
+                <div class="ov">
+                  <div><p class="v"><span id="o1a">0</span><span id="o1b">1</span></p><small>Stamps today</small></div>
+                  <div><p class="v"><span id="o2a">RM 0.00</span><span id="o2b">RM 14.00</span></p><small>Sales captured today</small></div>
+                  <div><p class="v"><span id="o3a">0</span><span id="o3b">1</span></p><small>New customers today</small></div>
+                  <div><p class="v"><span id="o4a">0</span></p><small>Rewards redeemed today</small></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="cursor"><svg viewBox="0 0 40 40"><path d="M6 3 L6 33 L14 25 L20 38 L26 35 L20 22 L31 22 Z" fill="#F6F1E3" stroke="#10201A" stroke-width="2.5" stroke-linejoin="round"/></svg></div>
+        <div class="ripple" id="rip"></div>
+        <div id="burst"></div>
+      </section>
+
+      <section id="bar" class="clip" data-start="0" data-duration="18.9" data-track-index="4">
+        <div id="bars"><div><i id="p1"></i></div><div><i id="p2"></i></div><div><i id="p3"></i></div><div><i id="p4"></i></div></div>
+      </section>
+
+      <section id="s9" class="clip" data-start="18.8" data-duration="3.4" data-track-index="5">
+        <div id="endc"><svg viewBox="0 0 80 80"><path d="M64 40 A24 24 0 1 1 57 23" fill="none" stroke="#F6F1E3" stroke-width="6" stroke-linecap="round"/><polygon points="62.7,28.7 60.5,19.5 53.5,26.5" fill="#F6F1E3"/><circle cx="40" cy="40" r="8" fill="#E0684B"/></svg><p class="word"><span>k</span><span>e</span><span>m</span><span>b</span><span>a</span><span>l</span><span class="i">i</span></p><p class="tagl">Loyalty your customers will love.</p><p class="line"></p></div>
+      </section>
+
+      <section id="ui" class="clip" data-start="0" data-duration="22.2" data-track-index="3">
+        <p class="tag"></p>
+        <p class="cap" data-layout-allow-overlap></p><p class="cap" data-layout-allow-overlap></p>
+        <p class="sub" data-layout-allow-overlap></p><p class="sub" data-layout-allow-overlap></p>
+        <div id="iris"></div>
+      </section>
+
+      <audio id="music" data-start="0" data-duration="22.2" data-track-index="10" data-volume="0.34" data-fade-in="0.4" data-fade-out="1.6" src="assets/music/track.mp3"></audio>
+    </div>
+
+    <script src="assets/qr-inline.js"></script>
+    <script src="assets/kit.js"></script>
+    <script>
+      const { b, phone, MARK } = K;
+      const tl = gsap.timeline({ paused: true });
+      const M = K.motion(tl);
+      const root = document.getElementById("root");
+
+      /* ---------- cashier phone ---------- */
+      const scanV = `<div class="view sc" id="Pscan" data-layout-allow-occlusion><h2>Scan &amp; stamp</h2><p class="ds">Stamp a member's card, or confirm a reward coupon.</p><div class="srv">You're serving at <b>SS15 Subang Jaya</b></div><div class="big">🪪<span>Scan member<small>Stamp their card and add points from the sale</small></span></div><div class="big">🎁<span>Scan reward<small>Check a coupon and confirm the redemption</small></span></div></div>`;
+      const camV = `<div class="view camv" id="Pcam" data-layout-allow-occlusion><div class="amt">RM&nbsp;${[..."14.00"].map((c) => `<span>${c}</span>`).join("")}</div><div class="qwrap" data-qr></div><div class="scan" id="Pbeam"></div></div>`;
+      const resV = `<div class="view sc" id="Pres" data-layout-allow-occlusion><h2>Scan &amp; stamp</h2><p class="ds">Stamp a member's card, or confirm a reward coupon.</p><div class="res"><b>Stamped for Mark Avon</b><p>8 more stamps to their reward.</p><p class="gold">+14 points · balance now 14</p></div><div class="big">🪪<span>Scan next member<small>Ready when they are</small></span></div></div>`;
+      document.getElementById("phA").outerHTML = phone("phA", 90, 620, 1.0, scanV + camV + resV);
+      K.fillQR();
+
+      /* ---------- typing + cursor helpers ---------- */
+      const typeInto = (id, text) => { const el = document.getElementById(id); el.innerHTML = [...text].map((c) => `<span>${c === " " ? "&nbsp;" : c}</span>`).join(""); return [...el.children]; };
+      const typed = (spans, t, step = 0.035) => spans.forEach((s, i) => tl.set(s, { opacity: 1 }, t + i * step));
+      const rootRect = root.getBoundingClientRect();
+      const at = (id, dx = 0.5, dy = 0.55) => { const r = document.getElementById(id).getBoundingClientRect(); return { x: r.left - rootRect.left + r.width * dx, y: r.top - rootRect.top + r.height * dy }; };
+      let cx = 900, cy = 1500;
+      const go = (p, t, d = 0.45) => { tl.to("#cursor", { x: p.x - 6, y: p.y - 3, duration: d, ease: "power2.inOut" }, t); cx = p.x; cy = p.y; };
+      const click = (p, t) => {
+        tl.to("#cursor", { scale: 0.82, duration: 0.07, transformOrigin: "15% 10%" }, t).to("#cursor", { scale: 1, duration: 0.18, ease: "back.out(2)" }, t + 0.07);
+        tl.set("#rip", { x: p.x, y: p.y }, t);
+        tl.fromTo("#rip", { opacity: 0.9, scale: 0.4 }, { opacity: 0, scale: 1.8, duration: 0.45, ease: "power2.out", immediateRender: false }, t);
+      };
+      const page = (show, hide, nav, t) => {
+        tl.fromTo(hide, { opacity: 1 }, { opacity: 0, duration: 0.18, immediateRender: false }, t); tl.set(hide, { visibility: "hidden" }, t + 0.19);
+        tl.set(show, { visibility: "visible" }, t); tl.fromTo(show, { opacity: 0, x: 16 }, { opacity: 1, x: 0, duration: 0.3, ease: "power3.out", immediateRender: false }, t + 0.1);
+        tl.set(".nav", { className: "nav" }, t); tl.set(nav, { className: "nav on" }, t);
+      };
+
+      // initial states
+      ["#pTeam", "#pQR", "#pOver"].forEach((p) => tl.set(p, { visibility: "hidden", opacity: 0 }, 0));
+      tl.set("#pSettings", { visibility: "visible", opacity: 1 }, 0);
+      ["#Pcam", "#Pres"].forEach((p) => tl.set(p, { visibility: "hidden" }, 0));
+      tl.set("#win", { opacity: 0, y: 900 }, 0);
+      tl.set("#phA", { opacity: 0, y: 900 }, 0);
+      tl.set("#cursor", { x: cx, y: cy }, 0);
+      ["#p1", "#p2", "#p3", "#p4"].forEach((p) => tl.set(p, { scaleX: 0 }, 0));
+      tl.set(["#o1a", "#o2a", "#o3a", "#o4a"], { opacity: 1 }, 0);
+      tl.set("#modal", { visibility: "hidden" }, 0);
+
+      M.tag("KEMBALI · 03 / 03", 0.1);
+
+      /* Hook: four step cards deal in, then shrink into the story bars */
+      M.say("From sign-in to <i>first stamp.</i>", b(0));
+      M.note("Four steps. No developer. No hardware.", b(0) + 0.1);
+      ["#c1", "#c2", "#c3", "#c4"].forEach((id, i) => tl.fromTo(id, { opacity: 0, x: -80 }, { opacity: 1, x: 0, duration: 0.4, ease: "power3.out", immediateRender: false }, b(1 + i * 0.5)));
+      ["#c1", "#c2", "#c3", "#c4"].forEach((id, i) => {
+        const top = [640, 764, 888, 1012][i], tx = 70 + i * 238 + 113 - 540, ty = 519 - (top + 52);
+        tl.to(id, { x: tx, y: ty, scaleX: 226 / 600, scaleY: 0.06, opacity: 0, duration: 0.5, ease: "power3.in" }, b(4) + i * 0.06);
+      });
+
+      /* Step 1: set your card (3.27–7.64) */
+      M.say("Set your <i>card.</i>", b(5)); M.note("Stamps, reward, how long it lasts.", b(5) + 0.1);
+      tl.to("#p1", { scaleX: 1, duration: b(13) - b(5), ease: "none" }, b(5));
+      tl.to("#win", { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, b(5));
+      tl.fromTo("#cursor", { opacity: 0 }, { opacity: 1, duration: 0.2, immediateRender: false }, b(6));
+      const pS = at("fStamps", 0.3), pR = at("fReward", 0.35), pSave = at("bSave");
+      go(pS, b(6)); click(pS, b(7));
+      tl.set("#fStamps", { className: "in focus" }, b(7)); tl.set("#oStamps", { opacity: 0 }, b(7) + 0.15);
+      typed(typeInto("tStamps", "9"), b(7) + 0.2);
+      go(pR, b(7) + 0.25, 0.35); click(pR, b(8));
+      tl.set("#fStamps", { className: "in" }, b(8)); tl.set("#fReward", { className: "in focus" }, b(8)); tl.set("#oReward", { opacity: 0 }, b(8) + 0.12);
+      typed(typeInto("tReward", "Free coffee of your choice"), b(8) + 0.18, 0.032);
+      go(pSave, b(10) + 0.1, 0.4); click(pSave, b(11));
+      tl.set("#fReward", { className: "in" }, b(11));
+      tl.fromTo("#toast1", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.3, ease: "back.out(2)", immediateRender: false }, b(11) + 0.1);
+      tl.to("#toast1", { opacity: 0, duration: 0.2 }, b(12) + 0.4);
+
+      /* Step 2: add your team (7.64–10.93) */
+      M.say("Add your <i>team.</i>", b(13)); M.note("Cashiers sign in and only see the scan page.", b(13) + 0.1);
+      tl.to("#p2", { scaleX: 1, duration: b(19) - b(13), ease: "none" }, b(13));
+      const pT = at("nTeam"); go(pT, b(12) + 0.25, 0.4); click(pT, b(13)); page("#pTeam", "#pSettings", "#nTeam", b(13));
+      tl.set("#pTeam", { visibility: "visible" }, b(13));
+      const pAdd = at("bAdd"); go(pAdd, b(13) + 0.1, 0.4); click(pAdd, b(14));
+      tl.set("#modal", { visibility: "visible" }, b(14));
+      tl.fromTo("#scrim", { opacity: 0 }, { opacity: 1, duration: 0.2, immediateRender: false }, b(14));
+      tl.fromTo("#modal", { opacity: 0, scale: 0.92, y: 10 }, { opacity: 1, scale: 1, y: 0, duration: 0.3, ease: "back.out(1.6)", immediateRender: false }, b(14) + 0.05);
+      const pN = at("fName", 0.3), pE = at("fEmail", 0.3), pRole = at("fRole", 0.4), pC = at("oCashier", 0.3), pAS = at("bAddStaff");
+      go(pN, b(14) + 0.15, 0.3); click(pN, b(14) + 0.45); tl.set("#fName", { className: "in focus" }, b(14) + 0.45);
+      typed(typeInto("tName", "Farid Iskandar"), b(14) + 0.5, 0.03);
+      go(pE, b(15) + 0.2, 0.25); click(pE, b(15) + 0.45); tl.set("#fName", { className: "in" }, b(15) + 0.45); tl.set("#fEmail", { className: "in focus" }, b(15) + 0.45);
+      typed(typeInto("tEmail", "farid@cornercoffee.example"), b(15) + 0.5, 0.022);
+      go(pRole, b(16) + 0.3, 0.25); click(pRole, b(17)); tl.set("#fEmail", { className: "in" }, b(17));
+      tl.fromTo("#dd", { opacity: 0, y: -6 }, { opacity: 1, y: 0, duration: 0.2, immediateRender: false }, b(17));
+      go(pC, b(17) + 0.15, 0.2); tl.set("#oCashier", { className: "hl" }, b(17) + 0.3); click(pC, b(17) + 0.4);
+      tl.to("#dd", { opacity: 0, duration: 0.15 }, b(17) + 0.5); tl.set("#roleTxt", { innerHTML: "Cashier" }, b(17) + 0.5);
+      go(pAS, b(17) + 0.55, 0.25); click(pAS, b(18));
+      tl.to("#modal", { opacity: 0, scale: 0.95, duration: 0.2 }, b(18) + 0.1); tl.to("#scrim", { opacity: 0, duration: 0.2 }, b(18) + 0.1); tl.set("#modal", { visibility: "hidden" }, b(18) + 0.32);
+      tl.fromTo("#tFarid", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.35, ease: "power3.out", immediateRender: false }, b(18) + 0.25);
+
+      /* Step 3: print the poster (10.93–14.2) */
+      M.say("Print the <i>poster.</i>", b(19)); M.note("One per outlet. Customers join in one scan.", b(19) + 0.1);
+      tl.to("#p3", { scaleX: 1, duration: b(25) - b(19), ease: "none" }, b(19));
+      const pQ = at("nQR"); go(pQ, b(18) + 0.35, 0.3); click(pQ, b(19)); page("#pQR", "#pTeam", "#nQR", b(19));
+      const pA4 = at("bA4"); go(pA4, b(19) + 0.15, 0.35); click(pA4, b(20));
+      // the window steps back, the poster prints forward, then lays flat on the counter
+      tl.to("#win", { opacity: 0, scale: 0.9, y: -40, duration: 0.4, ease: "power2.in" }, b(20) + 0.15);
+      tl.to("#cursor", { opacity: 0, duration: 0.2 }, b(20) + 0.2);
+      tl.fromTo("#poster", { opacity: 0, y: -300, scale: 0.5 }, { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: "power3.out", immediateRender: false }, b(20) + 0.3);
+      tl.fromTo("#counter", { opacity: 0, y: 60 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out", immediateRender: false }, b(21));
+      tl.to("#poster", { rotateX: 58, y: 210, scale: 0.92, boxShadow: "0 12px 30px rgba(0,0,0,0.5)", duration: 0.8, ease: "power3.inOut" }, b(22));
+      tl.to("#poster", { y: 200, duration: 0.08 }, b(23)).to("#poster", { y: 210, duration: 0.3, ease: "elastic.out(1, 0.5)" }, b(23) + 0.08);
+
+      /* Step 4: the first stamp (14.2–17.47): desktop shrinks to picture-in-picture, cashier phone rises */
+      M.say("Take the <i>first stamp.</i>", b(25)); M.note("Staff scan with any phone. You see it land.", b(25) + 0.1);
+      tl.to("#p4", { scaleX: 1, duration: b(31) - b(25), ease: "none" }, b(25));
+      tl.to(["#poster", "#counter"], { opacity: 0, y: "+=80", duration: 0.35, ease: "power2.in" }, b(25) - 0.1);
+      tl.set("#pQR", { visibility: "hidden", opacity: 0 }, b(25)); tl.set("#pOver", { visibility: "visible", opacity: 1 }, b(25)); tl.set(".nav", { className: "nav" }, b(25)); tl.set("#nOverview", { className: "nav on" }, b(25));
+      tl.set("#win", { x: 0, y: -40, scale: 0.42, transformOrigin: "100% 0%" }, b(25));
+      tl.fromTo("#win", { opacity: 0 }, { opacity: 1, duration: 0.35, immediateRender: false }, b(25) + 0.2);
+      tl.to("#win", { y: 0, duration: 0.45, ease: "power3.out" }, b(25) + 0.2);
+      tl.to("#phA", { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, b(25) + 0.1);
+      tl.set("#Pcam", { visibility: "visible" }, b(26)); tl.set("#Pscan", { visibility: "hidden" }, b(26) + 0.01);
+      tl.fromTo("#Pcam", { opacity: 0 }, { opacity: 1, duration: 0.2, immediateRender: false }, b(26));
+      document.querySelectorAll("#Pcam .amt span").forEach((s, i) => tl.set(s, { opacity: 1 }, b(26) + 0.1 + i * 0.06));
+      tl.fromTo("#Pbeam", { opacity: 1, y: 0 }, { opacity: 1, y: 240, duration: 0.55, ease: "none", immediateRender: false }, b(27));
+      tl.to("#Pbeam", { opacity: 0, duration: 0.1 }, b(28) - 0.05);
+      tl.set("#Pres", { visibility: "visible" }, b(28)); tl.set("#Pcam", { visibility: "hidden" }, b(28) + 0.01);
+      tl.fromTo("#Pres .res", { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(2)", immediateRender: false }, b(28));
+      tl.to("#phA", { y: -10, duration: 0.07 }, b(28)).to("#phA", { y: 0, duration: 0.45, ease: "elastic.out(1, 0.4)" }, b(28) + 0.07);
+      // the owner's overview ticks in the corner
+      [["#o1a", "#o1b"], ["#o2a", "#o2b"], ["#o3a", "#o3b"]].forEach(([a, c]) => { tl.set(a, { opacity: 0 }, b(28) + 0.25); tl.fromTo(c, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.3, ease: "back.out(2)", immediateRender: false }, b(28) + 0.25); });
+      tl.set("#burst", { x: 700, y: 700 }, 0);
+      tl.fromTo("#burst", { opacity: 0.95, scale: 0.3 }, { opacity: 0, scale: 2.4, duration: 0.7, ease: "power2.out", immediateRender: false }, b(28) + 0.25);
+
+      /* Live */
+      M.say("You're <i>live.</i>", b(31)); M.note("Your first regular just walked in.", b(31) + 0.1);
+      tl.to("#bars i", { backgroundColor: "#E0684B", duration: 0.3, stagger: 0.06 }, b(31));
+
+      /* End */
+      M.iris(b(33) + 0.3, (t) => { tl.set(["#win", "#phA", "#bars"], { opacity: 0 }, t); M.clear(t - 0.05); tl.set(".tag", { opacity: 0 }, t); });
+      M.end(19.0, "FROM SIGN-IN TO FIRST STAMP");
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>

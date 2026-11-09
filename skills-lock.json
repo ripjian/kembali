@@ -1,6 +1,12 @@
 {
   "version": 1,
   "skills": {
+    "brag": {
+      "source": "latent-spaces/brag",
+      "sourceType": "github",
+      "skillPath": "skills/brag/SKILL.md",
+      "computedHash": "23538f72c11ab6e872e54d156d8fe76b0966e88f5365167e9166e58709d9aa86"
+    },
     "emil-design-eng": {
       "source": "emilkowalski/skill",
       "sourceType": "github",
@@ -12,6 +18,12 @@
       "sourceType": "github",
       "skillPath": "skills/frontend-design/SKILL.md",
       "computedHash": "4eabc66183767153e404b39d1b839b1c37f2d82d86f0a0d7e880a579d8d62336"
+    },
+    "ian-xiaohei-illustrations": {
+      "source": "helloianneo/ian-xiaohei-illustrations",
+      "sourceType": "github",
+      "skillPath": "ian-xiaohei-illustrations/SKILL.md",
+      "computedHash": "0345947cf4ffbbaa3190d7d676e0a35821daae349be036555050a51eb71f5b55"
     },
     "remotion-best-practices": {
       "source": "remotion-dev/skills",

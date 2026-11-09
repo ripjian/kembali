@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en" data-resolution="portrait">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <link rel="stylesheet" href="assets/kit.css" />
+    <style>
+      /* Reel 01 — It just works. Customer and owner, one stamp, two screens. */
+      .pc { position: absolute; left: 390px; top: 780px; width: 300px; height: 190px; padding: 18px 20px; background: #F6F1E3; color: #16261E; border-radius: 18px; box-shadow: 0 24px 60px rgba(0,0,0,0.3); opacity: 0; }
+      .pc .t { font-family: "Fraunces", serif; font-size: 21px; }
+      .pc .g { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px 0; margin-top: 14px; justify-items: center; }
+      .pc .s { position: relative; width: 38px; height: 38px; border-radius: 50%; border: 2px dashed #CFC6AE; }
+      .pc .s i { position: absolute; inset: 3px; border-radius: 50%; background: #E0684B; opacity: .8; }
+      .pc .stain { position: absolute; right: -16px; bottom: -18px; width: 76px; height: 76px; border-radius: 50%; border: 8px solid rgba(91,58,41,0.2); }
+
+      .lbl { position: absolute; top: 536px; width: 430px; text-align: center; font-family: "PlexMono", monospace; font-size: 20px; letter-spacing: 0.26em; color: #AFBCA9; opacity: 0; }
+      #chip { position: absolute; left: 440px; top: 526px; width: 200px; height: 44px; border-radius: 99px; background: #F6F1E3; color: #0F3D32; font-family: "PlexMono", monospace; font-size: 18px; letter-spacing: 0.12em; text-align: center; line-height: 44px; opacity: 0; overflow: hidden; }
+      #chip span { position: absolute; left: 0; right: 0; top: 0; opacity: 0; }
+
+      #poster { position: absolute; left: 590px; top: 640px; width: 390px; padding: 30px 26px 26px; text-align: center; background: #F6F1E3; color: #16261E; border-radius: 24px; box-shadow: 0 30px 80px rgba(0,0,0,0.38); opacity: 0; }
+      #poster .t { font-family: "Fraunces", serif; font-size: 32px; font-weight: 500; }
+      #poster .q { width: 280px; height: 280px; margin: 18px auto 0; color: #0F3D32; }
+      #poster .q svg, #flyqr svg { width: 100%; height: 100%; display: block; }
+      #poster .st { margin-top: 18px; font-family: "PlexMono", monospace; font-size: 17px; letter-spacing: 0.14em; }
+      #flyqr { position: absolute; left: 645px; top: 732px; width: 280px; height: 280px; color: #0F3D32; opacity: 0; }
+
+      /* camera + join views inside the customer phone */
+      .cam { background: #0B1812; }
+      .cam .vf { position: absolute; left: 70px; top: 250px; width: 250px; height: 250px; }
+      .cam .vf i { position: absolute; width: 44px; height: 44px; border: 5px solid #E0684B; }
+      .cam .vf i:nth-child(1) { left: 0; top: 0; border-right: 0; border-bottom: 0; border-radius: 12px 0 0 0; }
+      .cam .vf i:nth-child(2) { right: 0; top: 0; border-left: 0; border-bottom: 0; border-radius: 0 12px 0 0; }
+      .cam .vf i:nth-child(3) { left: 0; bottom: 0; border-right: 0; border-top: 0; border-radius: 0 0 0 12px; }
+      .cam .vf i:nth-child(4) { right: 0; bottom: 0; border-left: 0; border-top: 0; border-radius: 0 0 12px 0; }
+      .cam p { position: absolute; left: 0; right: 0; top: 540px; text-align: center; color: #F6F1E3; font-size: 15px; font-weight: 500; }
+      .join { padding: 250px 24px 0; text-align: center; }
+      .join svg { width: 36px; height: 36px; }
+      .join h2 { margin-top: 14px; font-size: 22px; font-weight: 600; }
+      .join p { margin-top: 6px; font-size: 14px; color: #5C6B60; }
+      .join .f { margin-top: 26px; text-align: left; font-size: 14px; font-weight: 500; }
+      .join .in { margin-top: 8px; height: 48px; border: 1.5px solid #0F3D32; border-radius: 12px; padding: 0 14px; line-height: 45px; text-align: left; font-size: 16px; }
+      .join .in span { opacity: 0; }
+      .flash { position: absolute; inset: 0; background: #FFFFFF; opacity: 0; }
+
+      /* owner: top regulars */
+      .rg-h { margin-top: 16px; font-size: 24px; font-weight: 600; }
+      .rg-card { margin-top: 14px; background: #FFFFFF; border: 1px solid #E6DFCB; border-radius: 12px; overflow: hidden; }
+      .rg-card .lh { padding: 12px 14px; border-bottom: 1px solid #EDE6D2; font-size: 13px; font-weight: 600; }
+      .rg-rows { position: relative; height: 290px; }
+      .rg { position: absolute; left: 0; right: 0; height: 58px; padding: 0 14px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #EDE6D2; background: #FFFFFF; }
+      .rg .n { width: 22px; font-size: 13px; color: #8B9689; font-variant-numeric: tabular-nums; }
+      .rg b { flex: 1; font-size: 13px; font-weight: 500; }
+      .rg em { font-style: normal; font-size: 12px; color: #5C6B60; position: relative; width: 120px; height: 16px; text-align: right; }
+      .rg em span { position: absolute; right: 0; top: 0; opacity: 0; white-space: nowrap; }
+      .rg.me { background: #FBF3E8; }
+      #rgring { position: absolute; left: 4px; right: 4px; height: 52px; border-radius: 10px; border: 3px solid #E0684B; opacity: 0; }
+
+      #arc { position: absolute; inset: 0; width: 1080px; height: 1920px; pointer-events: none; }
+      #fx { position: absolute; inset: 0; pointer-events: none; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="18.8" data-width="1080" data-height="1920">
+      <div id="glow"></div>
+
+      <!-- Hook: paper cards -->
+      <section id="s1" class="clip" data-start="0" data-duration="3.6" data-track-index="1">
+        <div class="pc" id="pc1" data-layout-allow-occlusion><p class="t">Kopi &amp; Co</p><div class="g"><div class="s"><i></i></div><div class="s"><i></i></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div></div><div class="stain"></div></div>
+        <div class="pc" id="pc2" data-layout-allow-occlusion><p class="t">Bloom Bakery</p><div class="g"><div class="s"><i></i></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div></div><div class="stain"></div></div>
+        <div class="pc" id="pc3" data-layout-allow-occlusion><p class="t">Corner Coffee</p><div class="g"><div class="s"><i></i></div><div class="s"><i></i></div><div class="s"><i></i></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div><div class="s"></div></div><div class="stain"></div></div>
+      </section>
+
+      <!-- Main: poster, customer phone, owner phone -->
+      <section id="s2" class="clip" data-start="3.5" data-duration="11.8" data-track-index="2">
+        <p class="lbl" id="lblA" style="left:80px">YOUR CUSTOMER</p>
+        <p class="lbl" id="lblB" style="left:570px">YOU</p>
+        <div id="chip"></div>
+        <div id="poster"><p class="t">Scan for your card</p><div class="q" data-qr></div><p class="st">CORNER COFFEE · SS15</p></div>
+        <div id="phA"></div>
+        <div id="phB"></div>
+        <div id="flyqr" data-qr></div>
+        <svg id="arc" viewBox="0 0 1080 1920"><path id="arcp" d="M300 1000 C 420 760, 660 760, 790 960" fill="none" stroke="#E0684B" stroke-width="7" stroke-linecap="round"/><circle id="arcdot" r="13" fill="#E0684B"/></svg>
+        <div id="fx"></div>
+      </section>
+
+      <!-- End card -->
+      <section id="s9" class="clip" data-start="15.3" data-duration="3.5" data-track-index="1">
+        <div id="endc"><svg viewBox="0 0 80 80"><path d="M64 40 A24 24 0 1 1 57 23" fill="none" stroke="#F6F1E3" stroke-width="6" stroke-linecap="round"/><polygon points="62.7,28.7 60.5,19.5 53.5,26.5" fill="#F6F1E3"/><circle cx="40" cy="40" r="8" fill="#E0684B"/></svg><p class="word"><span>k</span><span>e</span><span>m</span><span>b</span><span>a</span><span>l</span><span class="i">i</span></p><p class="tagl">Loyalty your customers will love.</p><p class="line"></p></div>
+      </section>
+
+      <!-- Caption layer + signature dot -->
+      <section id="ui" class="clip" data-start="0" data-duration="18.8" data-track-index="3">
+        <p class="tag"></p>
+        <p class="cap" data-layout-allow-overlap></p><p class="cap" data-layout-allow-overlap></p>
+        <p class="sub" data-layout-allow-overlap></p><p class="sub" data-layout-allow-overlap></p>
+        <div id="iris"></div>
+      </section>
+
+      <audio id="music" data-start="0" data-duration="18.8" data-track-index="10" data-volume="0.34" data-fade-in="0.4" data-fade-out="1.6" src="assets/music/track.mp3"></audio>
+      <audio id="x1" data-start="1.09" data-duration="0.6" data-track-index="11" data-volume="0.5" src="assets/sfx/casino/card-place-1.ogg"></audio>
+      <audio id="x2" data-start="1.64" data-duration="0.6" data-track-index="12" data-volume="0.5" src="assets/sfx/casino/card-place-1.ogg"></audio>
+      <audio id="x3" data-start="2.19" data-duration="0.6" data-track-index="11" data-volume="0.5" src="assets/sfx/casino/card-place-1.ogg"></audio>
+      <audio id="x4" data-start="3.27" data-duration="0.8" data-track-index="13" data-volume="0.55" src="assets/sfx/impact/impactSoft_medium_001.ogg"></audio>
+      <audio id="x5" data-start="4.85" data-duration="0.4" data-track-index="11" data-volume="0.6" src="assets/sfx/interface/click_003.ogg"></audio>
+      <audio id="k1" data-start="5.0" data-duration="0.25" data-track-index="15" data-volume="0.5" src="assets/sfx/keyboard/keypress-001.wav"></audio>
+      <audio id="k2" data-start="5.18" data-duration="0.25" data-track-index="16" data-volume="0.5" src="assets/sfx/keyboard/keypress-002.wav"></audio>
+      <audio id="k3" data-start="5.36" data-duration="0.25" data-track-index="15" data-volume="0.5" src="assets/sfx/keyboard/keypress-003.wav"></audio>
+      <audio id="x6" data-start="6.56" data-duration="0.6" data-track-index="12" data-volume="0.5" src="assets/sfx/casino/card-place-1.ogg"></audio>
+      <audio id="x7" data-start="7.64" data-duration="0.4" data-track-index="11" data-volume="0.55" src="assets/sfx/interface/click_003.ogg"></audio>
+      <audio id="x8" data-start="8.19" data-duration="0.5" data-track-index="12" data-volume="0.75" src="assets/sfx/impact/impactGeneric_light_000.ogg"></audio>
+      <audio id="d1" data-start="9.56" data-duration="0.4" data-track-index="11" data-volume="0.45" src="assets/sfx/interface/drop_001.ogg"></audio>
+      <audio id="d2" data-start="10.1" data-duration="0.4" data-track-index="12" data-volume="0.45" src="assets/sfx/interface/drop_001.ogg"></audio>
+      <audio id="d3" data-start="10.65" data-duration="0.4" data-track-index="11" data-volume="0.45" src="assets/sfx/interface/drop_001.ogg"></audio>
+      <audio id="d4" data-start="11.2" data-duration="0.4" data-track-index="12" data-volume="0.45" src="assets/sfx/interface/drop_001.ogg"></audio>
+      <audio id="x9" data-start="11.46" data-duration="1.4" data-track-index="13" data-volume="0.6" src="assets/sfx/impact/impactBell_heavy_000.ogg"></audio>
+      <audio id="x10" data-start="14.73" data-duration="0.8" data-track-index="11" data-volume="0.55" src="assets/sfx/impact/impactSoft_medium_001.ogg"></audio>
+      <audio id="x11" data-start="15.55" data-duration="1.5" data-track-index="13" data-volume="0.6" src="assets/sfx/impact/impactBell_heavy_000.ogg"></audio>
+    </div>
+
+    <script src="assets/qr-inline.js"></script>
+    <script src="assets/kit.js"></script>
+    <script>
+      const { b, phone, custHome, overview, confetti, MARK } = K;
+      const S = 1.04; // split phone scale → 430 × 903
+
+      /* ---- customer phone: camera, join, home ---- */
+      const camV = `<div class="view cam" id="Acam" data-layout-allow-occlusion><div class="vf"><i></i><i></i><i></i><i></i></div><p>Point at the counter poster</p></div>`;
+      const joinV = `<div class="view join" id="Ajoin" data-layout-allow-occlusion>${MARK()}<h2>Join Corner Coffee</h2><p>Enter your phone number to start your loyalty card.</p><p class="f">Phone number</p><div class="in" id="Ain">${[..."+60 11-5449 9772"].map((c) => `<span>${c === " " ? "&nbsp;" : c}</span>`).join("")}</div><div class="a-btn pandan">Send code</div></div>`;
+      document.getElementById("phA").outerHTML = phone("phA", 80, 590, S, custHome("A") + joinV + camV + `<div class="flash" id="Aflash"></div>`);
+
+      /* ---- owner phone: overview + top regulars ---- */
+      const rows = [
+        { n: "Priya Nair", d: "27 Sept, 12:50 am · scanned", a: "RM 14.00", slot: 0 },
+        { n: "Tan Ming Wei", d: "27 Sept, 12:50 am · scanned", a: "RM 4.00", slot: 1 },
+        { n: "Aisyah binti Yusof", d: "27 Sept, 12:50 am · scanned", a: "RM 16.00", slot: 2 },
+        { n: "Priya Nair", d: "27 Sept, 12:49 am · scanned", a: "RM 8.50", slot: 3 },
+        { n: "Tan Ming Wei", d: "27 Sept, 12:49 am · scanned", a: "RM 12.50", slot: 4 },
+        { n: "Aisyah binti Yusof", d: "27 Sept, 12:49 am · scanned", a: "RM 4.00", slot: 5 },
+        { n: "Mark Avon", d: "27 Sept, 8:02 am · scanned", a: "RM 14.00", slot: -1, cls: "new" },
+      ];
+      const regs = [["Tan Ming Wei", "8 visits"], ["Aisyah binti Yusof", "7 visits"], ["Priya Nair", "5 visits"], ["Mei Lin", "3 visits"]];
+      const markVisits = [1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => `<span id="mv${n}">${n} ${n === 1 ? "visit" : "visits"}</span>`).join("");
+      const regV = `<div class="view" id="Breg" data-layout-allow-occlusion><div class="o-top"><span class="hb"><i></i></span>${MARK("#0F3D32", 7)}<b>Corner Coffee</b></div><div class="o-pad"><p class="rg-h">Reports</p><p class="o-sub">The numbers that show loyalty working.</p><div class="rg-card"><div class="lh">Your top regulars</div><div class="rg-rows">
+        ${regs.map((r, i) => `<div class="rg" id="rg${i}" style="top:0"><span class="n" id="rgn${i}">${i + 1}</span><b>${r[0]}</b><em><span style="opacity:1">${r[1]}</span></em></div>`).join("")}
+        <div class="rg me" id="rgM" style="top:0"><span class="n" id="rgnM">5</span><b>Mark Avon</b><em>${markVisits}</em></div>
+        <div id="rgring"></div></div></div></div></div>`;
+      document.getElementById("phB").outerHTML = phone("phB", 570, 590, S, overview("B", rows) + regV);
+
+      K.fillQR();
+
+      /* ---- timeline ---- */
+      const tl = gsap.timeline({ paused: true });
+      const M = K.motion(tl);
+      const H = 58; // regulars row height
+
+      // initial states (set in the timeline, not CSS, so GSAP owns the transforms)
+      tl.set("#Asheet", { y: 420 }, 0);
+      ["#Ajoin", "#Acam"].forEach((s) => tl.set(s, { opacity: 0 }, 0));
+      tl.set(["#Bt0", "#Bm0", "#Bn0", "#Bw0"], { opacity: 1 }, 0);
+      tl.set("#Am0", { opacity: 1 }, 0);
+      tl.set("#Breg", { x: 420 }, 0);
+      tl.set("#Brow6", { y: -55 }, 0);
+      [0, 1, 2, 3].forEach((i) => tl.set(`#rg${i}`, { y: i * H }, 0));
+      tl.set("#rgM", { y: 4 * H }, 0); tl.set("#mv1", { opacity: 1 }, 0);
+      tl.set("#arcp", { strokeDasharray: 700, strokeDashoffset: 700, opacity: 0 }, 0);
+      tl.set("#arcdot", { opacity: 0 }, 0);
+
+      M.tag("KEMBALI · 01 / 03", 0.1);
+
+      /* Hook 0–3.27: three cards land in a pile, then gravity takes them. */
+      M.say("Another paper <i>stamp card?</i>", 0.25);
+      [["#pc1", -150, -40, -14], ["#pc2", 120, -10, 9], ["#pc3", -10, 40, -3]].forEach(([id, x, y, r], i) => {
+        tl.fromTo(id, { opacity: 1, x: x * 2.4, y: -700, rotate: r * 3 }, { opacity: 1, x, y, rotate: r, duration: 0.5, ease: "power3.out", immediateRender: false }, b(1 + i) - 0.3);
+        tl.to(id, { y: y + 8, duration: 0.06 }, b(1 + i)).to(id, { y, duration: 0.3, ease: "elastic.out(1, 0.5)" }, b(1 + i) + 0.06);
+      });
+      M.say("Not <i>this time.</i>", b(4));
+      [["#pc1", -260, 1300, -70], ["#pc2", 240, 1350, 60], ["#pc3", 30, 1400, -25]].forEach(([id, x, y, r], i) => {
+        tl.to(id, { x: `+=${x}`, y: `+=${y}`, rotate: r, duration: 0.7, ease: "power2.in" }, b(4) + 0.08 * i);
+      });
+
+      /* Iris into the counter. */
+      M.iris(b(5), (t) => { tl.set("#phA", { opacity: 1 }, t); });
+      tl.set("#phA", { opacity: 0 }, 0);
+
+      /* Join 3.82–6.56: poster → QR flies into the camera → number → card */
+      M.say("Scan the <i>poster.</i>", b(6));
+      tl.fromTo("#poster", { opacity: 0, x: 60 }, { opacity: 1, x: 0, duration: 0.5, ease: "power3.out", immediateRender: false }, b(6));
+      tl.fromTo("#phA", { y: 700 }, { y: 0, duration: 0.6, ease: "power3.out", immediateRender: false }, b(6) + 0.05);
+      tl.set("#Acam", { opacity: 1 }, b(6));
+      // shared-element flight: poster QR → phone viewfinder
+      tl.set("#flyqr", { opacity: 1, x: 0, y: 0, scale: 1 }, b(7));
+      tl.to("#flyqr", { x: -482, y: 26, scale: 250 * S / 280, duration: 0.5, ease: "power3.inOut" }, b(7));
+      tl.to("#poster .q", { opacity: 0.25, duration: 0.2 }, b(7));
+      tl.to("#flyqr", { opacity: 0, duration: 0.12 }, b(7) + 0.5);
+      tl.fromTo("#Aflash", { opacity: 0.95 }, { opacity: 0, duration: 0.3, ease: "power1.out", immediateRender: false }, b(7) + 0.46);
+      tl.set("#Acam", { opacity: 0 }, b(7) + 0.46); tl.set("#Ajoin", { opacity: 1 }, b(7) + 0.46);
+      tl.set("#Ahome", { visibility: "hidden" }, 0); tl.set("#Ahome", { visibility: "visible" }, b(9) + 0.2); tl.set("#Ajoin", { visibility: "hidden" }, b(9) + 0.52); tl.set("#Acam", { visibility: "hidden" }, b(7) + 0.47);
+      M.say("Type your <i>number.</i>", b(8));
+      document.querySelectorAll("#Ain span").forEach((s, i) => tl.set(s, { opacity: 1 }, b(8) + 0.06 + i * 0.03));
+      tl.to("#Ajoin", { opacity: 0, x: -60, duration: 0.3, ease: "power2.in" }, b(9) + 0.2);
+      M.say("That's the <i>card.</i>", b(10));
+      M.note("No app to download. No password to remember.", b(10) + 0.1);
+      tl.to("#poster .q", { opacity: 1, duration: 0.2 }, b(10));
+
+      /* Split 6.56: poster out, owner in */
+      M.say("One stamp. <i>Both screens.</i>", b(11));
+      M.note("What your customer sees, and what you see.", b(11) + 0.1);
+      tl.to("#poster", { x: 480, opacity: 0, duration: 0.45, ease: "power3.in" }, b(11) - 0.2);
+      tl.fromTo("#phB", { x: 520, rotate: 6 }, { x: 0, rotate: 0, duration: 0.6, ease: "power3.out", immediateRender: false }, b(11) + 0.1);
+      tl.set("#phB", { x: 520 }, 0);
+      tl.fromTo(["#lblA", "#lblB"], { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.4, stagger: 0.1, immediateRender: false }, b(11) + 0.4);
+
+      /* Visit 1: sheet up, arc across, stamp lands on both */
+      tl.to("#Adim", { opacity: 1, duration: 0.25 }, b(12));
+      tl.to("#Asheet", { y: 0, duration: 0.4, ease: "power3.out" }, b(12));
+      tl.set("#arcp", { opacity: 1 }, b(13));
+      tl.to("#arcp", { strokeDashoffset: 0, duration: 0.32, ease: "power2.inOut" }, b(13));
+      const arcPath = document.getElementById("arcp"), L = arcPath.getTotalLength();
+      const dotAt = (f) => { const pt = arcPath.getPointAtLength(L * f); return { attr: { cx: pt.x, cy: pt.y } }; };
+      tl.set("#arcdot", { opacity: 1, ...dotAt(0) }, b(13));
+      [0.25, 0.5, 0.75, 1].forEach((f, i) => tl.to("#arcdot", { ...dotAt(f), duration: 0.08, ease: "none" }, b(13) + i * 0.08));
+      tl.to(["#arcp", "#arcdot"], { opacity: 0, duration: 0.25 }, b(13) + 0.45);
+      tl.to("#Asheet", { y: 420, duration: 0.35, ease: "power3.in" }, b(13) + 0.1);
+      tl.to("#Adim", { opacity: 0, duration: 0.25 }, b(13) + 0.2);
+      M.stamp("A", 1, b(14));
+      tl.set("#Apts", { innerHTML: "14" }, b(14)); tl.set("#Ai1", { innerHTML: "66 more points to go" }, b(14)); tl.set("#Ai2", { innerHTML: "106 more points to go" }, b(14));
+      // owner: tiles tick, Mark's row slides in at the top
+      [["Bt", 0, 1], ["Bm", 0, 1], ["Bn", 0, 1]].forEach(([id, a, c]) => { tl.set(`#${id}${a}`, { opacity: 0 }, b(14)); tl.fromTo(`#${id}${c}`, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.3, ease: "back.out(2)", immediateRender: false }, b(14)); });
+      for (let i = 0; i < 6; i++) tl.to(`#Brow${i}`, { y: 55, duration: 0.4, ease: "power3.out" }, b(14));
+      tl.to("#Brow6", { y: 55, duration: 0.4, ease: "power3.out" }, b(14));
+      M.note("Stamped for Mark Avon. +14 points.", b(15));
+
+      /* Fast-forward 9.29 → 11.46: eight more visits; Mark climbs the owner's regulars */
+      M.say("Eight visits <i>later.</i>", b(16));
+      M.note("Every visit lands in their card, and in your reports.", b(16) + 0.1);
+      tl.to(["#lblA", "#lblB"], { opacity: 0, duration: 0.2 }, b(16));
+      tl.fromTo("#chip", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)", immediateRender: false }, b(16));
+      tl.to("#Bover", { x: -420, duration: 0.45, ease: "power3.inOut" }, b(16));
+      tl.to("#Breg", { x: 0, duration: 0.45, ease: "power3.inOut" }, b(16));
+      tl.set("#Bover", { visibility: "hidden" }, b(16) + 0.46);
+      const chip = document.getElementById("chip");
+      const pts = [14, 26, 42, 56, 65, 83, 97, 110, 125];
+      const order = [0, 1, 2, 3]; // indices of others above Mark, ranks 1..4
+      let markRank = 5;
+      for (let n = 2; n <= 9; n++) {
+        const t = b(16 + (n - 2) * 0.5 + 0.5);
+        const cs = document.createElement("span"); cs.textContent = `VISIT ${n} OF 9`; chip.appendChild(cs);
+        tl.set(cs, { opacity: 1 }, t); if (n < 9) tl.set(cs, { opacity: 0 }, b(16 + (n - 1) * 0.5 + 0.5));
+        M.stamp("A", n, t);
+        tl.set("#Apts", { innerHTML: String(pts[n - 1]) }, t);
+        tl.set(`#mv${n - 1}`, { opacity: 0 }, t); tl.set(`#mv${n}`, { opacity: 1 }, t);
+        // overtakes: 4 visits passes Mei Lin, 6 Priya, 8 Aisyah, 9 Tan
+        const passes = { 4: 3, 6: 2, 8: 1, 9: 0 }[n];
+        if (passes !== undefined) {
+          markRank -= 1;
+          tl.to("#rgM", { y: (markRank - 1) * H, duration: 0.3, ease: "power3.inOut" }, t);
+          tl.to(`#rg${passes}`, { y: markRank * H, duration: 0.3, ease: "power3.inOut" }, t);
+          tl.set("#rgnM", { innerHTML: String(markRank) }, t + 0.15);
+          tl.set(`#rgn${passes}`, { innerHTML: String(markRank + 1) }, t + 0.15);
+        }
+      }
+      tl.set("#Ai1", { innerHTML: "You have enough points" }, b(18)); tl.set("#Ai1", { className: "ok" }, b(18));
+      tl.set("#Ai2", { innerHTML: "You have enough points" }, b(20)); tl.set("#Ai2", { className: "ok" }, b(20));
+
+      /* Card full 11.46 */
+      tl.set("#rgring", { y: 3 }, 0);
+      tl.fromTo("#rgring", { opacity: 0, scale: 1.08 }, { opacity: 1, scale: 1, duration: 0.3, ease: "power3.out", immediateRender: false }, b(20));
+      tl.to("#Acard", { boxShadow: "0 0 0 4px rgba(217,138,43,0.55), 0 18px 40px rgba(217,138,43,0.35)", duration: 0.35 }, b(20));
+      tl.to("#phA", { y: -10, duration: 0.08 }, b(20)).to("#phA", { y: 0, duration: 0.5, ease: "elastic.out(1, 0.4)" }, b(20) + 0.08);
+      confetti(document.getElementById("fx"), 295, 900, 34, tl, b(20));
+      M.say("Free coffee, <i>earned.</i>", b(21));
+      M.note("Reward earned. Their free item is ready to redeem.", b(21) + 0.1);
+      tl.to("#chip", { opacity: 0, duration: 0.25 }, b(22));
+      tl.fromTo(["#lblA", "#lblB"], { opacity: 0 }, { opacity: 1, duration: 0.3, immediateRender: false }, b(22));
+
+      M.say("Nothing to <i>lose.</i>", b(23));
+      M.note("Nothing to install, either. Just a poster at your counter.", b(23) + 0.1);
+
+      /* Out: iris to the end card */
+      M.iris(b(26), (t) => { tl.set(["#s2 > *"], { opacity: 0 }, t); M.clear(t - 0.05); tl.set(".tag", { opacity: 0 }, t); });
+      M.end(15.45, "JOIN IN ONE SCAN · NOTHING TO INSTALL");
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>

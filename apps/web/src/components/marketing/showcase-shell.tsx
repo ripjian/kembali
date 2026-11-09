@@ -19,7 +19,6 @@ export function ShowcaseShell() {
 
   return (
     <>
-      <canvas id="inkCanvas" aria-hidden />
       <div className="cursor-dot" id="cursorDot" aria-hidden />
     </>
   );

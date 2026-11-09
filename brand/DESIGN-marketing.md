@@ -90,7 +90,7 @@ engine to the pathname. **If you add motion, register its teardown.**
 
 Features initialise only when their elements exist, so one engine serves every
 page: WebGL hero panel (duotone photo, procedural steam, pointer ripple, grain),
-scroll-mapped story ledger, canvas ink stamps on click, roadmap cursor-following
+scroll-mapped story ledger, roadmap cursor-following
 previews, dashboard counters, the join phone demo.
 
 ## 6. Photography

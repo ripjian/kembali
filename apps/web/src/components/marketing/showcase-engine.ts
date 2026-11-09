@@ -78,9 +78,6 @@ void main(){
   outColor = vec4(col, 1.);
 }`;
 
-interface InkStamp {
-  x: number; y: number; rot: number; size: number; seed: number; t: number;
-}
 interface BurstLobe { dx: number; dy: number; rr: number }
 interface BurstPart {
   x: number; y: number; vx: number; vy: number; r: number; o: number;
@@ -699,68 +696,7 @@ export function initShowcase(): () => void {
     }
   }
 
-  /* ---------- ink stamps on click ---------- */
-  const inkCanvas = document.getElementById("inkCanvas") as HTMLCanvasElement | null;
-  const ictx = inkCanvas?.getContext("2d") ?? null;
-  const stamps: InkStamp[] = [];
   const cursorDot = document.getElementById("cursorDot");
-
-  function sizeInk() {
-    if (!inkCanvas) return;
-    inkCanvas.width = innerWidth * devicePixelRatio;
-    inkCanvas.height = innerHeight * devicePixelRatio;
-    inkCanvas.style.width = `${innerWidth}px`;
-    inkCanvas.style.height = `${innerHeight}px`;
-  }
-  sizeInk();
-
-  function drawStamp(s: InkStamp, age: number) {
-    if (!ictx) return;
-    const sy = s.y - scrollY;
-    if (sy < -80 || sy > innerHeight + 80) return;
-    const d = devicePixelRatio;
-    ictx.save();
-    ictx.translate(s.x * d, sy * d);
-    ictx.rotate(s.rot);
-    const pop = age < 0.3 ? 1 + (0.3 - age) * 1.4 : 1;
-    ictx.scale(pop * d, pop * d);
-    ictx.globalAlpha = clamp(age * 6, 0, 0.82);
-    ictx.strokeStyle = "#E0684B";
-    ictx.fillStyle = "#E0684B";
-    ictx.lineWidth = s.size * 0.18;
-    ictx.beginPath();
-    ictx.arc(0, 0, s.size * 0.68, s.seed, s.seed + Math.PI * 1.86);
-    ictx.stroke();
-    ictx.beginPath();
-    ictx.arc(0, 0, s.size * 0.26, 0, 7);
-    ictx.fill();
-    ictx.restore();
-  }
-  function drawInks(now: number) {
-    if (!ictx || !inkCanvas) return;
-    ictx.clearRect(0, 0, inkCanvas.width, inkCanvas.height);
-    for (const s of stamps) drawStamp(s, (now - s.t) / 1000);
-  }
-  if (ictx) {
-    on(window, "pointerdown", ((e: PointerEvent) => {
-      const el = e.target as HTMLElement;
-      if (el.closest("a, button, input, .btn, .chip-cta, .topnav")) return;
-      if (!el.closest(".sc-root")) return; // only stamp our own surface
-      stamps.push({
-        x: e.clientX,
-        y: e.clientY + scrollY,
-        rot: (Math.random() - 0.5) * 0.5,
-        size: 22 + Math.random() * 10,
-        seed: Math.random() * Math.PI * 2,
-        t: performance.now(),
-      });
-      if (stamps.length > 60) stamps.shift();
-      if (cursorDot) {
-        cursorDot.classList.add("press");
-        timer(setTimeout(() => cursorDot.classList.remove("press"), 180));
-      }
-    }) as EventListener);
-  }
 
   /* ---------- cursor ---------- */
   let cx = -100, cy = -100, cxs = -100, cys = -100;
@@ -848,7 +784,6 @@ export function initShowcase(): () => void {
     runParallax();
     kineticReward();
     drawBurst(now);
-    drawInks(now);
 
     if (finePointer && !reduceMotion && cursorDot) {
       cxs = lerp(cxs, cx, 0.3);
@@ -868,7 +803,6 @@ export function initShowcase(): () => void {
 
   on(window, "resize", () => {
     sizeHero();
-    sizeInk();
     measureParallax();
     if (glReady) drawHero(performance.now() / 1000);
   });

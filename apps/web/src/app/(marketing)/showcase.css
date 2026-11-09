@@ -944,8 +944,7 @@
 .hud-count { font-size: 10px; color: var(--sand-muted); letter-spacing: .14em; }
 .hud.complete .hud-count { color: var(--coral); }
 
-/* ink + cursor */
-#inkCanvas { position: fixed; inset: 0; z-index: 30; pointer-events: none; width: 100%; height: 100%; }
+/* cursor */
 .cursor-dot {
   position: fixed; z-index: 50; pointer-events: none;
   width: 14px; height: 14px; border-radius: 50%;
@@ -955,7 +954,6 @@
   opacity: 0;
 }
 .sc-root.has-cursor .cursor-dot { opacity: 1; }
-.cursor-dot.press { background: color-mix(in srgb, var(--coral) 55%, transparent); width: 26px; height: 26px; }
 
 /* ============================================================
    Responsive
